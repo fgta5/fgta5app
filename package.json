@@ -1,0 +1,24 @@
+{
+  "name": "fgta5app",
+  "version": "1.0.0",
+  "description": "fgta5 application",
+  "type": "module",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node .",
+    "debug": "node . --debug"
+  },
+  "author": "agung nugroho",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "multer": "^2.0.1",
+    "serve-favicon": "^2.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github-personal:fgta5/fgta5app.git"
+  }
+}

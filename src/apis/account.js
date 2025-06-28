@@ -1,38 +1,13 @@
-class Api {
-	#req
-	#res
-	#next
+import Api from './../api.js'
 
-	constructor(req, res, next) {
-		this.#req = req
-		this.#res = res
-		this.#next = next
-	}
-
-	get req() { return this.#req }
-	get res() { return this.#res }
-	get next() { return this.#next }
-
-	async handleRequest(methodName, body) {
-		if (typeof this[methodName] === 'function') {
-			const result = await this[methodName](body)
-			const response = JSON.stringify(result)
-			return response 
-		} else {
-			this.res.status(404).send(`Method "${methodName}" tidak ditemukan.`)
-		}
-	}
-}
-
-
-
-export default class AccountApi extends Api {
+// api: account
+export default class extends Api {
 	constructor(req, res, next) {
 		super(req, res, next);
 	}
 
 	async list(body) {
-		return await api_list(this, body)
+		return await list(this, body)
 	}
 
 	async upload(body) {
@@ -45,7 +20,7 @@ export default class AccountApi extends Api {
 }
 
 
-async function api_list(self, body) {
+async function list(self, body) {
 	const { searchtext='', limit=0, offset=0, sort={} } = body
 	const userSort = sort ?? {}
 
@@ -55,9 +30,7 @@ async function api_list(self, body) {
 	} else {
 		rawdata = data.persons
 	}
-	
-	//console.log(sort)
-	// sort hasilnya
+
 	var hasil = [...rawdata]
 	if (Object.keys(userSort).length>0) {
 		dynamicSort(hasil, userSort)

@@ -6,15 +6,23 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node .",
-    "debug": "node . --debug"
+    "debug": "node . --debug",
+    "redis": "docker run -d -p 6379:6379 --name redis redis",
+    "redis-monitor": "docker exec -it redis redis-cli MONITOR"
   },
   "author": "agung nugroho",
   "license": "ISC",
   "dependencies": {
+    "connect-redis": "^9.0.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
+    "express-session": "^1.18.1",
     "multer": "^2.0.1",
+    "pg": "^8.16.2",
+    "pg-promise": "^11.14.0",
+    "redis": "^5.5.6",
     "serve-favicon": "^2.5.0"
   },
   "repository": {

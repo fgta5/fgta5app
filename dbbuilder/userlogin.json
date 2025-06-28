@@ -1,0 +1,16 @@
+{
+	"tablename" : "core.userlogin",
+	"primarykey" : "userlogin_id",
+	"fields" : {
+		"userlogin_id" : {"type": "auto"},
+		"user_id" : {"type": "bigint", "allownull":false, "ref_table" : "core.user", "ref_id":"user_id"},
+		"userlogin_username" : {"type": "text", "description":"usename yang diinput untuk login"},
+		"_createby" : {"type": "bigint", "allownull":true, "defaultvalue":"", "description":"",  "ref_table":"core.user", "ref_id":"user_id", "imutable":true},
+		"_createdate" : {"type": "timestamp", "allownull":false, "defaultvalue":"", "description":""},
+		"_modifyby" : {"type": "bigint", "allownull":true, "defaultvalue":"", "description":"",  "ref_table":"core.user", "ref_id":"user_id"},
+		"_modifydate" : {"type": "timestamp", "allownull":true, "defaultvalue":"", "description":""}
+	},
+	"uniques" : {
+		"userlogin_username" : ["userlogin_username"]
+	}
+}

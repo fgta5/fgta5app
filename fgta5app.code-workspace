@@ -15,20 +15,26 @@
 		"version": "0.2.0",
 		"configurations": [
 			{
+				"name": "1. debug server",
 				"command": "npm run debug",
-				"name": "debug server",
 				"request": "launch",
 				"type": "node-terminal"
 			},
 			{
-				"name": "Chrome",
+				"name": "2. Chrome",
 				"request": "launch",
 				"type": "chrome",
 				"url": "http://localhost:3000",
 				"webRoot": "${workspaceFolder}",
 				"userDataDir": "${workspaceFolder}/.vscode/chrome-profile"
 
-			}
+			},
+			{
+				"name": "3. dbbuild",
+				"command": "node  src/dbbuild.js -i user",
+				"request": "launch",
+				"type": "node-terminal"
+			},
 		]
 	}
 }

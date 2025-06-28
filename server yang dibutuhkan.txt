@@ -1,0 +1,31 @@
+
+
+
+
+docker run -d --name fgta5-redis \
+-p 6379:6379 \
+redis:7-alpine
+
+docker run -d --name fgta5-timescaledb -p 5433:5432 \
+-e POSTGRES_USER=agung \
+-e POSTGRES_PASSWORD=rahasia \
+-e POSTGRES_DB=fgta5log \
+-v fgta5_timescale_data:/var/lib/postgresql/data \
+timescale/timescaledb:2.20.3-pg16
+
+
+docker run -d --name fgta5-postgres -p 5432:5432 \
+-e POSTGRES_USER=agung \
+-e POSTGRES_PASSWORD=rahasia \
+-e POSTGRES_DB=fgta5 \
+-v fgta5_postgres_data:/var/lib/postgresql/data \
+postgres:16
+
+
+docker run -d --name fgta5-minio -p 9000:9000 -p 9001:9001 \
+-e "MINIO_ROOT_USER=minioadmin" \
+-e "MINIO_ROOT_PASSWORD=rahasia123#" \
+-v fgta5_minio_data:/data \
+minio/minio:RELEASE.2025-02-07T23-21-09Z \
+server /data \
+--console-address ":9001"

@@ -14,13 +14,20 @@ export default class Api {
 	get next() { return this.#next }
 
 	async handleRequest(methodName, body) {
-		if (typeof this[methodName] === 'function') {
-			const result = await this[methodName](body)
-			const response = JSON.stringify(result)
-			return response 
-		} else {
-			this.res.status(404).send(`Method "${methodName}" tidak ditemukan.`)
+		try {
+			if (typeof this[methodName] === 'function') {
+				const result = await this[methodName](body)
+				return result 
+			} else {
+				const errNotFound = new Error(`Method "${methodName}" tidak ditemukan.`)
+				errNotFound.code = 404 
+				throw errNotFound
+			}
+		} catch (err) {
+			throw err
 		}
+
+		
 	}
 }
 

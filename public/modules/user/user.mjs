@@ -1,20 +1,26 @@
-import Module from './../module.mjs'
-
-const app = new $fgta5.Application('user')
+import userBase from './user-base.mjs'
 
 
-export default class extends Module {
+const fnRegistry = {}
+
+export default class extends userBase {
 	async main(args) {
-		await render(this)
+		await super.main(args)
 		await main(this, args)
+	}
+
+	getFunction(functionname) {
+		return fnRegistry[functionname]
 	}
 }
 
 
-async function render(self) {
-
+async function main(self, args) {
+	
 }
 
-async function main(self, args) {
-	app.SetTitle('User')
+async function userHeaderNew(self) {
+	return {
+		user_fullname: 'Agung Nugroho DW'
+	}
 }

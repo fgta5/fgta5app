@@ -7,13 +7,14 @@ const Carousell = $fgta5.SectionCarousell
 const currentUrlDir = 'public/modules/user'
 const MOD = {
 	SECTION: {
-		HEADERLIST : 'userHeaderList',
-		HEADEREDIT : 'userHeaderEdit',
+		HEADERLIST : 'sec_headerList',
+		HEADEREDIT : 'sec_headerEdit',
 	},
-	userHeaderList: document.getElementById('userHeaderList'),
-	userHeaderEdit: document.getElementById('userHeaderEdit'),
+	
 
-	userHeaderEditForm: null // disini belum ada karena halaman belum di fetch
+	// disini belum ada karena halaman belum di fetch
+	tbl_userHeader: null,
+	frm_userHeader: null 
 }
 
 export default class userBase extends Module {
@@ -25,25 +26,28 @@ export default class userBase extends Module {
 		app.SetTitle('User')
 		await render(this)
 
+		userHeaderEdit.init(this)
 		userHeaderEdit.handleHeaderEvents(this)
-	}
 
-	async btnHeaderNew_click(evt) { await userHeaderEdit.btnHeaderNew_click(this, evt) }
-	async btnHeaderSave_click(evt) { await userHeaderEdit.btnHeaderSave_click(this, evt) }
-	async btnHeaderDelete_click(evt) { await userHeaderEdit.btnHeaderDelete_click(this, evt) }
-	async btnHeaderEdit_click(evt) { await userHeaderEdit.btnHeaderEdit_click(this, evt) }
+		userHeaderList.init(this)
+		userHeaderList.handleGridEvents(this)
+		userHeaderList.loadData(this)
+	}
 }
 
 async function render(self) {
 	// inlcude halaman
-	const [headerList, headerEdit] = await Promise.all([
+	const sec_headerList = document.getElementById('sec_headerList')
+	const sec_headerEdit = document.getElementById('sec_headerEdit')
+	const [headerListContent, headerEditContent] = await Promise.all([
 		Module.GetContent(`${currentUrlDir}/userHeaderList.html`),
 		Module.GetContent(`${currentUrlDir}/userHeaderEdit.html`),
 	]);
-	MOD.userHeaderList.innerHTML = headerList
-	MOD.userHeaderEdit.innerHTML = headerEdit
+	sec_headerList.innerHTML = headerListContent
+	sec_headerEdit.innerHTML = headerEditContent
 
-	MOD.userHeaderEditForm = new $fgta5.Form('userHeaderEditForm');
+	MOD.tbl_userHeader = new $fgta5.Gridview('tbl_userHeader')
+	MOD.frm_userHeader = new $fgta5.Form('frm_userHeader');
 
 	setupCarousell(self)
 }

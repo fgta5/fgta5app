@@ -5,53 +5,64 @@ const TitleWhenNew = 'New User'
 const TitleWhenView = 'View User'
 const TitleWhenEdit = 'Edit User'
 
+const FN_userHeaderNew = 'userHeaderNew'
+const FN_userHeaderSaved = 'userHeaderSaved'
+const FN_userHeaderSaving = 'userHeaderSaving'
 
+
+const ME = {}
 let lastNewDataInit = null
+
+export function init(self) {
+	const MOD = self.MOD
+	ME.frm = MOD.frm_userHeader
+	ME.allButtonNew = document.getElementsByName('button-header-new')
+	ME.allButtonSave = document.getElementsByName('button-header-save')
+	ME.allButtonDelete = document.getElementsByName('button-header-delete')
+	ME.allButtonEdit = document.getElementsByName('button-header-edit')
+	ME.allButtonReset = document.getElementsByName('button-header-reset')
+
+}
 
 
 export function handleHeaderEvents(self) {
 	const MOD = self.MOD
-	const allButtonsHeaderNew = document.getElementsByName('button-header-new')
-	const allButtonsHeaderSave = document.getElementsByName('button-header-save')
-	const allButtonsHeaderDelete = document.getElementsByName('button-header-delete')
-	const allButtonsHeaderEdit = document.getElementsByName('button-header-edit')
-	const allButtonsHeaderReset = document.getElementsByName('button-header-reset')
-
-
-	allButtonsHeaderNew.forEach(btn => {
+	const frm = ME.frm
+	
+	ME.allButtonNew.forEach(btn => {
 		btn.addEventListener('click', (evt)=>{
-			btnHeaderNew_click(self, evt)
+			btnNew_click(self, evt)
 		})
 	});
 
-	allButtonsHeaderSave.forEach(btn => {
+	ME.allButtonSave.forEach(btn => {
 		btn.addEventListener('click', (evt)=>{
-			btnHeaderSave_click(self, evt)
+			btnSave_click(self, evt)
 		})
 	});
 
-	allButtonsHeaderDelete.forEach(btn => {
+	ME.allButtonDelete.forEach(btn => {
 		btn.addEventListener('click', (evt)=>{
-			btnHeaderDelete_click(self, evt)
+			btnDelete_click(self, evt)
 		})
 	});
 
-	allButtonsHeaderEdit.forEach(btn => {
+	ME.allButtonEdit.forEach(btn => {
 		btn.addEventListener('click', (evt)=>{
-			btnHeaderEdit_click(self, evt)
+			btnEdit_click(self, evt)
 		})
 	});
 
-	allButtonsHeaderReset.forEach(btn => {
+	ME.allButtonReset.forEach(btn => {
 		btn.addEventListener('click', (evt)=>{
-			btnHeaderReset_click(self, evt)
+			btnReset_click(self, evt)
 		})
 	});
 
 	MOD.Crsl.Items[MOD.SECTION.HEADEREDIT].addEventListener(Section.EVT_BACKBUTTONCLICK, async (evt)=>{
 		// cek apakah ada perubahan data
 		let goback = false
-		if (MOD.userHeaderEditForm.IsChanged()) {
+		if (frm.IsChanged()) {
 			var ret = await $fgta5.MessageBox.Confirm(Module.BACK_CONFIRM)
 			if (ret=='ok') {
 				goback = true
@@ -61,36 +72,38 @@ export function handleHeaderEvents(self) {
 		}
 
 		if (goback) {
-			MOD.userHeaderEditForm.Reset()
+			frm.Reset()
 			evt.detail.fn_ShowNextSection()
 		}
 	})
 
-	MOD.userHeaderEditForm.addEventListener('locked', (evt) => { userHeaderEditForm_locked(self, evt) });
-	MOD.userHeaderEditForm.addEventListener('unlocked', (evt) => { userHeaderEditForm_unlocked(self, evt) });
-	MOD.userHeaderEditForm.Render()
+	frm.addEventListener('locked', (evt) => { frm_locked(self, evt) });
+	frm.addEventListener('unlocked', (evt) => { frm_unlocked(self, evt) });
+	frm.Render()
 }
 
 
-export async function  userHeaderEditForm_locked(self, evt) {
+export async function  frm_locked(self, evt) {
 	const MOD = self.MOD
 	MOD.Crsl.Items[MOD.SECTION.HEADEREDIT].Title = TitleWhenView
 }
 
-export async function  userHeaderEditForm_unlocked(self, evt) {
+export async function  frm_unlocked(self, evt) {
 	const MOD = self.MOD
-	if (MOD.userHeaderEditForm.IsNew()) {
+	const frm = ME.frm
+	if (frm.IsNew()) {
 		MOD.Crsl.Items[MOD.SECTION.HEADEREDIT].Title = TitleWhenNew
 	} else {
 		MOD.Crsl.Items[MOD.SECTION.HEADEREDIT].Title = TitleWhenEdit
 	}
 }
 
-export async function btnHeaderNew_click(self, evt) {
+export async function btnNew_click(self, evt) {
 	const MOD = self.MOD
+	const frm = ME.frm
 
 	let cancel_new = false
-	if (MOD.userHeaderEditForm.IsChanged()) {
+	if (frm.IsChanged()) {
 		var ret = await $fgta5.MessageBox.Confirm(Module.NEWDATA_CONFIRM)
 		if (ret=='cancel') {
 			cancel_new = true
@@ -102,9 +115,9 @@ export async function btnHeaderNew_click(self, evt) {
 	}
 
 	// setup id
-	const autoid = MOD.userHeaderEditForm.AutoID
-	const primarykey = MOD.userHeaderEditForm.PrimaryKey
-	const obj_pk = MOD.userHeaderEditForm.Inputs[primarykey]
+	const autoid = frm.AutoID
+	const primarykey = frm.PrimaryKey
+	const obj_pk = frm.Inputs[primarykey]
 	const el = document.getElementById(primarykey)
 	if (autoid) {
 		obj_pk.Disabled = true
@@ -123,41 +136,72 @@ export async function btnHeaderNew_click(self, evt) {
 
 	// kalau perlu munculkan dialog disini
 	let newDataInit = {}
-	const fn_dialogNew = self.getFunction('userHeaderNew')
+	const fn_dialogNew = self.getFunction(FN_userHeaderNew)
 	if (typeof fn_dialogNew==='function') {
 		newDataInit = await fn_dialogNew(self)
 	}
 
-	MOD.userHeaderEditForm.NewData(newDataInit)
-	MOD.userHeaderEditForm.Lock(false)
+	frm.NewData(newDataInit)
+	frm.Lock(false)
 	
 	lastNewDataInit = newDataInit
 }
 
-export async function btnHeaderSave_click(self, evt) {
-	const MOD = self.MOD
+
+
+
+export async function btnSave_click(self, evt) {
+	const frm = ME.frm
+
+	// cek dulu apakah ada error
 	
 
+
+	const args = {}
+	const fn_saving = self.getFunction(FN_userHeaderSaving)
+	if (typeof fn_saving==='function') {
+		await fn_saved(self, frm, args)
+	}
+
+	if (args.Cancel==='true') {
+		return
+	}
+
+
+	let result
+	if (args.Handled!==true) {
+		const data = frm.GetData()
+		result = await SaveData(data)
+	}
+
 	const newid = '12345'
-
-
+	const fn_saved = self.getFunction(FN_userHeaderSaved)
+	if (typeof fn_saved==='function') {
+		await fn_saved(self, frm)
+	}
 
 	// saat sudah berhasil save, set ID menjadi disabled	
-	const autoid = MOD.userHeaderEditForm.AutoID
-	const primarykey = MOD.userHeaderEditForm.PrimaryKey
-	const obj_pk = MOD.userHeaderEditForm.Inputs[primarykey]
+	const autoid = frm.AutoID
+	const primarykey = frm.PrimaryKey
+	const obj_pk = frm.Inputs[primarykey]
 	if (!autoid) {
 		obj_pk.Disabled = true
 	} else {
 		obj_pk.Value = newid
 	}
 
-	MOD.userHeaderEditForm.AcceptChanges()
+
+
+
+	frm.AcceptChanges()
 
 }
 
-export async function btnHeaderDelete_click(self, evt) {
-	const MOD = self.MOD
+
+
+
+export async function btnDelete_click(self, evt) {
+	const frm = ME.frm
 
 	let cancel_delete = false
 	var ret = await $fgta5.MessageBox.Confirm(Module.DELETE_CONFIRM)
@@ -167,12 +211,12 @@ export async function btnHeaderDelete_click(self, evt) {
 
 
 	let delete_success = false
-	if (MOD.userHeaderEditForm.IsNew()) {
-		MOD.userHeaderEditForm.Reset()
+	if (frm.IsNew()) {
+		frm.Reset()
 		delete_success = true
 	} else {
-		if (MOD.userHeaderEditForm.IsChanged()) {
-			MOD.userHeaderEditForm.Reset()
+		if (frm.IsChanged()) {
+			frm.Reset()
 		}
 
 		// call api delete
@@ -185,27 +229,26 @@ export async function btnHeaderDelete_click(self, evt) {
 
 }
 
-export async function btnHeaderEdit_click(self, evt) {
-	const MOD = self.MOD
-	if (MOD.userHeaderEditForm.IsLocked()) {
+export async function btnEdit_click(self, evt) {
+	const frm = ME.frm
+
+	if (frm.IsLocked()) {
 		// user mau inlock
-		console.log('mau unlock')
-		MOD.userHeaderEditForm.Lock(false)
+		frm.Lock(false)
 	} else {
-		console.log('mau lock')
- 		if (MOD.userHeaderEditForm.IsChanged() || MOD.userHeaderEditForm.IsNew()) {
+ 		if (frm.IsChanged() || frm.IsNew()) {
 			await $fgta5.MessageBox.Warning(Module.EDIT_WARNING)
 			return
 		}
-		MOD.userHeaderEditForm.Lock(true)
+		frm.Lock(true)
 	}
 }
 
-export async function btnHeaderReset_click(self, evt) {
-	const MOD = self.MOD
+export async function btnReset_click(self, evt) {
+	const frm = ME.frm
 
 	let cancel_reset = false
-	if (MOD.userHeaderEditForm.IsChanged()) {
+	if (frm.IsChanged()) {
 		var ret = await $fgta5.MessageBox.Confirm(Module.RESET_CONFIRM)
 		if (ret=='cancel') {
 			cancel_reset = true
@@ -216,10 +259,10 @@ export async function btnHeaderReset_click(self, evt) {
 		return
 	}
 	
-	if (MOD.userHeaderEditForm.IsNew()) {
-		MOD.userHeaderEditForm.NewData(lastNewDataInit)
+	if (frm.IsNew()) {
+		frm.NewData(lastNewDataInit)
 	} else {
-		MOD.userHeaderEditForm.Reset()
+		frm.Reset()
 	}
 }
 
@@ -228,3 +271,8 @@ function backToList(self) {
 	const MOD = self.MOD
 	MOD.Crsl.Items[MOD.SECTION.HEADERLIST].Show()
 }
+
+async function SaveData() {
+
+}
+

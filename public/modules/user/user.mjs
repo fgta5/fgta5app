@@ -4,7 +4,9 @@ import userBase from './user-base.mjs'
 const fnRegistry = {}
 
 export default class extends userBase {
-	async main(args) {
+	async main(args={}) {
+		args.customcontent = 'user-customcontent.html'
+
 		await super.main(args)
 		await main(this, args)
 	}

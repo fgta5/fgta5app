@@ -35,6 +35,12 @@
 				"request": "launch",
 				"type": "node-terminal"
 			},
+			{
+				"name": "4. test",
+				"command": "node  src/dev-list.js",
+				"request": "launch",
+				"type": "node-terminal"
+			},
 		]
 	}
 }

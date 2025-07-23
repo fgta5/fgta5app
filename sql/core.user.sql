@@ -137,6 +137,30 @@ ALTER TABLE core."user" DROP CONSTRAINT user_password;
 
 
 
+-- **** group_id *******************************************
+
+-- ADD Column
+
+		ALTER TABLE core."user" ADD group_id integer NULL ;
+		COMMENT ON COLUMN core."user".group_id IS '';
+	
+-- MODIFY Column
+
+		ALTER TABLE core."user" 
+			ALTER COLUMN group_id TYPE integer,
+			ALTER COLUMN group_id DROP DEFAULT,
+			ALTER COLUMN group_id DROP NOT NULL;
+		COMMENT ON COLUMN core."user".group_id IS '';
+	
+
+-- Foreign Key Constraint
+
+
+-- Remove Constraint if Available
+ALTER TABLE core."user" DROP CONSTRAINT group_id;
+
+
+
 -- **** _createby *******************************************
 
 -- ADD Column

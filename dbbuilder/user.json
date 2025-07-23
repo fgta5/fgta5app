@@ -9,6 +9,7 @@
 		"user_isdisabled" : {"type": "boolean", "allownull":false, "defaultvalue":"false", "description":""},
 		"user_email" : {"type": "text"},
 		"user_password" : {"type": "text", "description":"password user terenkripsi"},
+		"group_id" : {"type": "integer"},
 		"_createby" : {"type": "bigint", "allownull":true, "defaultvalue":"", "description":"", "ref_table":"core.user", "ref_id":"user_id", "imutable":true},
 		"_createdate" : {"type": "timestamp", "allownull":false, "defaultvalue":"", "description":"", "imutable":true},
 		"_modifyby" : {"type": "bigint", "allownull":true, "defaultvalue":"", "description":"", "ref_table":"core.user", "ref_id":"user_id"},

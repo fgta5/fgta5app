@@ -26,12 +26,11 @@ export default class userBase extends Module {
 		app.SetTitle('User')
 		await render(this, args)
 
-		userHeaderEdit.init(this)
-		userHeaderEdit.handleHeaderEvents(this)
-
-		userHeaderList.init(this)
-		userHeaderList.handleGridEvents(this)
+		await userHeaderEdit.init(this)
+		await userHeaderList.init(this)
+	
 		userHeaderList.loadData(this)
+	
 	}
 }
 // args.customcontent!==undefined ? Module.GetContent(`${currentUrlDir}/user-customcontent.html`) :
@@ -43,21 +42,22 @@ async function render(self, args) {
 	const [customcontent, headerListContent, headerEditContent] = await Promise.all([
 		args.customcontent===undefined ? (()=>{return ''})() : Module.GetContent(`${currentUrlDir}/user-customcontent.html`),
 		Module.GetContent(`${currentUrlDir}/userHeaderList.html`),
-		Module.GetContent(`${currentUrlDir}/userHeaderEdit.html`),
+		// Module.GetContent(`${currentUrlDir}/userHeaderEdit.html`),
 	]);
 	sec_headerList.innerHTML = headerListContent
-	sec_headerEdit.innerHTML = headerEditContent
+	// sec_headerEdit.innerHTML = headerEditContent
 
 	MOD.tbl_userHeader = new $fgta5.Gridview('tbl_userHeader')
-	MOD.frm_userHeader = new $fgta5.Form('frm_userHeader');
+	// MOD.frm_userHeader = new $fgta5.Form('frm_userHeader');
 
 
 	document.getElementById('customcontent').innerHTML = customcontent
 
+
 	setupCarousell(self)
 
-	const searchtext = new $fgta5.Textbox('obj_searchtext')
-	const searchkota = new $fgta5.Combobox('obj_kota')
+	
+
 }
 
 
@@ -78,7 +78,5 @@ async function setupCarousell(self) {
 			};
 		}, 500)
 	})
-
-	
 }
 

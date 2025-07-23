@@ -20,11 +20,20 @@ async function headerlist(self, body) {
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
 	const searchMap = {
 		searchtext: `user_fullname ILIKE '%' || \${searchtext} || '%' OR user_id=try_cast_bigint(\${searchtext}, 0)`,
+		searchgroup: `group_id = \${searchgroup}`,
 		user_isdisabled: `user_isdisabled = \${user_isdisabled}`
 	};
 
 	try {
 	
+		// hilangkan criteria '' atau null
+		for (var cname in criteria) {
+			if (criteria[cname]==='' || criteria[cname]===null) {
+				delete criteria[cname]
+			}
+		}
+
+
 		var max_rows = limit==0 ? 10 : limit
 		const tablename = 'core."user"'
 		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
@@ -52,6 +61,7 @@ async function headerlist(self, body) {
 			nextoffset: nextoffset,
 			data: data
 		}
+
 	} catch (err) {
 		throw err
 	}

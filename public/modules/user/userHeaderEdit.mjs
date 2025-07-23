@@ -13,7 +13,7 @@ const FN_userHeaderSaving = 'userHeaderSaving'
 const ME = {}
 let lastNewDataInit = null
 
-export function init(self) {
+export async function init(self) {
 	const MOD = self.MOD
 	ME.frm = MOD.frm_userHeader
 	ME.allButtonNew = document.getElementsByName('button-header-new')

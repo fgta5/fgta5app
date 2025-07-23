@@ -1,25 +1,8 @@
-<div id="search-container">
-
-	<div class="search-field" field="obj_searchtext">
-		<!-- <label for="obj_searchtext">Search</label> -->
-		<input id="obj_searchtext" fgta5-component="Textbox" placeholder="searchtext" autocomplete="off" spellcheck="false" binding="searchtext">
+<div class="search-container">
+	<div id="pnl_userHeader_params" class="search-parameters">
+		<input id="obj_searchtext" fgta5-component="Textbox" placeholder="search" autocomplete="off" spellcheck="false" binding="searchtext">
 	</div>
-
-
-	<div class="search-field" field="obj_kota">
-		<label for="obj_kota">Kota</label>
-		<input id="obj_kota" fgta5-component="Combobox" placeholder="pilih kota" autocomplete="off" spellcheck="false" 
-			binding="kota"
-
-			>
-		<!-- <datalist for="obj_kota">
-			<option value="JKT">Jakarta</option>
-			<option value="MGL">Magelang</option>
-			<option value="JGJ">Jogjakarta</option>	
-			<option value="SLG">Salatiga</option>
-			<option value="SLO">Solo</option>
-		</datalist> -->
-	</div>
+	<button id="btn_userHeader_load">Load</button>
 </div>
 
 <table id="tbl_userHeader" fgta5-component="Gridview">

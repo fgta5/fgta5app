@@ -6,7 +6,7 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node .",
-    "debug": "node . --debug",
+    "debug": "node --inspect . --debug",
     "redis": "docker run -d -p 6379:6379 --name redis redis",
     "redis-monitor": "docker exec -it redis redis-cli MONITOR"
   },
@@ -20,6 +20,7 @@
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "multer": "^2.0.1",
+    "node-fetch": "^3.3.2",
     "pg": "^8.16.2",
     "pg-promise": "^11.14.0",
     "redis": "^5.5.6",

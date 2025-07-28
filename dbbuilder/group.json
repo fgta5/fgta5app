@@ -1,0 +1,18 @@
+{
+	"tablename" : "core.group",
+	"primarykey" : "group_id",
+	"description" : "daftar group system",
+	"fields" : {
+		"group_id" : {"type": "bigint auto"},
+		"group_name" : {"type": "text", "allownull":false, "defaultvalue":"", "description":""},
+		"group_descr" : {"type": "text", "allownull":false, "defaultvalue":"", "description":""},
+		"group_isdisabled" : {"type": "boolean", "allownull":false, "defaultvalue":"false", "description":""},
+		"_createby" : {"type": "bigint", "allownull":true, "defaultvalue":"", "description":"", "ref_table":"core.user", "ref_id":"user_id", "imutable":true},
+		"_createdate" : {"type": "timestamp", "allownull":false, "defaultvalue":"", "description":"", "imutable":true},
+		"_modifyby" : {"type": "bigint", "allownull":true, "defaultvalue":"", "description":"", "ref_table":"core.user", "ref_id":"user_id"},
+		"_modifydate" : {"type": "timestamp", "allownull":true, "defaultvalue":"", "description":""}
+	},
+	"uniques" : {
+		"group_name" : ["group_name"]
+	}
+}

@@ -13,8 +13,12 @@ export default class Module {
 	static get EDIT_WARNING() { return EDIT_WARNING }
 
 
+	constructor() {
+		
+	}
 
-	static async GetContent(url) {
+
+	static async getContent(url) {
 		try {
 			const response = await fetch(url)
 			if (!response.ok) {
@@ -30,5 +34,56 @@ export default class Module {
 	}
 
 	async getFunction(functionname) { return null }
+	async loadSections(sections, args) { await loadSections(this, sections, args) }
+
+}
+
+
+async function loadSections(self, sections, args) {
+	const entries = Object.entries(sections);
+	try {
+		const fnImport = async (key, sectionId, html, mjs) => {
+			try {
+				if (html!=null) {
+					console.log(sectionId, html)
+					const content = await Module.getContent(`${html}`)
+					const el = document.getElementById(sectionId)
+					if (el==null) {
+						throw new Error(`${key}: element untuk <section> '${sectionId}' tidak ditemukan`)
+					}
+					el.innerHTML = content
+				}
+				
+				if (mjs!=null) {
+					if (typeof self.import==='function') {
+						return await self.import(mjs) 
+					} else {
+						return await import(`./${mjs}`) 
+					}
+					
+				} else {
+					return null
+				} 
+			} catch (err) {
+				throw err
+			}
+		} 
+
+		// load html
+		const modules = await Promise.all(
+			entries.map(([key, { sectionId, html, mjs }]) => fnImport(key, sectionId, html, mjs))
+		)
+		
+		for (var module of modules) {
+			if (module===null) {
+				continue
+			}
+			if (typeof module.init === 'function') {
+				module.init(self, args)
+			}
+		}
+	} catch (err) {
+		throw err
+	}
 
 }

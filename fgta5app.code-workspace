@@ -8,7 +8,35 @@
 	
 	"settings": {
 		"editor.insertSpaces": false,
-		"codium.codeCompletion.enable": false
+		"files.excludes": {
+			"public/libs/fgta5js/.vscode": true,
+			"public/libs/fgta5js/apps": true,
+			"public/libs/fgta5js/dist": true,
+			"public/libs/fgta5js/example": true,
+			"public/libs/fgta5js/fonts": true,
+			"public/libs/fgta5js/images": true,
+			"public/libs/fgta5js/views": true,
+			"public/libs/fgta5js/src/*.*": true,
+			"public/libs/fgta5js/*.*": true,
+			"public/libs/fgta5js/LICENSE": true,
+			"public/libs/-*": true,
+		},
+	
+		"search.excludes": {
+			"public/libs/fgta5js/.vscode": true,
+			"public/libs/fgta5js/apps": true,
+			"public/libs/fgta5js/dist": true,
+			"public/libs/fgta5js/example": true,
+			"public/libs/fgta5js/fonts": true,
+			"public/libs/fgta5js/images": true,
+			"public/libs/fgta5js/views": true,
+			"public/libs/fgta5js/src/*.*": true,
+			"public/libs/fgta5js/*.*": true,
+			"public/libs/fgta5js/LICENSE": true,
+			"public/libs/-*": true,
+		}
+
+		
 	},
 
 	"launch": {
@@ -31,7 +59,7 @@
 			},
 			{
 				"name": "3. dbbuild",
-				"command": "node  src/dbbuild.js -i user",
+				"command": "node  src/dbbuild.js -i group",
 				"request": "launch",
 				"type": "node-terminal"
 			},

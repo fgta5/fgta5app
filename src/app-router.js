@@ -29,10 +29,21 @@ const importModule = async (modulename) => {
 	}
 }
 
+const kebabToCamel = (str) => {
+  return str
+    .split('-')
+    .map((part, index) =>
+      index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)
+    )
+    .join('');
+}
+
 
 const handlePageError = (err, res, next) => {
+	const modulename = err.Context.modulename
+
 	if (err.code === 'ENOENT') {
-		res.status(404).send("module tidak ditemukan.");
+		res.status(404).send(`module '${modulename}' tidak ditemukan.`);
 
 	} else if (err.code==='UNAUTHORIZED') {
 		// belum login, server tidak tahu user saat ini siapa
@@ -45,6 +56,15 @@ const handlePageError = (err, res, next) => {
 	} else {
 		// error lain-lain yang belum teridentifikasi
 		res.status(500).send('error 500');
+	}
+}
+
+const isFileExists = async (filepath) => {
+	try {
+		await fs.access(filepath);
+		return true
+	} catch (err) {
+		return false
 	}
 }
 
@@ -79,23 +99,32 @@ router.get('/', (req, res) => {
 
 router.get('/:modulename', async(req, res, next)=>{
 	const modulename = req.params.modulename;
-	const filename = path.join(__dirname, '..', 'public', 'modules', modulename, `${modulename}.html`)
 	const fullUrlWithHostHeader = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
 
-	
-	try {
+	const htmlPath = path.join(__dirname, '..', 'public', 'modules', modulename, `${modulename}.html`)
+	const cssPath = path.join(__dirname, '..', 'public', 'modules', modulename, `${modulename}.css`);
+	const mjsPath = path.join(__dirname, '..', 'public', 'modules', modulename, `${modulename}.mjs`);
 
+	const cssExists = await isFileExists(cssPath)
+	const mjsExists = await isFileExists(mjsPath);
+
+
+	try {
 		// TODO: cek dulu disini apakah user berhak mengakses halaman ini
 		// UNAUTHORIZED: belum login
 		// FORBIDDEN: sudah login, tapi tidak punya akses
-	
-		
-		await fs.access(filename, fs.constants.F_OK);
+
+
+		// load halaman html-nya
+		await fs.access(htmlPath, fs.constants.F_OK);
 		res.render('application', {
 			modulename: modulename,
+			cssExists,
+			mjsExists
 		});
 		logger.access(req.session.user, modulename, fullUrlWithHostHeader)
 	} catch(err) {
+		err.Context = { modulename, htmlPath}
 		handlePageError(err, res, next)
 		logger.access(req.session.user, modulename, fullUrlWithHostHeader, err)
 	} 
@@ -118,7 +147,7 @@ router.post('/upload', async (req, res, next) => {
 router.post('/:modulename/:method', async (req, res, next)=>{
 	const modulename = req.params.modulename;
 	const ModuleClass = await importModule(modulename)
-	const method = req.params.method;
+	const method = kebabToCamel(req.params.method);
 	const module = new ModuleClass(req, res, next)
 	try {
 		const result = await module.handleRequest(method, req.body)

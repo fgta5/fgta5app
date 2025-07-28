@@ -5,11 +5,26 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-		<script src="public/libs/fgta5js/fgta5js-v1.0.6.js"></script>
+		<!-- <script src="public/libs/fgta5js/fgta5js-v1.0.6.js"></script> -->
+		<script type="module" src="public/libs/fgta5js/src/main.mjs"></script>
 
-		<link rel="stylesheet" href="public/libs/fgta5js/fgta5js-v1.0.6-min.css" />
+		<!-- ini production -->
+		<!-- <link rel="stylesheet" href="public/libs/fgta5js/fgta5js-v1.0.6-min.css" /> -->
+
+		<!-- ini debug -->
+		<link rel="stylesheet" href="public/libs/fgta5js/styles/fgta5js-root.css" />
+		<link rel="stylesheet" href="public/libs/fgta5js/styles/fgta5js-messagebox.css" />
+		<link rel="stylesheet" href="public/libs/fgta5js/styles/fgta5js-modal.css" />
+		<link rel="stylesheet" href="public/libs/fgta5js/styles/fgta5js-entry.css" />
+		<link rel="stylesheet" href="public/libs/fgta5js/styles/fgta5js-checkbox.css" />
+		<link rel="stylesheet" href="public/libs/fgta5js/styles/fgta5js-gridview.css" />
+		<link rel="stylesheet" href="public/libs/fgta5js/styles/fgta5js-appmanager.css" />
+
+
 		<link rel="stylesheet" href="public/modules/module.css" />
+		<% if (cssExists) { %>
 		<link rel="stylesheet" href="public/modules/<%= `${modulename}/${modulename}.css` %>" />
+		<% } %>
 
 		<style>
 			#loadingindicator {
@@ -48,25 +63,47 @@
 		<main id="<%= modulename %>">
 		<%- include(`${modulename}/${modulename}.html`) %>
 		</main>
-		<div id="customcontent" style="display: none;"></div>
+		<div id="extender-templates" style="display: none;"></div>
 	</body>
 
 	<script type="module">
+
+		// loading mjs...  <% if (mjsExists) { %> 
 		import Application from './public/modules/<%= `${modulename}/${modulename}.mjs` %>'	
+		// <% } else { %>
+		// module './public/modules/<%= `${modulename}/${modulename}.mjs` %>' not found. 
+		// Create dummy module
+		class Application {
+			async main() {
+				console.warn("empty module: './public/modules/<%= `${modulename}/${modulename}.mjs` %>' not found!")
+			}
+		}
+		// <% } %>
+
 		window.addEventListener("load", async (event) => {
-			var $app = new Application();
-			await $app.main();
-			// remove loading indikator
-			var myapp = document.getElementById('<%= modulename %>')
-			var pagemask = document.getElementById('loadingindicator')
-			myapp.classList.remove('hidden')
-			setTimeout(()=>{
-				pagemask.style.opacity = 0
-				pagemask.style.visibility = 'hidden'
+			const myapp = document.getElementById('<%= modulename %>')
+			const pagemask = document.getElementById('loadingindicator')
+			try {
+				const $app = new Application();
+				await $app.main();
+			} catch (err) {
+				console.error(err)
+				myapp.innerHTML = '<h1>Module Error</h1>' + err.message
+			} finally {
+				// remove loading indikator
+
+				myapp.classList.remove('hidden')
 				setTimeout(()=>{
-					pagemask.parentNode.removeChild(pagemask)
-				}, 500)
-			}, 500)
+					pagemask.style.opacity = 0
+					pagemask.style.visibility = 'hidden'
+					setTimeout(()=>{
+						pagemask.parentNode.removeChild(pagemask)
+					}, 500)
+				}, 50)
+			}
+			
+
 		});
+		
 	</script>		
 </html>

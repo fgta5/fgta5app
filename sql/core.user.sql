@@ -141,13 +141,13 @@ ALTER TABLE core."user" DROP CONSTRAINT user_password;
 
 -- ADD Column
 
-		ALTER TABLE core."user" ADD group_id integer NULL ;
+		ALTER TABLE core."user" ADD group_id bigint NULL ;
 		COMMENT ON COLUMN core."user".group_id IS '';
 	
 -- MODIFY Column
 
 		ALTER TABLE core."user" 
-			ALTER COLUMN group_id TYPE integer,
+			ALTER COLUMN group_id TYPE bigint,
 			ALTER COLUMN group_id DROP DEFAULT,
 			ALTER COLUMN group_id DROP NOT NULL;
 		COMMENT ON COLUMN core."user".group_id IS '';
@@ -158,6 +158,14 @@ ALTER TABLE core."user" DROP CONSTRAINT user_password;
 
 -- Remove Constraint if Available
 ALTER TABLE core."user" DROP CONSTRAINT group_id;
+
+-- ADD Constraint
+
+					ALTER TABLE core."user"
+						ADD CONSTRAINT group_id
+						FOREIGN KEY (group_id)
+						REFERENCES core."group"(group_id)
+				
 
 
 

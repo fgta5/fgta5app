@@ -10,13 +10,14 @@ export default class extends Api {
 		super(req, res, next);
 	}
 
-	async headerlist(body) {
-		return await headerlist(this, body)
-	}
+	async headerList(body) { return await headerList(this, body) }
+	async headerOpenData(body) { return await headerOpenData(this, body) }
+
+
 
 }
 
-async function headerlist(self, body) {
+async function headerList(self, body) {
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
 	const searchMap = {
 		searchtext: `user_fullname ILIKE '%' || \${searchtext} || '%' OR user_id=try_cast_bigint(\${searchtext}, 0)`,
@@ -46,6 +47,7 @@ async function headerlist(self, body) {
 		for (var row of rows) {
 			i++
 			if (i>max_rows) { break }
+
 			// kalau ada tambahan, atau modifikasi kolom bisa disini
 			data.push(row)
 		}
@@ -62,6 +64,23 @@ async function headerlist(self, body) {
 			data: data
 		}
 
+	} catch (err) {
+		throw err
+	}
+}
+
+async function headeropendata(self, body) {
+	try {
+		const { user_id } = body 
+		const queryParams = {user_id: user_id}
+		const sql = 'select * from core."user" where user_id = \${user_id}'
+		const data = await db.one(sql, queryParams);
+
+		if (data==null) { throw new Error("data tidak ditemukan") }	
+		const { group_name } = await sqlUtil.lookupdb(db, 'core."group"', 'group_id', row.group_id)
+		data.group_name = group_name
+
+		return data
 	} catch (err) {
 		throw err
 	}

@@ -23,7 +23,7 @@ export default class userBase extends Module {
 	get Application() { return app }
 	
 	async main(args) {
-		app.SetTitle('User')
+		app.setTitle('User')
 		await render(this, args)
 
 		await userHeaderEdit.init(this)
@@ -33,6 +33,7 @@ export default class userBase extends Module {
 	
 	}
 }
+
 // args.customcontent!==undefined ? Module.GetContent(`${currentUrlDir}/user-customcontent.html`) :
 async function render(self, args) {
 
@@ -40,15 +41,15 @@ async function render(self, args) {
 	const sec_headerList = document.getElementById('sec_headerList')
 	const sec_headerEdit = document.getElementById('sec_headerEdit')
 	const [customcontent, headerListContent, headerEditContent] = await Promise.all([
-		args.customcontent===undefined ? (()=>{return ''})() : Module.GetContent(`${currentUrlDir}/user-customcontent.html`),
-		Module.GetContent(`${currentUrlDir}/userHeaderList.html`),
-		// Module.GetContent(`${currentUrlDir}/userHeaderEdit.html`),
+		args.customcontent===undefined ? (()=>{return ''})() : Module.getContent(`${currentUrlDir}/user-customcontent.html`),
+		Module.getContent(`${currentUrlDir}/userHeaderList.html`),
+		Module.getContent(`${currentUrlDir}/userHeaderEdit.html`),
 	]);
 	sec_headerList.innerHTML = headerListContent
-	// sec_headerEdit.innerHTML = headerEditContent
+	sec_headerEdit.innerHTML = headerEditContent
 
 	MOD.tbl_userHeader = new $fgta5.Gridview('tbl_userHeader')
-	// MOD.frm_userHeader = new $fgta5.Form('frm_userHeader');
+	MOD.frm_userHeader = new $fgta5.Form('frm_userHeader');
 
 
 	document.getElementById('customcontent').innerHTML = customcontent

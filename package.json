@@ -29,5 +29,8 @@
   "repository": {
     "type": "git",
     "url": "git@github-personal:fgta5/fgta5app.git"
+  },
+  "devDependencies": {
+    "@agung_dhewe/pgsqlc": "file:../../agungdhewe/pgsqlc"
   }
 }

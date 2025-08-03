@@ -1,11 +1,13 @@
+
+
 <div class="search-container">
-	<div id="pnl_userHeader_params" class="search-parameters">
-		<input id="obj_searchtext" fgta5-component="Textbox" placeholder="search" autocomplete="off" spellcheck="false" binding="searchtext">
+	<div id="userHeaderList-pnl_search" class="search-parameters">
+		<input id="userHeaderList-txt_searchtext" fgta5-component="Textbox" placeholder="search" autocomplete="off" spellcheck="false" binding="searchtext">
 	</div>
-	<button id="btn_userHeader_load">Load</button>
+	<button name="userHeaderList-btn_gridload">Load</button>
 </div>
 
-<table id="tbl_userHeader" fgta5-component="Gridview">
+<table id="userHeaderList-tbl" fgta5-component="Gridview">
 	<thead>
 		<tr data-header key="user_id">
 			<th autonumber>No</th>
@@ -17,3 +19,13 @@
 		</tr>
 	</thead>
 </table>
+
+
+
+<div class="footer-buttons-container">
+	<div></div>
+	<div>
+		<button name="userHeaderList-btn_new">New</button>
+	</div>
+	<div></div>
+</div>

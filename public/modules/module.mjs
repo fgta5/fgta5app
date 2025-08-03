@@ -5,6 +5,7 @@ const DELETE_CONFIRM = 'Apakah akan hapus data ini?'
 const EDIT_WARNING = 'Silakan data di save atau di reset dahulu'
 
 
+
 export default class Module {
 	static get RESET_CONFIRM() { return RESET_CONFIRM }
 	static get NEWDATA_CONFIRM() { return NEWDATA_CONFIRM }
@@ -13,10 +14,14 @@ export default class Module {
 	static get EDIT_WARNING() { return EDIT_WARNING }
 
 
+
 	constructor() {
 		
 	}
 
+	static isMobileDevice() {
+		return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Opera Mini|IEMobile/i.test(navigator.userAgent);
+	}
 
 	static async getContent(url) {
 		try {
@@ -34,47 +39,80 @@ export default class Module {
 	}
 
 	async getFunction(functionname) { return null }
-	async loadSections(sections, args) { await loadSections(this, sections, args) }
+	async loadSections(sections) { await loadSections(this, sections) }
+	async loadModules(sections, args) { return await loadModules(this, sections, args) }
+
+	renderFooterButtons(footerButtonsContainer) { renderFooterButtons(this, footerButtonsContainer) }
 
 }
 
 
-async function loadSections(self, sections, args) {
+async function loadSections(self, sections) {
 	const entries = Object.entries(sections);
-	try {
-		const fnImport = async (key, sectionId, html, mjs) => {
-			try {
-				if (html!=null) {
-					console.log(sectionId, html)
-					const content = await Module.getContent(`${html}`)
-					const el = document.getElementById(sectionId)
-					if (el==null) {
-						throw new Error(`${key}: element untuk <section> '${sectionId}' tidak ditemukan`)
-					}
-					el.innerHTML = content
+	const fnFetchContent = async (key, sectionId, html) => {
+		try {
+			if (html!=null) {
+				const content = await Module.getContent(`${html}`)
+				const el = document.getElementById(sectionId)
+				if (el==null) {
+					throw new Error(`${key}: element untuk <section> '${sectionId}' tidak ditemukan`)
 				}
-				
-				if (mjs!=null) {
-					if (typeof self.import==='function') {
-						return await self.import(mjs) 
-					} else {
-						return await import(`./${mjs}`) 
-					}
-					
-				} else {
-					return null
-				} 
-			} catch (err) {
-				throw err
+				el.innerHTML = content
 			}
-		} 
 
-		// load html
-		const modules = await Promise.all(
-			entries.map(([key, { sectionId, html, mjs }]) => fnImport(key, sectionId, html, mjs))
+		} catch (err) {
+			throw err
+		}
+	} 
+
+	try {
+		await Promise.all(
+			entries.map(([key, { sectionId, html }]) => fnFetchContent(key, sectionId, html))
 		)
-		
-		for (var module of modules) {
+	} catch (err) {
+		throw err
+	}
+
+}
+
+function assignModule(key, modules, index) {
+  return [key, modules[index]];
+}
+
+async function loadModules(self, sections, args) {
+	const entries = Object.entries(sections);
+	const fnImportModule =  async (key, mjs) => {
+		if (mjs!=null) {
+			if (typeof self.import==='function') {
+				return await self.import(mjs) 
+			} else {
+				return await import(`./${mjs}`)
+			}
+		} else {
+			return null
+		} 
+	}
+
+	try {
+		const loadedModules = await Promise.all(
+			entries.map(([key, { mjs }]) => fnImportModule(key, mjs))
+		)
+
+		const modules = Object.fromEntries(
+			entries.map(([key], i) => assignModule(key, loadedModules, i))
+		);
+
+		// jika ada extender
+		if (modules.Extender!=null) {
+			if (typeof modules.Extender.extendPage==='function') {
+				modules.Extender.extendPage(self)
+			}
+		}
+
+
+		self.Context.Modules = modules
+		for (var name in modules) {
+			const module = modules[name]
 			if (module===null) {
 				continue
 			}
@@ -82,8 +120,25 @@ async function loadSections(self, sections, args) {
 				module.init(self, args)
 			}
 		}
+
+
+
+		return modules		
 	} catch (err) {
 		throw err
 	}
+}
 
+
+function renderFooterButtons(self, footerButtonsContainer) {
+	const footer = document.querySelector('footer.fgta5-app-footer')
+	footer.innerHTML = ''
+
+	// masukkan semua footerButtonsContainer ke footer
+	for (var bc of Array.from(footerButtonsContainer)) {
+		var section = bc.closest('section')
+		bc.setAttribute('data-section', section.id)
+
+		footer.appendChild(bc)
+	}
 }

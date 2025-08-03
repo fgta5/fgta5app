@@ -60,7 +60,9 @@
 				loading module...
 			</div>
 		</div>		
-		<main id="<%= modulename %>">
+
+		<!-- <%= modulename %> -->
+		<main id="mainapp"> 
 		<%- include(`${modulename}/${modulename}.html`) %>
 		</main>
 		<div id="extender-templates" style="display: none;"></div>
@@ -81,18 +83,18 @@
 		// <% } %>
 
 		window.addEventListener("load", async (event) => {
-			const myapp = document.getElementById('<%= modulename %>')
+			const mainapp = document.getElementById('mainapp')
 			const pagemask = document.getElementById('loadingindicator')
 			try {
 				const $app = new Application();
 				await $app.main();
 			} catch (err) {
 				console.error(err)
-				myapp.innerHTML = '<h1>Module Error</h1>' + err.message
+				mainapp.innerHTML = '<h1>Module Error</h1>' + err.message
 			} finally {
 				// remove loading indikator
 
-				myapp.classList.remove('hidden')
+				mainapp.classList.remove('hidden')
 				setTimeout(()=>{
 					pagemask.style.opacity = 0
 					pagemask.style.visibility = 'hidden'

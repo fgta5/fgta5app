@@ -8,7 +8,7 @@
 	
 	"settings": {
 		"editor.insertSpaces": false,
-		"files.excludes": {
+		"files.exclude": {
 			"public/libs/fgta5js/.vscode": true,
 			"public/libs/fgta5js/apps": true,
 			"public/libs/fgta5js/dist": true,
@@ -22,7 +22,7 @@
 			"public/libs/-*": true,
 		},
 	
-		"search.excludes": {
+		"search.exclude": {
 			"public/libs/fgta5js/.vscode": true,
 			"public/libs/fgta5js/apps": true,
 			"public/libs/fgta5js/dist": true,

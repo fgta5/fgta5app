@@ -1,1 +1,79 @@
-edit
+
+
+<form id="userHeaderEdit-frm" class="module-form" locked="true" autoid="true" primarykey="obj_user_id">
+
+	<div class="input-field" field="obj_user_id">
+		<label for="obj_user_id">ID</label>
+		<input id="obj_user_id"  fgta5-component="Textbox" placeholder="[AUTO]" autocomplete="off" spellcheck="false" 
+			binding="user_id"
+		>
+	</div>
+
+	<div class="input-field" field="obj_user_nickname">
+		<label for="obj_user_nickname">Nickname</label>
+		<input id="obj_user_nickname" fgta5-component="Textbox" placeholder="nickname" autocomplete="off" spellcheck="false" 
+			binding="user_nickname"
+		>
+	</div>
+
+	<div class="input-field" field="obj_user_fullname">
+		<label for="obj_user_fullname">Fullname</label>
+		<input id="obj_user_fullname" fgta5-component="Textbox" placeholder="fullname" autocomplete="off" spellcheck="false" 
+			binding="user_fullname"
+		>
+	</div>
+
+
+	<div class="input-field" field="obj_user_email">
+		<label for="obj_user_email">Email</label>
+		<input id="obj_user_email" fgta5-component="Textbox" placeholder="email" autocomplete="off" spellcheck="false" 
+			binding="user_email"
+		>
+	</div>
+
+	<div class="input-field" field="obj_user_isdisabled">
+		<label for="obj_user_isdisabled">Disabled</label>
+		<input id="obj_user_isdisabled" fgta5-component="Checkbox" type="checkbox" 
+			binding="user_isdisabled"
+		>
+	</div>
+
+	<div class="input-field" field="obj_user_password">
+		<label for="obj_user_password">Password</label>
+		<input id="obj_user_password" fgta5-component="Textbox" placeholder="password" autocomplete="off" spellcheck="false" 
+			binding="user_password"
+		>
+	</div>
+
+	<div class="input-field" field="obj_group_id">
+		<label for="obj_group_id">Group</label>
+		<input id="obj_group_id" fgta5-component="Combobox" placeholder="pilih group" autocomplete="off" spellcheck="false" 
+			required
+			binding="group_id"
+			data-display="group_name"
+			description="default group"
+			invalid-message="group harus diisi"
+			>
+		<!-- 
+		<datalist for="obj_group_id">
+		</datalist>
+		-->
+	</div>
+</form>
+
+
+<div class="footer-buttons-container hidden">
+	<div>
+		<button name="userHeaderEdit-btn_prev"><span>&laquo;&laquo;</span></button>
+	</div>
+	<div>
+		<button name="userHeaderEdit-btn_save">Save</button>
+		<button name="userHeaderEdit-btn_edit">Edit</button>
+		<button name="userHeaderEdit-btn_new">New</button>
+		<button name="userHeaderEdit-btn_reset">Reset</button>
+		<button name="userHeaderEdit-btn_delete">Delete</button>
+	</div>
+	<div>
+		<button data-action="userHeaderEdit-btn_next"><span>&raquo;&raquo;</span></button>
+	</div>
+</div>

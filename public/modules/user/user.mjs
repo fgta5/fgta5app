@@ -1,20 +1,21 @@
 import Module from './../module.mjs'
 
 
-const app = new $fgta5.Application('user')
-const Carousell = $fgta5.SectionCarousell
+const app = new $fgta5.Application('mainapp')
 const urlDir = 'public/modules/user'
 const Context = {
-	urlDir: 'public/modules/user',
+	Application: app,
 	Sections: {
-		HEADERLIST: {sectionId:'sec_headerList', html:`${urlDir}/userHeaderList.html`, mjs:'userHeaderList.mjs'},
-		HEADEREDIT: {sectionId:'sec_headerEdit', html:`${urlDir}/userHeaderEdit.html`, mjs:'userHeaderEdit.mjs'},
+		userHeaderList: {sectionId:'userHeaderList-section', html:`${urlDir}/userHeaderList.html`, mjs:'userHeaderList.mjs'},
+		userHeaderEdit: {sectionId:'userHeaderEdit-section', html:`${urlDir}/userHeaderEdit.html`, mjs:'userHeaderEdit.mjs'},
 		Extender: {sectionId:'extender-templates', html:`${urlDir}/user-ext.html`, mjs:'user-ext.mjs'},
 	},
-	Mods: {},
-	tbl_userHeader: null,
-	frm_userHeader: null,
+	Modules: null
 }
+
+export const HEADERLIST = 'userHeaderList'
+export const HEADEREDIT = 'userHeaderEdit'
+export const Extender = 'Extender'
 
 export default class extends Module {
 	constructor() {
@@ -28,31 +29,59 @@ export default class extends Module {
 	async main(args={}) {
 		console.log('initialising module...')
 		app.setTitle('User')
-
+		app.showFooter(true)
+		
+		args.autoLoadGridData = true
 		
 		try {
+			
+			
 			// include semua halaman yang dibutuhkan
-			await this.loadSections(Context.Sections, args)
+			await this.loadSections(Context.Sections)
+
+			// load and init modules
+			Context.Crsl = new $fgta5.SectionCarousell(app.Nodes.Main) 
+			await this.loadModules(Context.Sections, args)
 
 			// render dan setup halaman
 			await render(this)
-
 
 		} catch (err) {
 			throw err
 		}
 	}
+
 }
-
-
-
-
 
 async function render(self) {
 	try {
-		// render sections
-		Context.Crsl = new Carousell(app.Nodes.Main) 
-		
+		const footerButtonsContainer =  document.getElementsByClassName('footer-buttons-container')
+		self.renderFooterButtons(footerButtonsContainer)
+	
+		Context.Crsl.addEventListener($fgta5.SectionCarousell.EVT_SECTIONSHOWING, (evt)=>{
+			var sectionId = evt.detail.commingSection.Id
+			for (let cont of footerButtonsContainer) {
+				var currContainerSectionId = cont.getAttribute('data-section')
+				if (currContainerSectionId==sectionId) {
+					setTimeout(()=>{
+						cont.classList.remove('hidden')
+						cont.style.animation = 'dropped 0.3s forwards'
+						setTimeout(()=>{
+							cont.style.animation = 'unset'	
+						}, 300)
+					}, 500)
+				} else {
+					cont.classList.add('hidden')
+				}
+			}
+		})
+
+		for (var modulename in Context.Modules) {
+			var module = Context.Modules[modulename]
+			if (typeof module.render ==='function') {
+				module.render(self)
+			}
+		}
 	} catch (err) {
 		throw err
 	}

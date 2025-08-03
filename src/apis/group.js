@@ -10,15 +10,14 @@ export default class extends Api {
 		super(req, res, next);
 	}
 
-	async headerlist(body) { return await headerlist(this, body) }
-
-
-
-	
+	// dipanggil dengan model snake syntax
+	// contoh: header-list --> headerList
+	//         header-open-data --> headerOpenData
+	async headerList(body) { return await headerList(this, body) }
 
 }
 
-async function headerlist(self, body) {
+async function headerList(self, body) {
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
 	var max_rows = limit==0 ? 10 : limit
 	var nextoffset = null

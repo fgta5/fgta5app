@@ -10,6 +10,9 @@ export default class extends Api {
 		super(req, res, next);
 	}
 
+	// dipanggil dengan model snake syntax
+	// contoh: header-list
+	//         header-open-data
 	async headerList(body) { return await headerList(this, body) }
 	async headerOpenData(body) { return await headerOpenData(this, body) }
 
@@ -69,7 +72,7 @@ async function headerList(self, body) {
 	}
 }
 
-async function headeropendata(self, body) {
+async function headerOpenData(self, body) {
 	try {
 		const { user_id } = body 
 		const queryParams = {user_id: user_id}
@@ -77,7 +80,7 @@ async function headeropendata(self, body) {
 		const data = await db.one(sql, queryParams);
 
 		if (data==null) { throw new Error("data tidak ditemukan") }	
-		const { group_name } = await sqlUtil.lookupdb(db, 'core."group"', 'group_id', row.group_id)
+		const { group_name } = await sqlUtil.lookupdb(db, 'core."group"', 'group_id', data.group_id)
 		data.group_name = group_name
 
 		return data

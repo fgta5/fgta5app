@@ -53,6 +53,8 @@
 				html, body, input, button { font-size: 20px; }
 			}
 		</style>
+
+
 	</head>
 	<body>
 		<div id="loadingindicator">
@@ -63,13 +65,16 @@
 
 		<!-- <%= modulename %> -->
 		<main id="mainapp"> 
-		<%- include(`${modulename}/${modulename}.html`) %>
+		<%- include(`${modulename}/${modulename}.ejs`) %>
 		</main>
-		<div id="extender-templates" style="display: none;"></div>
+		<div id="extender-templates" style="display: none;">
+			<% if (htmlExtenderExists) { %>
+			<%- include(htmlExtender) %>
+			<% } %>
+		</div>
 	</body>
 
 	<script type="module">
-
 		// loading mjs...  <% if (mjsExists) { %> 
 		import Application from './public/modules/<%= `${modulename}/${modulename}.mjs` %>'	
 		// <% } else { %>

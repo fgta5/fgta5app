@@ -5,7 +5,6 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import db from './app-db.js'
 import logger from './app-logger.js'
-import test from 'node:test';
 
 
 
@@ -101,12 +100,20 @@ router.get('/:modulename', async(req, res, next)=>{
 	const modulename = req.params.modulename;
 	const fullUrlWithHostHeader = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
 
-	const htmlPath = path.join(__dirname, '..', 'public', 'modules', modulename, `${modulename}.html`)
+	const ejsPath = path.join(__dirname, '..', 'public', 'modules', modulename, `${modulename}.ejs`)
 	const cssPath = path.join(__dirname, '..', 'public', 'modules', modulename, `${modulename}.css`);
 	const mjsPath = path.join(__dirname, '..', 'public', 'modules', modulename, `${modulename}.mjs`);
 
+
+	const htmlExtenderFile = `${modulename}-ext.html`
+	const htmlExtender = `${modulename}/${htmlExtenderFile}`
+	const htmlExtenderPath = path.join(__dirname, '..', 'public', 'modules', modulename, htmlExtenderFile)
+
+
 	const cssExists = await isFileExists(cssPath)
 	const mjsExists = await isFileExists(mjsPath);
+	const htmlExtenderExists = await isFileExists(htmlExtenderPath);
+
 
 
 	try {
@@ -116,15 +123,17 @@ router.get('/:modulename', async(req, res, next)=>{
 
 
 		// load halaman html-nya
-		await fs.access(htmlPath, fs.constants.F_OK);
+		await fs.access(ejsPath, fs.constants.F_OK);
 		res.render('application', {
 			modulename: modulename,
 			cssExists,
-			mjsExists
+			mjsExists,
+			htmlExtenderExists,
+			htmlExtender
 		});
 		logger.access(req.session.user, modulename, fullUrlWithHostHeader)
 	} catch(err) {
-		err.Context = { modulename, htmlPath}
+		err.Context = { modulename, ejsPath}
 		handlePageError(err, res, next)
 		logger.access(req.session.user, modulename, fullUrlWithHostHeader, err)
 	} 

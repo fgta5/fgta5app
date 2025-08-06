@@ -110,7 +110,6 @@ async function loadModules(self, sections, args) {
 		}
 
 
-		self.Context.Modules = modules
 		for (var name in modules) {
 			const module = modules[name]
 			if (module===null) {
@@ -120,8 +119,6 @@ async function loadModules(self, sections, args) {
 				module.init(self, args)
 			}
 		}
-
-
 
 		return modules		
 	} catch (err) {

@@ -1,22 +1,35 @@
 import Module from './../module.mjs'
-import * as mainapp from './user.mjs'
+import Context from './user-context.mjs'
 
-const Section = $fgta5.Section
+
+const Crsl =  Context.Crsl
+const CurrentSectionId = Context.Sections.userheaderEdit
+const CurrentSection = Crsl.Items[CurrentSectionId]
+
+
 const frm = new $fgta5.Form('userHeaderEdit-frm');
 
 const TitleWhenNew = 'New User'
 const TitleWhenView = 'View User'
 const TitleWhenEdit = 'Edit User'
+const EditModeText = 'Edit'
+const LockModeText = 'Lock'
 
 const btn_edit = new $fgta5.ActionButton('userHeaderEdit-btn_edit')
 const btn_save = new $fgta5.ActionButton('userHeaderEdit-btn_save')
+const btn_new = new $fgta5.ActionButton('userHeaderEdit-btn_new', 'userHeader-new')
+const btn_del = new $fgta5.ActionButton('userHeaderEdit-btn_delete')
+const btn_reset = new $fgta5.ActionButton('userHeaderEdit-btn_reset')
+const btn_prev = new $fgta5.ActionButton('userHeaderEdit-btn_prev')
+const btn_next = new $fgta5.ActionButton('userHeaderEdit-btn_next')
+
+
+export const Section = CurrentSection
 
 
 export async function init(self, args) {
-	const Crsl = self.Context.Crsl
-	const secname = self.Context.Sections[mainapp.HEADEREDIT].sectionId
 
-	Crsl.Items[secname].addEventListener(Section.EVT_BACKBUTTONCLICK, async (evt)=>{
+	CurrentSection.addEventListener($fgta5.Section.EVT_BACKBUTTONCLICK, async (evt)=>{
 		backToList(self, evt)
 	})
 
@@ -25,16 +38,55 @@ export async function init(self, args) {
 	frm.render()
 
 	btn_edit.addEventListener('click', (evt)=>{ btn_edit_click(self, evt) })
-	btn_save.addEventListener('click', (evt)=>{ console.log('save')})
-	
-	btn_edit.disabled = true
-	
+	btn_save.addEventListener('click', (evt)=>{ btn_save_click(self, evt)  })
+	btn_new.addEventListener('click', (evt)=>{ btn_new_click(self, evt)})
+	btn_del.addEventListener('click', (evt)=>{ btn_del_click(self, evt)})
+	btn_reset.addEventListener('click', (evt)=>{ btn_reset_click(self, evt)})
+	btn_prev.addEventListener('click', (evt)=>{ btn_prev_click(self, evt)})
+	btn_next.addEventListener('click', (evt)=>{ btn_next_click(self, evt)})
+
+
 }
 
 
-export async function openData(self, params) {
-	var Context = self.Context	
 
+export async function render(self) {
+	console.log('userHeaderEdit render')
+}
+
+
+export async function newData(self, fromListSection) {
+	// console.log('newdata')
+	if (!fromListSection) {
+		let cancel_new = false
+		if (frm.isChanged()) {
+			var ret = await $fgta5.MessageBox.confirm(Module.NEWDATA_CONFIRM)
+			if (ret=='cancel') {
+				cancel_new = true
+			}
+		}
+		if (cancel_new) {
+			return
+		}
+	}
+
+	var autoid = frm.AutoID
+	if (autoid) {
+		setPrimaryKeyState(self, {disabled:true, placeholder:'[AutoID]'})
+	} else {
+		setPrimaryKeyState(self, {disabled:false, placeholder:'ID'})
+	}
+
+	frm.lock(false)
+	frm.newData({})
+	frm.acceptChanges()
+
+	CurrentSection.Title = TitleWhenNew
+
+	btn_edit.disabled = true
+}
+
+export async function openData(self, params) {
 	var args = {
 		method: 'POST',
 		headers: {
@@ -45,6 +97,8 @@ export async function openData(self, params) {
 		})
 	}
 
+	setPrimaryKeyState(self, {disabled:true})
+
 	var mask = $fgta5.Modal.createMask()
 	var loader = new $fgta5.Dataloader() 
 	try {
@@ -53,24 +107,30 @@ export async function openData(self, params) {
 			throw new Error('server: ' + resp.message)
 		}
 
-		var result = resp.result 
+		var data = resp.result 
 
-		console.log(result)
-		frm.setData(result)
-
-		// var secname = Context.Sections[mainapp.HEADEREDIT].sectionId
-		// var section = Context.Crsl.Items[secname] 	
-		// section.show()
+		frm.setData(data)
+		frm.acceptChanges()
+		frm.lock()
 
 	} catch (err) {
-		console.error(err)
-		await $fgta5.MessageBox.error(err.message)
 		throw err
 	} finally {
 		mask.close();
 		loader.dispose()
 		loader = null
 		mask = null
+	}
+}
+
+
+export async function saveData(self) {
+	try {
+
+	} catch (err) {
+		throw err
+	} finally {
+
 	}
 }
 
@@ -94,19 +154,43 @@ async function backToList(self, evt) {
 }
 
 async function  frm_locked(self, evt) {
-	const Crsl = self.Context.Crsl
-	const secname = self.Context.Sections[mainapp.HEADEREDIT].sectionId
-	Crsl.Items[secname].Title = TitleWhenView
+	CurrentSection.Title = TitleWhenView
+
+	btn_edit.setText(EditModeText)
+
+	btn_edit.disabled = false
+	btn_save.disabled = true
+	btn_new.disabled = false
+	btn_del.disabled = true
+	btn_reset.disabled = true
+	btn_prev.disabled = false
+	btn_next.disabled = false
+
 }
 
 async function  frm_unlocked(self, evt) {
-	const Crsl = self.Context.Crsl
-	const secname = self.Context.Sections[mainapp.HEADEREDIT].sectionId
-	if (frm.isNew()) {
-		Crsl.Items[secname].Title = TitleWhenNew
-	} else {
-		Crsl.Items[secname].Title = TitleWhenEdit
-	}
+	CurrentSection.Title = TitleWhenEdit
+
+	btn_edit.setText(LockModeText)
+
+	btn_edit.disabled = false
+	btn_save.disabled = false
+	btn_new.disabled = true
+	btn_del.disabled = false
+	btn_reset.disabled = false
+	btn_prev.disabled = true
+	btn_next.disabled = true
+}
+
+
+async function setPrimaryKeyState(self, opt) {
+	var primarykey = frm.PrimaryKey
+	var obj_pk = frm.Inputs[primarykey]
+	var el = document.getElementById(primarykey)
+	var placeholder = opt.placeholder==null ? 'ID' : opt.placeholder
+
+	obj_pk.disabled = opt.disabled===true
+	el.setAttribute('placeholder', placeholder)
 }
 
 async function btn_edit_click(self, evt) {
@@ -120,4 +204,53 @@ async function btn_edit_click(self, evt) {
 		}
 		frm.lock(true)
 	}
+}
+
+async function btn_new_click(self, evt) {
+	var sourceSection = evt.target.getAttribute('data-sectionsource') 
+
+	var listsecid = Context.Sections[mainapp.HEADERLIST].sectionId
+	var fromListSection = sourceSection===listsecid
+	if (fromListSection) {
+		// kalau tombol baru dari halaman list, munculkan section editor
+		CurrentSection.show()
+		newData(self, fromListSection)
+	} else {
+		newData(self)
+	}
+}
+
+async function btn_save_click(self, evt) {
+	console.log('save data')
+	try {
+		await saveData(self)
+		frm.acceptChanges()
+		btn_edit.disabled = false
+	} catch (err) {
+		console.err(err)
+		await $fgta5.MessageBox.error(err.message)
+	}
+}
+
+async function btn_del_click(self, evt) {
+	console.log('delete data')
+}
+
+
+async function btn_reset_click(self, evt) {
+	if (frm.isChanged() || frm.isNew()) {
+		var resp = await $fgta5.MessageBox.confirm(Module.RESET_CONFIRM)
+		if (resp!='ok') {
+			return
+		}
+	}
+	frm.reset()
+}
+
+async function btn_prev_click(self, evt) {
+	console.log('prev')
+}
+
+async function btn_next_click(self, evt) {
+	console.log('next')
 }

@@ -1,17 +1,20 @@
 import Module from '../module.mjs'
-import * as mainapp from './user.mjs'
+import Context from './user-context.mjs'
+import * as headerEdit from './userHeaderEdit.mjs'
+import * as extender from './user-ext.mjs'
+
+const Crsl =  Context.Crsl
+const CurrentSectionId = Context.Sections.userheaderList
+const CurrentSection = Crsl.Items[CurrentSectionId]
 
 const tbl =  new $fgta5.Gridview('userHeaderList-tbl')
 const pnl_search = document.getElementById('userHeaderList-pnl_search')
-
 const btn_gridload = new $fgta5.ActionButton('userHeaderList-btn_gridload') 
-const btn_new = new $fgta5.ActionButton('userHeaderList-btn_new') 
 
+export const Section = CurrentSection
 export const SearchParams = {}
 
 export async function init(self, args) {
-	const modules = self.Context.Modules
-
 	try {
 		// extract custom search panel from template
 		const tplSearchPanel = document.querySelector('template[name="custom-search-panel"]')
@@ -30,8 +33,8 @@ export async function init(self, args) {
 		}
 
 		// user-ext.mjs, export function initSearchParams(self, SearchParams) {} 
-		if (typeof modules[mainapp.Extender].initSearchParams === 'function') {
-			modules[mainapp.Extender].initSearchParams(self, SearchParams)
+		if (typeof extender.initSearchParams === 'function') {
+			extender.initSearchParams(self, SearchParams)
 		} 
 
 
@@ -42,10 +45,7 @@ export async function init(self, args) {
 		tbl.addEventListener('celldblclick', async evt=>{ tbl_celldblclick(self, evt) })
 
 		btn_gridload.addEventListener('click', async evt=>{ btn_gridload_click(self, evt) })
-		btn_new.addEventListener('click', (evt)=>{ btn_new_click(self, evt) })		
-
-
-		btn_new.hide()
+			
 		
 	} catch (err) {
 		throw err
@@ -57,6 +57,10 @@ export async function init(self, args) {
 	}
 }
 
+export async function render(self) {
+	console.log('userHeaderList render')
+}
+
 async function tbl_nextdata(self, evt) {
 	var criteria = evt.detail.criteria
 	var limit = evt.detail.limit
@@ -64,8 +68,6 @@ async function tbl_nextdata(self, evt) {
 	var sort = evt.detail.sort
 	await tbl_loadData(self, {criteria, limit, offset, sort})
 	tbl.scrollToFooter()
-
-	console.log('scroll to bottom')
 }
 
 async function tbl_sorting(self, evt) {
@@ -86,19 +88,16 @@ async function tbl_celldblclick(self, evt) {
 	var keyvalue = tr.getAttribute('keyvalue')
 	var key = tr.getAttribute('key')
 
-	var editModule = self.Context.Modules[mainapp.HEADEREDIT]
-
-	var secname = self.Context.Sections[mainapp.HEADEREDIT].sectionId
-	var section = self.Context.Crsl.Items[secname] 	
-	section.show()
+	headerEdit.Section.show()
 
 	try {
-		editModule.openData(self, {key:key, keyvalue:keyvalue, tr:tr})
+		headerEdit.openData(self, {key:key, keyvalue:keyvalue, tr:tr})
 	} catch (err) {
+		console.error(err)
+		await $fgta5.MessageBox.error(err.message)
+
 		// kembalikan ke list
-		var secname = self.Context.Sections[mainapp.HEADERLIST].sectionId
-		var section = self.Context.Crsl.Items[secname] 	
-		section.show()
+		CurrentSection.show()
 	}
 }
 
@@ -107,16 +106,6 @@ async function btn_gridload_click(self, evt) {
 	tbl_loadData(self)
 }
 
-async function btn_new_click(self, evt) {
-	var secname = self.Context.Sections[mainapp.HEADEREDIT].sectionId
-	var section = self.Context.Crsl.Items[secname] 	
-	
-	try {
-		await section.show()
-	} catch (err) {
-		console.error(err)
-	}
-}
 
 async function tbl_loadData(self, params={}) {
 	var { criteria={}, limit=0, offset=0, sort={} } = params

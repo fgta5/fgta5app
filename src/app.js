@@ -31,6 +31,21 @@ app.use(favicon(path.join(__dirname, '..', 'public', 'favicon.ico')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(session);
+
+
+
+// Middleware untuk mengecualikan file dengan ekstensi tertentu
+app.use('/public', (req, res, next) => {
+  const excludedExtensions = ['.ejs']; 
+  const ext = path.extname(req.url);
+
+  if (excludedExtensions.includes(ext)) {
+    return res.status(403).send('Akses ke file ini tidak diperbolehkan');
+  }
+
+  next();
+});
+
 app.use('/public', express.static(path.join(__dirname, '..', 'public')));
 app.use('/', router)
 

@@ -11,7 +11,7 @@
 		"files.exclude": {
 			"public/libs/fgta5js/.vscode": true,
 			"public/libs/fgta5js/apps": true,
-			"public/libs/fgta5js/dist": true,
+			"public/libs/fgta5js/dist": false,
 			"public/libs/fgta5js/example": true,
 			"public/libs/fgta5js/fonts": true,
 			"public/libs/fgta5js/images": true,

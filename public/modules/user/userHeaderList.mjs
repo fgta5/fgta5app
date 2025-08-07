@@ -1,6 +1,6 @@
 import Module from '../module.mjs'
 import Context from './user-context.mjs'
-import * as headerEdit from './userHeaderEdit.mjs'
+import * as userHeaderEdit from './userHeaderEdit.mjs'
 import * as extender from './user-ext.mjs'
 
 const Crsl =  Context.Crsl
@@ -88,10 +88,10 @@ async function tbl_celldblclick(self, evt) {
 	var keyvalue = tr.getAttribute('keyvalue')
 	var key = tr.getAttribute('key')
 
-	headerEdit.Section.show()
+	userHeaderEdit.show()
 
 	try {
-		headerEdit.openData(self, {key:key, keyvalue:keyvalue, tr:tr})
+		userHeaderEdit.openData(self, {key:key, keyvalue:keyvalue, tr:tr})
 	} catch (err) {
 		console.error(err)
 		await $fgta5.MessageBox.error(err.message)

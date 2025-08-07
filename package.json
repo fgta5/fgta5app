@@ -4,6 +4,10 @@
   "description": "fgta5 application",
   "type": "module",
   "main": "src/app.js",
+
+  "x-commnent-debug-1" : "parameter --inspect agar bisa debug code di vscode (dari devtools dilempar ke vscode",
+  "x-commennt-debug-2" : "paramter --debug agar load api selalu dilakukan saat request tanpa module caching (untuk debug mjs di client, diset dari file .env ",
+
   "scripts": {
     "start": "node .",
     "debug": "node --inspect . --debug",
@@ -31,6 +35,8 @@
     "url": "git@github-personal:fgta5/fgta5app.git"
   },
   "devDependencies": {
-    "@agung_dhewe/pgsqlc": "file:../../agungdhewe/pgsqlc"
+    "@agung_dhewe/pgsqlc": "file:../../agungdhewe/pgsqlc",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.46.2"
   }
 }

@@ -1,5 +1,6 @@
 import Module from './../module.mjs'
 import Context from './user-context.mjs'
+import * as userHeaderList from './userHeaderList.mjs'
 
 
 const Crsl =  Context.Crsl
@@ -54,9 +55,13 @@ export async function render(self) {
 	console.log('userHeaderEdit render')
 }
 
+export async function show(self) {
+	CurrentSection.show()
+}
 
 export async function newData(self, fromListSection) {
-	// console.log('newdata')
+	console.log('new data')
+
 	if (!fromListSection) {
 		let cancel_new = false
 		if (frm.isChanged()) {
@@ -87,6 +92,9 @@ export async function newData(self, fromListSection) {
 }
 
 export async function openData(self, params) {
+	console.log('open data')
+
+
 	var args = {
 		method: 'POST',
 		headers: {
@@ -125,6 +133,8 @@ export async function openData(self, params) {
 
 
 export async function saveData(self) {
+	console.log('save data')
+
 	try {
 
 	} catch (err) {
@@ -209,7 +219,7 @@ async function btn_edit_click(self, evt) {
 async function btn_new_click(self, evt) {
 	var sourceSection = evt.target.getAttribute('data-sectionsource') 
 
-	var listsecid = Context.Sections[mainapp.HEADERLIST].sectionId
+	var listsecid = userHeaderList.Section.Id
 	var fromListSection = sourceSection===listsecid
 	if (fromListSection) {
 		// kalau tombol baru dari halaman list, munculkan section editor

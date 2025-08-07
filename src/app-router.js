@@ -1,3 +1,4 @@
+import dotenv from 'dotenv';
 import express from 'express';
 import multer from 'multer';
 import fs from 'fs/promises';
@@ -7,6 +8,7 @@ import db from './app-db.js'
 import logger from './app-logger.js'
 
 
+dotenv.config();
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -14,10 +16,14 @@ const __dirname = path.dirname(__filename);
 const router = express.Router({ mergeParams: true });
 const upload = multer();
 const args = process.argv.slice(2); // Potong 2 yang pertama: 'node' dan path ke file
-const debugMode = args.includes('--debug');
+const apiDebugMode = args.includes('--debug');
+const fgta5jsDebugMode = process.env.DEBUG_MODE_FGTA5JS === 'true'
+const appDebugMode = process.env.DEBUG_MODE_APP === 'true'
 
 const importModule = async (modulename) => {
-	if (debugMode) {
+	// jika mode debug, 
+	// load api akan selalu dilakukan saat request (tanpa caching)
+	if (apiDebugMode) {
 		const fullPath = new URL(`./apis/${modulename}.js`, import.meta.url).pathname;
 		const mtime = (await fs.stat(fullPath)).mtimeMs;
 		const freshUrl = `${fullPath}?v=${mtime}`;
@@ -100,9 +106,12 @@ router.get('/:modulename', async(req, res, next)=>{
 	const modulename = req.params.modulename;
 	const fullUrlWithHostHeader = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
 
+
 	const ejsPath = path.join(__dirname, '..', 'public', 'modules', modulename, `${modulename}.ejs`)
 	const cssPath = path.join(__dirname, '..', 'public', 'modules', modulename, `${modulename}.css`);
-	const mjsPath = path.join(__dirname, '..', 'public', 'modules', modulename, `${modulename}.mjs`);
+	
+	const mjsFileName = appDebugMode ? `${modulename}.mjs` : `${modulename}.min.mjs`
+	const mjsPath = path.join(__dirname, '..', 'public', 'modules', modulename, mjsFileName);
 
 
 	const htmlExtenderFile = `${modulename}-ext.html`
@@ -128,8 +137,11 @@ router.get('/:modulename', async(req, res, next)=>{
 			modulename: modulename,
 			cssExists,
 			mjsExists,
+			mjsFileName,
 			htmlExtenderExists,
-			htmlExtender
+			htmlExtender,
+			fgta5jsDebugMode,
+			appDebugMode
 		});
 		logger.access(req.session.user, modulename, fullUrlWithHostHeader)
 	} catch(err) {

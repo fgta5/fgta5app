@@ -1,14 +1,13 @@
 import Module from './../module.mjs'
 import Context from './user-context.mjs'
-import * as userHeaderList from './userHeaderList.mjs'
 
 
+const CurrentState = {}
 const Crsl =  Context.Crsl
 const CurrentSectionId = Context.Sections.userheaderEdit
 const CurrentSection = Crsl.Items[CurrentSectionId]
 
 
-const frm = new $fgta5.Form('userHeaderEdit-frm');
 
 const TitleWhenNew = 'New User'
 const TitleWhenView = 'View User'
@@ -24,11 +23,16 @@ const btn_reset = new $fgta5.ActionButton('userHeaderEdit-btn_reset')
 const btn_prev = new $fgta5.ActionButton('userHeaderEdit-btn_prev')
 const btn_next = new $fgta5.ActionButton('userHeaderEdit-btn_next')
 
+const frm = new $fgta5.Form('userHeaderEdit-frm');
+const cbo_group_id = frm.Inputs.cbo_group_id
+
+
 
 export const Section = CurrentSection
 
-
 export async function init(self, args) {
+	console.log('initializing userHeaderEdit ...')
+	
 
 	CurrentSection.addEventListener($fgta5.Section.EVT_BACKBUTTONCLICK, async (evt)=>{
 		backToList(self, evt)
@@ -47,6 +51,16 @@ export async function init(self, args) {
 	btn_next.addEventListener('click', (evt)=>{ btn_next_click(self, evt)})
 
 
+	CurrentState.obj_pk =  frm.getPrimaryInput()
+	CurrentState.key = CurrentState.obj_pk.getBindingData()
+
+	cbo_group_id.addEventListener('selecting', (evt)=>{ 
+		// user-ext.mjs, pada init, 
+		// self.Extender.cbo_group_id_selecting = ({evt}) => { cbo_group_id_selecting(self, evt) }
+		try { self.fnExecute('cbo_group_id_selecting', { evt }) } catch (err) { console.error(err)}
+	}) 
+		
+	
 }
 
 
@@ -55,115 +69,177 @@ export async function render(self) {
 	console.log('userHeaderEdit render')
 }
 
-export async function show(self) {
-	CurrentSection.show()
-}
 
-export async function newData(self, fromListSection) {
-	console.log('new data')
+export async function openSelectedData(self, params) {
+	console.log('openSelectedData')
 
-	if (!fromListSection) {
-		let cancel_new = false
-		if (frm.isChanged()) {
-			var ret = await $fgta5.MessageBox.confirm(Module.NEWDATA_CONFIRM)
-			if (ret=='cancel') {
-				cancel_new = true
-			}
-		}
-		if (cancel_new) {
-			return
-		}
-	}
-
-	var autoid = frm.AutoID
-	if (autoid) {
-		setPrimaryKeyState(self, {disabled:true, placeholder:'[AutoID]'})
-	} else {
-		setPrimaryKeyState(self, {disabled:false, placeholder:'ID'})
-	}
-
-	frm.lock(false)
-	frm.newData({})
-	frm.acceptChanges()
-
-	CurrentSection.Title = TitleWhenNew
-
-	btn_edit.disabled = true
-}
-
-export async function openData(self, params) {
-	console.log('open data')
-
-
-	var args = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			user_id: params.keyvalue
-		})
-	}
-
-	setPrimaryKeyState(self, {disabled:true})
-
-	var mask = $fgta5.Modal.createMask()
-	var loader = new $fgta5.Dataloader() 
+	let mask = $fgta5.Modal.createMask()
 	try {
-		var resp = await loader.load('/user/header-open-data', args)
-		if (resp.code!=0) {
-			throw new Error('server: ' + resp.message)
-		}
+		const id = params.keyvalue
+		const data = await openData(self, id)
 
-		var data = resp.result 
+		// disable primary key
+		setPrimaryKeyState(self, {disabled:true})
 
 		frm.setData(data)
 		frm.acceptChanges()
 		frm.lock()
-
 	} catch (err) {
 		throw err
 	} finally {
-		mask.close();
-		loader.dispose()
-		loader = null
+		mask.close()
 		mask = null
 	}
 }
 
 
-export async function saveData(self) {
-	console.log('save data')
+async function newData(self, datainit) {
+	try {
+		frm.newData(datainit)
+		frm.acceptChanges()
+		frm.setAsNewData()
+	} catch (err) {
+		throw err
+	}
+}
 
+async function openData(self, id) {
+	CurrentState.currentOpenedId = id
+	const args = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			id: id
+		})
+	}
+
+	let loader = new $fgta5.Dataloader() 
 	try {
 
+		const resp = await loader.load('/user/header-open', args)
+		if (resp.code!=0) {
+			throw new Error(resp.message)
+		}
+
+		return resp.result
+		// frm.setData(resp.result)
+		// frm.acceptChanges()
+	} catch (err) {
+		CurrentState.currentOpenedId = null
+		throw err
+	} finally {
+		loader.dispose()
+		loader = null
+	}
+}
+
+async function createData(self, data) {
+	const args = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			data: data
+		})
+	}
+
+	let loader = new $fgta5.Dataloader() 
+	try {
+
+		const resp = await loader.load('/user/header-create', args)
+		if (resp.code!=0) {
+			throw new Error(resp.message)
+		}
+
+		return resp.result 
+	} catch (err) {
+		throw err
+	}
+}
+
+
+async function updateData(self, data) {
+	const args = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			data: data
+		})
+	}
+
+	let loader = new $fgta5.Dataloader() 
+	try {
+
+		const resp = await loader.load('/user/header-update', args)
+		if (resp.code!=0) {
+			throw new Error(resp.message)
+		}
+
+		return resp.result 
+	} catch {
+		throw err
+	}
+}
+
+async function deleteData(self, id) {
+	const args = {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			id: id
+		})
+	}
+
+	let loader = new $fgta5.Dataloader() 
+	try {
+
+		const resp = await loader.load('/user/header-delete', args)
+		if (resp.code!=0) {
+			throw new Error(resp.message)
+		}
+
+		return resp.result
 	} catch (err) {
 		throw err
 	} finally {
-
+		loader.dispose()
+		loader = null
 	}
 }
+
 
 async function backToList(self, evt) {
 	// cek apakah ada perubahan data
 	let goback = false
 	if (frm.isChanged()) {
+		// ada perubahan data, konfirmasi apakah mau lanjut back
 		var ret = await $fgta5.MessageBox.confirm(Module.BACK_CONFIRM)
 		if (ret=='ok') {
+			// user melanjutkan back, walaupun data berubah
+			// reset dahulu data form
+			frm.reset()
 			goback = true
 		}
-		ret=null
 	} else {
 		goback = true
 	}
 
 	if (goback) {
-		frm.reset()
+		frm.lock()
 		evt.detail.fn_ShowNextSection()
 	}
 }
 
 async function  frm_locked(self, evt) {
+	console.log('frm_locked')
+
 	CurrentSection.Title = TitleWhenView
 
 	btn_edit.setText(EditModeText)
@@ -179,6 +255,8 @@ async function  frm_locked(self, evt) {
 }
 
 async function  frm_unlocked(self, evt) {
+	console.log('frm_unlocked')
+
 	CurrentSection.Title = TitleWhenEdit
 
 	btn_edit.setText(LockModeText)
@@ -193,17 +271,22 @@ async function  frm_unlocked(self, evt) {
 }
 
 
-async function setPrimaryKeyState(self, opt) {
-	var primarykey = frm.PrimaryKey
-	var obj_pk = frm.Inputs[primarykey]
-	var el = document.getElementById(primarykey)
-	var placeholder = opt.placeholder==null ? 'ID' : opt.placeholder
 
+
+async function setPrimaryKeyState(self, opt) {
+	const obj_pk = CurrentState.obj_pk 
 	obj_pk.disabled = opt.disabled===true
-	el.setAttribute('placeholder', placeholder)
+	if (opt.placeholder!==undefined) {
+		obj_pk.placeholder = opt.placeholder
+	}
+	if (opt.value!==undefined) {
+		obj_pk.value = opt.value
+	}
 }
 
 async function btn_edit_click(self, evt) {
+	console.log('btn_edit_click')
+
 	if (frm.isLocked()) {
 		// user mau inlock
 		frm.lock(false)
@@ -217,50 +300,229 @@ async function btn_edit_click(self, evt) {
 }
 
 async function btn_new_click(self, evt) {
-	var sourceSection = evt.target.getAttribute('data-sectionsource') 
+	console.log('btn_new_click')
+	const sourceSection = evt.target.getAttribute('data-sectionsource') 
 
-	var listsecid = userHeaderList.Section.Id
-	var fromListSection = sourceSection===listsecid
+	const userHeaderList = self.Modules.userHeaderList
+	const listsecid = userHeaderList.Section.Id
+	const fromListSection = sourceSection===listsecid
 	if (fromListSection) {
-		// kalau tombol baru dari halaman list, munculkan section editor
-		CurrentSection.show()
-		newData(self, fromListSection)
+		// klik new dari list (tidak perlu cek ada perubahan data)
+		// tampilkan dulu form
+		await CurrentSection.show()
 	} else {
-		newData(self)
+		// klik new dari form
+		let cancel_new = false
+		if (frm.isChanged()) {
+			const ret = await $fgta5.MessageBox.confirm(Module.NEWDATA_CONFIRM)
+			if (ret=='cancel') {
+				cancel_new = true
+			}
+		}
+		if (cancel_new) {
+			return
+		}
+	}
+
+	if (frm.AutoID) {
+		setPrimaryKeyState(self, {disabled:true, placeholder:'[AutoID]'})
+	} else {
+		setPrimaryKeyState(self, {disabled:false, placeholder:'ID'})
+	}
+
+	try {
+
+		let datainit = {}
+		// jika perlu modifikasi data initial,
+		// atau dialog untuk opsi data baru, dapat dibuat di userExtender.newData
+		const newDataExtender = self.Modules.userExtender.newData
+		if (typeof newDataExtender === 'function') {
+			datainit = await newDataExtender(self)
+		}
+
+		// buat data baru
+		await newData(self, datainit)
+
+		// buka lock, agar user bisa edit
+		frm.lock(false)
+
+		// matikan tombol edit dan del saat kondisi form adalah data baru 
+		btn_edit.disabled = true
+		btn_del.disabled = true
+	} catch (err) {
+		console.error(err)
+		await $fgta5.MessageBox.error(err.message)
+		if (fromListSection) {
+			// jika saat tombol baru dipilih saat di list, tampilan kembalikan ke list
+			self.Modules.userHeaderList.Section.show()
+		}
 	}
 }
 
 async function btn_save_click(self, evt) {
-	console.log('save data')
-	try {
-		await saveData(self)
-		frm.acceptChanges()
-		btn_edit.disabled = false
-	} catch (err) {
-		console.err(err)
-		await $fgta5.MessageBox.error(err.message)
+	console.log('btn_save_click')
+
+	// cek apakah data valid
+	const valid = frm.validate()
+	if (!valid) {
+		const message = frm.getLastError()
+		console.warn(message)
+		$fgta5.MessageBox.warning(message)
+		return
 	}
+
+
+	// abaikan jika bukan data baru dan tidak ada perubahan
+	let dataToSave
+	const isNewData = frm.isNew()
+	if (!isNewData) {
+		// cek dulu apakah ada perubahaan
+		if (!frm.isChanged()) {
+			// skip save jika tidak ada perubahan data
+			console.log('tidak ada perubahan data, skip save')
+			return
+		} 
+		
+		// ambil hanya data yang berubah
+		dataToSave = frm.getDataChanged()
+
+	} else {
+
+		// untuk posisi data baru, ambil semua data
+		dataToSave = frm.getData()		
+	}
+
+	try {
+		let result
+
+		if (isNewData) {
+			result = await createData(self, dataToSave)
+		} else {
+ 			result = await updateData(self, dataToSave)
+		}
+
+		console.log('result', result)
+		const obj_pk = CurrentState.obj_pk 
+		const pk = CurrentState.key
+		const idValue = result[pk]
+
+		console.log(`get data id ${idValue}`)
+		const data = await openData(self, idValue)
+		console.log('data', data)
+
+		if (frm.AutoID) {
+			console.log('update field ID di form')
+			obj_pk.value = idValue
+		} else {
+			// jika bukan autoID, kunci field PK menjadi disabled
+			setPrimaryKeyState(self, {disabled:true})
+
+		}
+
+		// update form
+		frm.setData(data)	
+
+
+		// persist perubahan di form
+		frm.acceptChanges()
+
+
+		if (isNewData) {
+			// saat new data, posisi button toggle edit akan disabled
+			// setelah berhasil save, nyalakan button edit (untuk lock)
+			btn_edit.disabled = false
+
+			// buat baris baru di grid
+			console.log('tamabah baris baru di grid')
+			self.Modules.userHeaderList.addNewRow(self, data)
+		} else {
+			console.log('update data baris yang dibuka')
+			self.Modules.userHeaderList.updateCurrentRow(self, data)
+		}
+
+	} catch (err) {
+		console.error(err)
+		await $fgta5.MessageBox.error(err.message)
+	} 
 }
 
 async function btn_del_click(self, evt) {
+	console.log('btn_del_click')
+
+	// jika data masih dalam kondisi baru (belum di save, 
+	// perintah delete harus dibatalkan, 
+	// karena belum ada data di database)
+	const isNewData = frm.isNew()
+	if (isNewData) {
+		console.log('posisi data baru, skip delete')
+		return
+	}
+
+	const obj_pk = CurrentState.obj_pk 
+	const idValue = obj_pk.value
+
+	// konfirmasi untuk delete data
+	const resp = await $fgta5.MessageBox.confirm(Module.DELETE_CONFIRM + `id: ${idValue}`)
+	if (resp!='ok') {
+		return
+	}
+
 	console.log('delete data')
+	try {
+		const result = await deleteData(self, idValue)
+		
+		// hapus current row yang dipilih di list
+		self.Modules.userHeaderList.removeCurrentRow(self)
+		
+		// kembali ke list
+		self.Modules.userHeaderList.Section.show()
+
+
+		// lock kembali form
+		frm.lock()
+
+	} catch (err) {
+		console.error(err)
+		await $fgta5.MessageBox.error(err.message)
+	}
+
 }
 
 
 async function btn_reset_click(self, evt) {
-	if (frm.isChanged() || frm.isNew()) {
-		var resp = await $fgta5.MessageBox.confirm(Module.RESET_CONFIRM)
-		if (resp!='ok') {
-			return
+	console.log('btn_reset_click')
+
+	const isNewData = frm.isNew()
+	if (isNewData) {
+		// untuk data baru, di reset berarti sama seperti membuat data baru
+		console.log('reset: buat data baru')
+		newData(self)
+	} else {
+		if (frm.isChanged()) {
+			// ada perubahan data, tampilkan konfirmasi perubahan data
+			var resp = await $fgta5.MessageBox.confirm(Module.RESET_CONFIRM)
+			if (resp!='ok') {
+				// user klik tombil cancel
+				console.log('cancel reset')
+				return
+			}
+			console.log('reset form')
+			frm.reset()
+		} else {
+			console.log('tidak ada perubahan data, reset data tidak dieksekusi')
 		}
 	}
-	frm.reset()
+
 }
 
 async function btn_prev_click(self, evt) {
-	console.log('prev')
+	console.log('btn_prev_click')
+	self.Modules.userHeaderList.selectPreviousRow(self)
 }
 
 async function btn_next_click(self, evt) {
-	console.log('next')
+	console.log('btn_next_click')
+	self.Modules.userHeaderList.selectNextRow(self)
 }
+
+

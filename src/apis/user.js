@@ -14,11 +14,12 @@ export default class extends Api {
 	// contoh: header-list
 	//         header-open-data
 	async headerList(body) { return await headerList(this, body) }
-	async headerOpenData(body) { return await headerOpenData(this, body) }
-
-
-
+	async headerOpen(body) { return await headerOpen(this, body) }
+	async headerUpdate(body) { return await headerUpdate(this, body)}
+	async headerCreate(body) { return await headerCreate(this, body)}
+	async headerDelete(body) { return await headerDelete(this, body) }
 }
+
 
 async function headerList(self, body) {
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
@@ -51,7 +52,10 @@ async function headerList(self, body) {
 			i++
 			if (i>max_rows) { break }
 
-			// kalau ada tambahan, atau modifikasi kolom bisa disini
+			
+			// pasang extender di sini
+
+
 			data.push(row)
 		}
 
@@ -72,10 +76,10 @@ async function headerList(self, body) {
 	}
 }
 
-async function headerOpenData(self, body) {
+async function headerOpen(self, body) {
 	try {
-		const { user_id } = body 
-		const queryParams = {user_id: user_id}
+		const { id } = body 
+		const queryParams = {user_id: id}
 		const sql = 'select * from core."user" where user_id = \${user_id}'
 		const data = await db.one(sql, queryParams);
 
@@ -83,7 +87,73 @@ async function headerOpenData(self, body) {
 		const { group_name } = await sqlUtil.lookupdb(db, 'core."group"', 'group_id', data.group_id)
 		data.group_name = group_name
 
+
+		// pasang extender untuk olah data
+
 		return data
+	} catch (err) {
+		throw err
+	}
+}
+
+
+async function headerCreate(self, body) {
+	const { data } = body
+	const tablename = 'core."user"'
+
+
+	try {
+		sqlUtil.connect(db)
+
+		data._createby = 1
+		data._createdate = (new Date()).toISOString()
+
+
+		const cmd = sqlUtil.createInsertCommand(tablename, data, ['user_id'])
+		const result = await cmd.execute(data)
+		
+
+		// pasang extender di sini
+		
+		return result
+	} catch (err) {
+		throw err
+	}
+}
+
+async function headerUpdate(self, body) {
+	const { data } = body
+	const tablename = 'core."user"'
+
+	try {
+		sqlUtil.connect(db)
+
+		data._modifyby = 1
+		data._modifydate = (new Date()).toISOString()
+		
+		const cmd =  sqlUtil.createUpdateCommand(tablename, data, ['user_id'])
+		const result = await cmd.execute(data)
+		
+		// pasang extender di sini
+
+		return result
+	} catch (err) {
+		throw err
+	}
+}
+
+
+async function headerDelete(self, body) {
+	const tablename = 'core."user"'
+
+	try {
+		const { id } = body 
+		const dataToRemove = {user_id: id}
+
+		const cmd = sqlUtil.createDeleteCommand(tablename, ['user_id'])
+		const result = await cmd.execute(dataToRemove)
+	
+		return result
 	} catch (err) {
 		throw err
 	}

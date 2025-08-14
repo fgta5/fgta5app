@@ -18,6 +18,7 @@ const upload = multer();
 const args = process.argv.slice(2); // Potong 2 yang pertama: 'node' dan path ke file
 const apiDebugMode = args.includes('--debug');
 const fgta5jsDebugMode = process.env.DEBUG_MODE_FGTA5JS === 'true'
+const fgta5jsVersion = process.env.FGTA5JS_VERSION || ''
 const appDebugMode = process.env.DEBUG_MODE_APP === 'true'
 
 const importModule = async (modulename) => {
@@ -77,7 +78,7 @@ const handleApiError = (err, res, next) => {
 	const code = err.code ?? 500
 	res.json({
 		code: code,
-		message: err.message
+		message: "API: " + err.message
 	})
 }
 
@@ -141,6 +142,7 @@ router.get('/:modulename', async(req, res, next)=>{
 			htmlExtenderExists,
 			htmlExtender,
 			fgta5jsDebugMode,
+			fgta5jsVersion: fgta5jsVersion==='' ? '' : `-${fgta5jsVersion}`,
 			appDebugMode
 		});
 		logger.access(req.session.user, modulename, fullUrlWithHostHeader)

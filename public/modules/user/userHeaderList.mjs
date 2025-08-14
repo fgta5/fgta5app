@@ -1,11 +1,10 @@
 import Module from '../module.mjs'
 import Context from './user-context.mjs'
-import * as userHeaderEdit from './userHeaderEdit.mjs'
-import * as extender from './user-ext.mjs'
 
 const Crsl =  Context.Crsl
 const CurrentSectionId = Context.Sections.userheaderList
 const CurrentSection = Crsl.Items[CurrentSectionId]
+const CurrentState = {}
 
 const tbl =  new $fgta5.Gridview('userHeaderList-tbl')
 const pnl_search = document.getElementById('userHeaderList-pnl_search')
@@ -15,6 +14,17 @@ export const Section = CurrentSection
 export const SearchParams = {}
 
 export async function init(self, args) {
+	console.log('initializing userHeaderList ...')
+
+	// add event listener
+	tbl.addEventListener('nextdata', async evt=>{ tbl_nextdata(self, evt) })
+	tbl.addEventListener('sorting', async evt=>{ tbl_sorting(self, evt) })
+	tbl.addEventListener('cellclick', async evt=>{ tbl_cellclick(self, evt) })
+	tbl.addEventListener('celldblclick', async evt=>{ tbl_celldblclick(self, evt) })
+
+	btn_gridload.addEventListener('click', async evt=>{ btn_gridload_click(self, evt) })
+	
+
 	try {
 		// extract custom search panel from template
 		const tplSearchPanel = document.querySelector('template[name="custom-search-panel"]')
@@ -33,47 +43,114 @@ export async function init(self, args) {
 		}
 
 		// user-ext.mjs, export function initSearchParams(self, SearchParams) {} 
-		if (typeof extender.initSearchParams === 'function') {
-			extender.initSearchParams(self, SearchParams)
-		} 
-
-
-		// add event listener
-		tbl.addEventListener('nextdata', async evt=>{ tbl_nextdata(self, evt) })
-		tbl.addEventListener('sorting', async evt=>{ tbl_sorting(self, evt) })
-		tbl.addEventListener('cellclick', async evt=>{ tbl_cellclick(self, evt) })
-		tbl.addEventListener('celldblclick', async evt=>{ tbl_celldblclick(self, evt) })
-
-		btn_gridload.addEventListener('click', async evt=>{ btn_gridload_click(self, evt) })
-			
+		// jangan exekusi langsung dari userExtender, karena akan error saat di rollup
+		const initSearchParams = self.Modules.userExtender.initSearchParams
+		if (typeof initSearchParams === 'function') {
+			initSearchParams(self, SearchParams)
+		} else {
+			console.warn(`'initSearchParams' tidak diimplementasikan di extender`)
+		}
 		
 	} catch (err) {
 		throw err
 	} finally {
 		// load data
 		if (args.autoLoadGridData===true) {
-			await tbl_loadData(self)
+			loadData(self)
 		}
 	}
+
+
 }
 
 export async function render(self) {
 	console.log('userHeaderList render')
 }
 
+
+export async function loadData(self) {
+	await tbl.clear()
+	tbl_loadData(self)
+}
+
+export function getCurrentRow(self) {
+	return CurrentState.SelectedRow
+}
+
+function setCurrentRow(self, tr) {
+	CurrentState.SelectedRow = tr
+}
+
+export function addNewRow(self, data) {
+	const tr = tbl.addRow(data)
+	setCurrentRow(self, tr)
+}
+
+export function updateCurrentRow(self, data) {
+	const tr = CurrentState.SelectedRow
+
+	try {
+		tbl.updateRow(tr, data)
+	} catch (err) {
+		throw err
+	}
+}
+
+export function removeCurrentRow(self) {
+	const tr = CurrentState.SelectedRow
+	tr.remove()
+}
+
+export function selectNextRow(self) {
+	const tr = CurrentState.SelectedRow
+	if (tr.nextElementSibling) {
+		openRow(self, tr.nextElementSibling)
+	}
+}
+
+export function selectPreviousRow(self) {
+	const tr = CurrentState.SelectedRow
+	if (tr.previousElementSibling) {
+		openRow(self, tr.previousElementSibling)
+	}
+}
+
+
+async function openRow(self, tr) {
+	const keyvalue = tr.getAttribute('keyvalue')
+	const key = tr.getAttribute('key')
+
+	const userHeaderEdit = self.Modules.userHeaderEdit
+
+	try {
+		setCurrentRow(self, tr)
+		CurrentState.SelectedRow.keyValue = keyvalue
+		CurrentState.SelectedRow.key = key
+		await userHeaderEdit.openSelectedData(self, {key:key, keyvalue:keyvalue})
+	} catch (err) {
+		console.error(err)
+		await $fgta5.MessageBox.error(err.message)
+
+		setCurrentRow(self, null)
+		CurrentSection.show() // kembalikan ke list kalau error saat buka data
+	}
+}
+
+
 async function tbl_nextdata(self, evt) {
-	var criteria = evt.detail.criteria
-	var limit = evt.detail.limit
-	var offset = evt.detail.nextoffset
-	var sort = evt.detail.sort
+	const criteria = evt.detail.criteria
+	const limit = evt.detail.limit
+	const offset = evt.detail.nextoffset
+	const sort = evt.detail.sort
+
 	await tbl_loadData(self, {criteria, limit, offset, sort})
 	tbl.scrollToFooter()
 }
 
 async function tbl_sorting(self, evt) {
 	tbl.clear()
-	var sort = evt.detail.sort
-	var criteria = evt.detail.Criteria
+	const sort = evt.detail.sort
+	const criteria = evt.detail.Criteria
 	tbl_loadData(self, {criteria, sort})
 }
 
@@ -84,31 +161,25 @@ async function tbl_cellclick(self, evt) {
 }
 
 async function tbl_celldblclick(self, evt) {
-	var tr = evt.detail.tr
-	var keyvalue = tr.getAttribute('keyvalue')
-	var key = tr.getAttribute('key')
+	const tr = evt.detail.tr
 
-	userHeaderEdit.show()
+	const userHeaderEdit = self.Modules.userHeaderEdit
+	userHeaderEdit.Section.show()
 
-	try {
-		userHeaderEdit.openData(self, {key:key, keyvalue:keyvalue, tr:tr})
-	} catch (err) {
-		console.error(err)
-		await $fgta5.MessageBox.error(err.message)
-
-		// kembalikan ke list
-		CurrentSection.show()
-	}
+	await openRow(self, tr)
 }
 
 async function btn_gridload_click(self, evt) {
-	await tbl.clear()
-	tbl_loadData(self)
+	setCurrentRow(self, null)
+	loadData(self)
 }
 
 
 async function tbl_loadData(self, params={}) {
-	var { criteria={}, limit=0, offset=0, sort={} } = params
+	console.log('loading userHeader data')
+	console.log(params)
+
+	const { criteria={}, limit=0, offset=0, sort={} } = params
 
 	// isi criteria
 	for (var key in SearchParams) {
@@ -127,7 +198,7 @@ async function tbl_loadData(self, params={}) {
 		sort = tbl.getSort()
 	}
 
-	var args = {
+	const args = {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
@@ -141,16 +212,16 @@ async function tbl_loadData(self, params={}) {
 		})
 	}
 
-	var mask = $fgta5.Modal.createMask()
-	var loader = new $fgta5.Dataloader() 
+	let mask = $fgta5.Modal.createMask()
+	let loader = new $fgta5.Dataloader() 
 	try {
-		var resp = await loader.load('/user/header-list', args)
-		var code = resp.code
-		var message = resp.message
-		var result = resp.result
+		const resp = await loader.load('/user/header-list', args)
+		const code = resp.code
+		const message = resp.message
+		const result = resp.result
 
 		if (code!=0) {
-			var err = new Error('Server Error: ' + message)
+			const err = new Error('Server Error: ' + message)
 			err.code = code
 			throw err
 		}

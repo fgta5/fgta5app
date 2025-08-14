@@ -29,7 +29,8 @@ export default {
     plugins: [
 		terser({
 			compress: {
-				drop_console: true // hapus console.log
+				pure_funcs: ['console.log', 'console.warn'] // hanya log dan warn dihilangkan, sedangkan error tidak
+				// drop_console: true // hapus console
 			}
 		})
 	]

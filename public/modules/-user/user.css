@@ -1,9 +1,0 @@
-.input-field[field] {
-	flex-basis: 100%; /* definisikan flex-basis, apabila dalam satu baris hanya akan terdapat maximal 1 field */
-}
-
-
-.input-field[field] .fgta5-entry-container {
-	width: 150px;
-	max-width: 150px;
-}

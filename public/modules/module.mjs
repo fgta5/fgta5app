@@ -1,7 +1,7 @@
 const RESET_CONFIRM = 'Sudah ada perubahan data, apakah akan direset?'
 const NEWDATA_CONFIRM  = 'Sudah ada perubahan data, apakah akan membuat baru?'
 const BACK_CONFIRM = 'Sudah ada perubahan data, apakah akan kembali ke list?'
-const DELETE_CONFIRM = 'Apakah akan hapus data ini?'
+const DELETE_CONFIRM = 'Apakah akan hapus data '
 const EDIT_WARNING = 'Silakan data di save atau di reset dahulu'
 
 
@@ -39,92 +39,112 @@ export default class Module {
 	}
 
 	async getFunction(functionname) { return null }
-	async loadSections(sections) { await loadSections(this, sections) }
-	async loadModules(sections, args) { return await loadModules(this, sections, args) }
+	// async loadSections(sections) { await loadSections(this, sections) }
+	// async loadModules(sections, args) { return await loadModules(this, sections, args) }
 
 	renderFooterButtons(footerButtonsContainer) { renderFooterButtons(this, footerButtonsContainer) }
 
-}
-
-
-async function loadSections(self, sections) {
-	const entries = Object.entries(sections);
-	const fnFetchContent = async (key, sectionId, html) => {
-		try {
-			if (html!=null) {
-				const content = await Module.getContent(`${html}`)
-				const el = document.getElementById(sectionId)
-				if (el==null) {
-					throw new Error(`${key}: element untuk <section> '${sectionId}' tidak ditemukan`)
-				}
-				el.innerHTML = content
-			}
-
-		} catch (err) {
-			throw err
-		}
-	} 
-
-	try {
-		await Promise.all(
-			entries.map(([key, { sectionId, html }]) => fnFetchContent(key, sectionId, html))
-		)
-	} catch (err) {
-		throw err
-	}
-
-}
-
-function assignModule(key, modules, index) {
-  return [key, modules[index]];
-}
-
-async function loadModules(self, sections, args) {
-	const entries = Object.entries(sections);
-	const fnImportModule =  async (key, mjs) => {
-		if (mjs!=null) {
-			if (typeof self.import==='function') {
-				return await self.import(mjs) 
-			} else {
-				return await import(`./${mjs}`)
-			}
+	fnExecute(fnname, args) {
+		var fn = this.Extender[fnname]
+		if (typeof fn==='function') {
+			fn(args)
 		} else {
-			return null
-		} 
-	}
-
-	try {
-		const loadedModules = await Promise.all(
-			entries.map(([key, { mjs }]) => fnImportModule(key, mjs))
-		)
-
-		const modules = Object.fromEntries(
-			entries.map(([key], i) => assignModule(key, loadedModules, i))
-		);
-
-		// jika ada extender
-		if (modules.Extender!=null) {
-			if (typeof modules.Extender.extendPage==='function') {
-				modules.Extender.extendPage(self)
-			}
+			throw new Error(`'${fnname}' belum diimplementasikan di extender`)
 		}
-
-
-		for (var name in modules) {
-			const module = modules[name]
-			if (module===null) {
-				continue
-			}
-			if (typeof module.init === 'function') {
-				module.init(self, args)
-			}
-		}
-
-		return modules		
-	} catch (err) {
-		throw err
 	}
 }
+
+
+export async function loadTemplate(self, name) {
+	const tpl = document.querySelector(`template[name="${name}"]`)
+	if (tpl==null) {
+		throw new Error(`template "${name}" is not found!`)
+	}
+
+	const clone = tpl.content.cloneNode(true); // salin isi template
+	document.body.appendChild(clone);
+}
+
+
+
+// async function loadSections(self, sections) {
+// 	const entries = Object.entries(sections);
+// 	const fnFetchContent = async (key, sectionId, html) => {
+// 		try {
+// 			if (html!=null) {
+// 				const content = await Module.getContent(`${html}`)
+// 				const el = document.getElementById(sectionId)
+// 				if (el==null) {
+// 					throw new Error(`${key}: element untuk <section> '${sectionId}' tidak ditemukan`)
+// 				}
+// 				el.innerHTML = content
+// 			}
+
+// 		} catch (err) {
+// 			throw err
+// 		}
+// 	} 
+
+// 	try {
+// 		await Promise.all(
+// 			entries.map(([key, { sectionId, html }]) => fnFetchContent(key, sectionId, html))
+// 		)
+// 	} catch (err) {
+// 		throw err
+// 	}
+
+// }
+
+// function assignModule(key, modules, index) {
+//   return [key, modules[index]];
+// }
+
+// async function loadModules(self, sections, args) {
+// 	const entries = Object.entries(sections);
+// 	const fnImportModule =  async (key, mjs) => {
+// 		if (mjs!=null) {
+// 			if (typeof self.import==='function') {
+// 				return await self.import(mjs) 
+// 			} else {
+// 				return await import(`./${mjs}`)
+// 			}
+// 		} else {
+// 			return null
+// 		} 
+// 	}
+
+// 	try {
+// 		const loadedModules = await Promise.all(
+// 			entries.map(([key, { mjs }]) => fnImportModule(key, mjs))
+// 		)
+
+// 		const modules = Object.fromEntries(
+// 			entries.map(([key], i) => assignModule(key, loadedModules, i))
+// 		);
+
+// 		// jika ada extender
+// 		if (modules.Extender!=null) {
+// 			if (typeof modules.Extender.extendPage==='function') {
+// 				modules.Extender.extendPage(self)
+// 			}
+// 		}
+
+
+// 		for (var name in modules) {
+// 			const module = modules[name]
+// 			if (module===null) {
+// 				continue
+// 			}
+// 			if (typeof module.init === 'function') {
+// 				module.init(self, args)
+// 			}
+// 		}
+
+// 		return modules		
+// 	} catch (err) {
+// 		throw err
+// 	}
+// }
 
 
 function renderFooterButtons(self, footerButtonsContainer) {

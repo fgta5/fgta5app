@@ -26,8 +26,10 @@ export default class Api {
 		} catch (err) {
 			throw err
 		}
+	}
 
-		
+	async log(data) {
+		console.log(data)
 	}
 }
 

@@ -4,6 +4,12 @@ import db from '../app-db.js'
 import Api from '../api.js'
 import sqlUtil from '@agung_dhewe/pgsqlc'
 
+import * as Extender from './extenders/user-apiext.js'
+
+
+const headerSectionName = 'header'
+
+
 // api: account
 export default class extends Api {
 	constructor(req, res, next) {
@@ -18,6 +24,8 @@ export default class extends Api {
 	async headerUpdate(body) { return await headerUpdate(this, body)}
 	async headerCreate(body) { return await headerCreate(this, body)}
 	async headerDelete(body) { return await headerDelete(this, body) }
+
+
 }
 
 
@@ -54,7 +62,9 @@ async function headerList(self, body) {
 
 			
 			// pasang extender di sini
-
+			if (typeof Extender.headerListRow === 'function') {
+				await Extender.headerListRow(row)
+			}
 
 			data.push(row)
 		}
@@ -89,6 +99,9 @@ async function headerOpen(self, body) {
 
 
 		// pasang extender untuk olah data
+		if (typeof Extender.headerOpen === 'function') {
+			await Extender.headerOpen(data)
+		}
 
 		return data
 	} catch (err) {
@@ -98,7 +111,7 @@ async function headerOpen(self, body) {
 
 
 async function headerCreate(self, body) {
-	const { data } = body
+	const { source, data } = body
 	const tablename = 'core."user"'
 
 
@@ -113,7 +126,8 @@ async function headerCreate(self, body) {
 		const result = await cmd.execute(data)
 		
 
-		// pasang extender di sini
+		// record log
+		await self.log({source, tablename, section:headerSectionName, action:'CREATE', id: result.user_id})
 		
 		return result
 	} catch (err) {
@@ -122,7 +136,7 @@ async function headerCreate(self, body) {
 }
 
 async function headerUpdate(self, body) {
-	const { data } = body
+	const { source, data } = body
 	const tablename = 'core."user"'
 
 	try {
@@ -134,7 +148,12 @@ async function headerUpdate(self, body) {
 		const cmd =  sqlUtil.createUpdateCommand(tablename, data, ['user_id'])
 		const result = await cmd.execute(data)
 		
-		// pasang extender di sini
+		// record log
+		let logdata = {source, tablename, section:headerSectionName, action:'UPDATE', id: data.user_id} 
+		if (typeof Extender.logHeaderUpdate === 'function') {
+			await Extender.logHeaderUpdate(logdata, data, result)
+		}
+		await self.log(logdata)
 
 		return result
 	} catch (err) {
@@ -147,12 +166,15 @@ async function headerDelete(self, body) {
 	const tablename = 'core."user"'
 
 	try {
-		const { id } = body 
+		const { source, id } = body 
 		const dataToRemove = {user_id: id}
 
 		const cmd = sqlUtil.createDeleteCommand(tablename, ['user_id'])
 		const result = await cmd.execute(dataToRemove)
 	
+		// record log
+		await self.log({source, tablename, section:headerSectionName, action:'DELETE', id})
+
 		return result
 	} catch (err) {
 		throw err

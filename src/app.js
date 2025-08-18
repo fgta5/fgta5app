@@ -33,6 +33,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session);
 
 
+app.locals.appConfig = {
+  notifierHost: process.env.NOTIFIER_HOST || 'ws://localhost:8080'
+};
+
 
 // Middleware untuk mengecualikan file dengan ekstensi tertentu
 app.use('/public', (req, res, next) => {

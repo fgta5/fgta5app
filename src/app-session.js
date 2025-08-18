@@ -31,5 +31,12 @@ export default session({
 		secure: false,
 		httpOnly: true,
 		maxAge: 15 * MINUTE
+
+		// domain: '.example.com',       // ✅ Cookie tersedia untuk semua subdomain
+		// path: '/',                    // ✅ Berlaku untuk semua path
+		// secure: true,                 // ✅ Hanya dikirim lewat HTTPS
+		// httpOnly: true,              // ✅ Tidak bisa diakses dari JavaScript
+		// sameSite: 'none',            // ✅ Bisa lintas domain (harus paired dengan secure)
+		// maxAge: 15 * MINUTE,		
 	}
 });

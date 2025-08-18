@@ -6,6 +6,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import db from './app-db.js'
 import logger from './app-logger.js'
+import session from 'express-session';
 
 
 dotenv.config();
@@ -97,6 +98,9 @@ router.get('/', (req, res) => {
 		id: '234',
 		name: 'agung',
 	}
+
+	const sessionId = req.sessionID;
+	console.log('Session ID:', sessionId);
 
 	res.render('index', {
 		title: 'Fgta5js Development',

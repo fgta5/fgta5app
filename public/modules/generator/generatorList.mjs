@@ -1,22 +1,22 @@
 import Module from '../module.mjs'
-import Context from './user-context.mjs'
-import * as Extender from './user-ext.mjs'
+import Context from './generator-context.mjs'
+import * as Extender from './generator-ext.mjs'
 
 
 const Crsl =  Context.Crsl
-const CurrentSectionId = Context.Sections.userheaderList
+const CurrentSectionId = Context.Sections.generatorList
 const CurrentSection = Crsl.Items[CurrentSectionId]
 const CurrentState = {}
 
-const tbl =  new $fgta5.Gridview('userHeaderList-tbl')
-const pnl_search = document.getElementById('userHeaderList-pnl_search')
-const btn_gridload = new $fgta5.ActionButton('userHeaderList-btn_gridload') 
+const tbl =  new $fgta5.Gridview('generatorList-tbl')
+const pnl_search = document.getElementById('generatorList-pnl_search')
+const btn_gridload = new $fgta5.ActionButton('generatorList-btn_gridload') 
 
 export const Section = CurrentSection
 export const SearchParams = {}
 
 export async function init(self, args) {
-	console.log('initializing userHeaderList ...')
+	console.log('initializing generatorList ...')
 
 	// add event listener
 	tbl.addEventListener('nextdata', async evt=>{ tbl_nextdata(self, evt) })
@@ -44,7 +44,8 @@ export async function init(self, args) {
 			SearchParams[binding] =  new $fgta5[componentname](id)
 		}
 
-		// user-ext.mjs, export function initSearchParams(self, SearchParams) {} 
+		// generator-ext.mjs, export function initSearchParams(self, SearchParams) {} 
+		// jangan exekusi langsung dari generatorExtender, karena akan error saat di rollup
 		if (typeof Extender.initSearchParams === 'function') {
 			Extender.initSearchParams(self, SearchParams)
 		} else {
@@ -64,7 +65,7 @@ export async function init(self, args) {
 }
 
 export async function render(self) {
-	console.log('userHeaderList render')
+	console.log('generatorList render')
 }
 
 
@@ -120,13 +121,13 @@ async function openRow(self, tr) {
 	const keyvalue = tr.getAttribute('keyvalue')
 	const key = tr.getAttribute('key')
 
-	const userHeaderEdit = self.Modules.userHeaderEdit
+	const generatorEdit = self.Modules.generatorEdit
 
 	try {
 		setCurrentRow(self, tr)
 		CurrentState.SelectedRow.keyValue = keyvalue
 		CurrentState.SelectedRow.key = key
-		await userHeaderEdit.openSelectedData(self, {key:key, keyvalue:keyvalue})
+		await generatorEdit.openSelectedData(self, {key:key, keyvalue:keyvalue})
 	} catch (err) {
 		console.error(err)
 		await $fgta5.MessageBox.error(err.message)
@@ -163,8 +164,8 @@ async function tbl_cellclick(self, evt) {
 async function tbl_celldblclick(self, evt) {
 	const tr = evt.detail.tr
 
-	const userHeaderEdit = self.Modules.userHeaderEdit
-	userHeaderEdit.Section.show()
+	const generatorEdit = self.Modules.generatorEdit
+	generatorEdit.Section.show()
 
 	await openRow(self, tr)
 }
@@ -176,7 +177,7 @@ async function btn_gridload_click(self, evt) {
 
 
 async function tbl_loadData(self, params={}) {
-	console.log('loading userHeader data')
+	console.log('loading generator data')
 	console.log(params)
 
 	const { criteria={}, limit=0, offset=0, sort={} } = params
@@ -192,40 +193,27 @@ async function tbl_loadData(self, params={}) {
 		criteria[key] = SearchParams[key].value
 	}
 
-
 	// cek sorting
 	if (sort===undefined) {
 		sort = tbl.getSort()
 	}
 
 	const args = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			columns: [],
-			criteria: criteria,
-			offset: offset,
-			limit: limit,
-			sort: sort
-		})
+		columns: ['generator_id', 'generator_appname', 'generator_modulename'],
+		criteria: criteria,
+		offset: offset,
+		limit: limit,
+		sort: sort		
 	}
 
 	let mask = $fgta5.Modal.createMask()
-	let loader = new $fgta5.Dataloader() 
+
+	const apiList = new $fgta5.ApiEndpoint('/generator/list')
 	try {
-		const resp = await loader.load('/user/header-list', args)
-		const code = resp.code
-		const message = resp.message
-		const result = resp.result
+		const result = await apiList.execute(args)
 
-		if (code!=0) {
-			const err = new Error('Server Error: ' + message)
-			err.code = code
-			throw err
-		}
-
+		// jika offset tidak didefinisikan, berarti start dari awal, table dikosongkan dahulua
+		// jika offset didefinisikan berarti request untuk halaman berikutnya
 		if (offset===undefined) {
 			tbl.clear()
 		}
@@ -236,9 +224,8 @@ async function tbl_loadData(self, params={}) {
 		console.error(err)
 		$fgta5.MessageBox.error(err.message)
 	} finally {
+		apiList.dispose()
 		mask.close()
-		loader.dispose()
-		loader = null
 		mask = null
 	}
 	

@@ -4,8 +4,6 @@ const BACK_CONFIRM = 'Sudah ada perubahan data, apakah akan kembali ke list?'
 const DELETE_CONFIRM = 'Apakah akan hapus data '
 const EDIT_WARNING = 'Silakan data di save atau di reset dahulu'
 
-
-
 export default class Module {
 	static get RESET_CONFIRM() { return RESET_CONFIRM }
 	static get NEWDATA_CONFIRM() { return NEWDATA_CONFIRM }
@@ -14,9 +12,8 @@ export default class Module {
 	static get EDIT_WARNING() { return EDIT_WARNING }
 
 
-
+	
 	constructor() {
-		
 	}
 
 	static isMobileDevice() {
@@ -44,14 +41,14 @@ export default class Module {
 
 	renderFooterButtons(footerButtonsContainer) { renderFooterButtons(this, footerButtonsContainer) }
 
-	fnExecute(fnname, args) {
-		var fn = this.Extender[fnname]
-		if (typeof fn==='function') {
-			fn(args)
-		} else {
-			throw new Error(`'${fnname}' belum diimplementasikan di extender`)
-		}
-	}
+	// fnExecute(fnname, args) {
+	// 	var fn = this.Extender[fnname]
+	// 	if (typeof fn==='function') {
+	// 		fn(args)
+	// 	} else {
+	// 		throw new Error(`'${fnname}' belum diimplementasikan di extender`)
+	// 	}
+	// }
 }
 
 

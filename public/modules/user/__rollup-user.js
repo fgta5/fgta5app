@@ -9,6 +9,9 @@ const banner = `user
 * build at ${currentdate}
 `
 
+// untuk eksekusi npx
+// npx rollup -c ./public/modules/user/__rollup-user.js
+
 export default {
 	input: "public/modules/user/user.mjs", // File utama yang menjadi entry point
 	output: {

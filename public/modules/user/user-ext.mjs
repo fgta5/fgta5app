@@ -8,7 +8,7 @@ async function testAsync() {
 
 export async function init(self, args) {
 	console.log('initializing userExtender ...')
-	self.Extender.cbo_group_id_selecting = ({evt}) => { cbo_group_id_selecting(self, evt) }
+	// self.Extender.cbo_group_id_selecting = ({evt}) => { cbo_group_id_selecting(self, evt) }
 
 	// tambahkan new user dialog
 	loadTemplate(self, 'dlg-newdata')
@@ -48,6 +48,8 @@ export async function newData(self) {
 	// var dlg = Context.dlgNewData 
 	// var ret = await dlg.show()
 	// return ret
+
+	console.log('new data extender')
 }
 
 
@@ -58,7 +60,7 @@ async function cbo_group_id_change(self, evt) {
 	userHeaderList.loadData(self)
 }
 
-async function cbo_group_id_selecting(self, evt) {
+export async function cbo_group_id_selecting(self, evt) {
 	console.log('extender: cbo_group_id_selecting()')
 
 	const cbo = evt.detail.sender

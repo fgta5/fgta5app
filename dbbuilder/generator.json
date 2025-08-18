@@ -1,0 +1,18 @@
+{
+	"tablename" : "core.generator",
+	"primarykey" : "generator_id",
+	"description" : "daftar program untuk di generate",
+	"fields" : {
+		"generator_id" : {"type": "bigint auto always"},
+		"generator_appname" : {"type": "text", "allownull":false, "defaultvalue":"", "description":""},
+		"generator_modulename" : {"type": "text", "allownull":false, "defaultvalue":"", "description":""},
+		"generator_data" : {"type": "json", "allownull":false, "description":""},
+		"_createby" : {"type": "bigint", "allownull":true, "defaultvalue":"", "description":"", "ref_table":"core.user", "ref_id":"user_id", "imutable":true},
+		"_createdate" : {"type": "timestamp", "allownull":false, "defaultvalue":"", "description":"", "imutable":true},
+		"_modifyby" : {"type": "bigint", "allownull":true, "defaultvalue":"", "description":"", "ref_table":"core.user", "ref_id":"user_id"},
+		"_modifydate" : {"type": "timestamp", "allownull":true, "defaultvalue":"", "description":""}
+	},
+	"uniques" : {
+		"generator_name" : ["generator_appname", "generator_modulename"]
+	}
+}

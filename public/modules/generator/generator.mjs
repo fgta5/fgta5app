@@ -1,8 +1,8 @@
 import Module from './../module.mjs'
-import Context from './user-context.mjs'
-import * as userHeaderList from './userHeaderList.mjs'
-import * as userHeaderEdit from './userHeaderEdit.mjs'
-import * as Extender from './user-ext.mjs'
+import Context from './generator-context.mjs'
+import * as generatorList from './generatorList.mjs'
+import * as generatorEdit from './generatorEdit.mjs'
+import * as generatorExtender from './generator-ext.mjs'
 
 const app = Context.app
 const Crsl = Context.Crsl
@@ -16,38 +16,67 @@ export default class extends Module {
 	async main(args={}) {
 		
 		console.log('initializing module...')
-		app.setTitle('User')
+		app.setTitle('Generator')
 		app.showFooter(true)
 		
 		args.autoLoadGridData = true
 
 		const self = this
 
+		// self.Extender untuk meampung fungsi-fungsi dalam generator-ext.mjs
+		self.Extender = {}
+
 		// module-module yang di load perlu di pack dulu ke dalam variable
 		// jangan import lagi module-module ini di dalam mjs tersebut
 		// karena akan terjadi cyclic redudancy pada saat di rollup
 		self.Modules = {
-			userHeaderList,
-			userHeaderEdit
+			generatorList,
+			generatorEdit,
+			generatorExtender
 		}
 
 		try {
 			
+			// inisiasi sisi server
+			const apiGen = new $fgta5.ApiEndpoint('/generator/init')
+			try {
+				const result = await apiGen.execute({ })
+				console.log(result)
+			} catch (err) {
+				throw err
+			} finally {
+				apiGen.dispose()
+			}
+
+
 			await Promise.all([
-				userHeaderList.init(self, args),
-				userHeaderEdit.init(self, args),
-				Extender.init(self, args)
+				generatorList.init(self, args),
+				generatorEdit.init(self, args),
+				generatorExtender.init(self, args)
 			])
 
 			// render dan setup halaman
 			await render(self)
+
+
+			// setup web socket
+			const userId = 'u001';
+			const ws = new WebSocket(`ws://localhost:8080/?userId=${userId}`);
+
+			ws.onmessage = (event) => {
+				const { jobId, status } = JSON.parse(event.data);
+				console.log(`Job ${jobId} status: ${status}`);
+			};
 
 		} catch (err) {
 			throw err
 		}
 	}
 
+
 }
+
+
 
 async function render(self) {
 	try {
@@ -72,9 +101,11 @@ async function render(self) {
 			}
 		})
 
-		// user-ext.mjs, export function extendPage(self) {} 
-		if (typeof Extender.extendPage === 'function') {
-			Extender.extendPage(self)
+		// generator-ext.mjs, export function extendPage(self) {} 
+		// jangan exekusi langsung dari userExtender, karena akan error saat di rollup
+		const extendPage = self.Modules.generatorExtender.extendPage
+		if (typeof extendPage === 'function') {
+			extendPage(self)
 		} else {
 			console.warn(`'extendPage' tidak diimplementasikan di extender`)
 		}

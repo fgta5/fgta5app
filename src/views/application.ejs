@@ -78,42 +78,44 @@
 	</body>
 
 	<script type="module">
-		// loading mjs...  <% if (mjsExists) { %> 
-		import Application from './public/modules/<%= `${modulename}/${mjsFileName}` %>'	
-		// <% } else { %>
-		// module './public/modules/<%= `${modulename}/${modulename}.mjs` %>' not found. 
-		// Create dummy module
-		class Application {
-			async main() {
-				console.warn("empty module: './public/modules/<%= `${modulename}/${mjsFileName}` %>' not found!")
+
+			// loading mjs...  <% if (mjsExists) { %> 
+			import Application from './public/modules/<%= `${modulename}/${mjsFileName}` %>'	
+			// <% } else { %>
+			// module './public/modules/<%= `${modulename}/${modulename}.mjs` %>' not found. 
+			// Create dummy module
+			class Application {
+				async main() {
+					console.warn("empty module: './public/modules/<%= `${modulename}/${mjsFileName}` %>' not found!")
+				}
 			}
-		}
-		// <% } %>
+			// <% } %>
 
-		window.addEventListener("load", async (event) => {
-			const mainapp = document.getElementById('mainapp')
-			const pagemask = document.getElementById('loadingindicator')
-			try {
-				const $app = new Application();
-				await $app.main();
-			} catch (err) {
-				console.error(err)
-				mainapp.innerHTML = '<h1>Module Error</h1>' + err.message
-			} finally {
-				// remove loading indikator
+			window.addEventListener("load", async (event) => {
+				const mainapp = document.getElementById('mainapp')
+				const pagemask = document.getElementById('loadingindicator')
+				try {
+					const $app = new Application();
+					await $app.main();
+				} catch (err) {
+					console.error(err)
+					mainapp.innerHTML = '<h1>Module Error</h1>' + err.message
+				} finally {
+					// remove loading indikator
 
-				mainapp.classList.remove('hidden')
-				setTimeout(()=>{
-					pagemask.style.opacity = 0
-					pagemask.style.visibility = 'hidden'
+					mainapp.classList.remove('hidden')
 					setTimeout(()=>{
-						pagemask.parentNode.removeChild(pagemask)
-					}, 500)
-				}, 50)
-			}
-			
+						pagemask.style.opacity = 0
+						pagemask.style.visibility = 'hidden'
+						setTimeout(()=>{
+							pagemask.parentNode.removeChild(pagemask)
+						}, 500)
+					}, 50)
+				}
+				
 
-		});
-		
+			});
+
+	
 	</script>		
 </html>

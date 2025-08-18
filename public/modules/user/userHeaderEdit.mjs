@@ -1,5 +1,6 @@
 import Module from './../module.mjs'
 import Context from './user-context.mjs'
+import * as Extender from './user-ext.mjs'
 
 
 const CurrentState = {}
@@ -56,8 +57,13 @@ export async function init(self, args) {
 
 	cbo_group_id.addEventListener('selecting', (evt)=>{ 
 		// user-ext.mjs, pada init, 
-		// self.Extender.cbo_group_id_selecting = ({evt}) => { cbo_group_id_selecting(self, evt) }
-		try { self.fnExecute('cbo_group_id_selecting', { evt }) } catch (err) { console.error(err)}
+		// .cbo_group_id_selecting = ({evt}) => { cbo_group_id_selecting(self, evt) }
+		// try { self.Extender.execute('cbo_group_id_selecting', { evt }) } catch (err) { console.error(err)}
+
+		if (typeof Extender.cbo_group_id_selecting === 'function') {
+			Extender.cbo_group_id_selecting(self, evt)
+		}
+
 	}) 
 		
 	
@@ -337,10 +343,9 @@ async function btn_new_click(self, evt) {
 
 		let datainit = {}
 		// jika perlu modifikasi data initial,
-		// atau dialog untuk opsi data baru, dapat dibuat di userExtender.newData
-		const newDataExtender = self.Modules.userExtender.newData
-		if (typeof newDataExtender === 'function') {
-			datainit = await newDataExtender(self)
+		// atau dialog untuk opsi data baru, dapat dibuat di Extender.newData
+		if (typeof Extender.newData === 'function') {
+			datainit = await Extender.newData(self)
 		}
 
 		// buat data baru

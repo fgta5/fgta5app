@@ -122,6 +122,10 @@ export default class AppGenUI {
 		IO.load(data)
 	}
 
+	pauseAutoSave(pause) {
+		IO.pauseAutoSave(pause)
+	}
+
 	async updateCache() {
 		IO.updateCache()
 	}

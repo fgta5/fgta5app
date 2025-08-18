@@ -56,7 +56,7 @@ export async function openSelectedData(self, params) {
 
 
 async function openData(self, id) {
-	const apiOpen = new $fgta5.ApiEndpoint('/generator/open')
+	const apiOpen = new $fgta5.ApiEndpoint(`/${Context.moduleName}/open`)
 	try {
 		const result = await apiOpen.execute({ id })
 		return result
@@ -128,22 +128,20 @@ async function btn_generate_click(self, evt)  {
 	
 	let mask = $fgta5.Modal.createMask()
 	btn_generate.disabled = true
+	ui.pauseAutoSave(true)
 	try {
 		if (data.id=='') {
 			throw new Error('save dahulu sebelum generate')
 		}
-		const result = await Generate(self, data)
-
-
-		// tunggu sampai proses selesai, baru tutup
-		
-
+		const result = await Generate(self, data, mask)
 		console.log(result)
+		$fgta5.MessageBox.info('done')
 	} catch (err) {
 		console.error(err)
 		$fgta5.MessageBox.error(err.message)
 	} finally {
 		btn_generate.disabled = false
+		ui.pauseAutoSave(false)
 		mask.close()
 		mask = null
 	}
@@ -152,49 +150,52 @@ async function btn_generate_click(self, evt)  {
 
 
 async function Save(self, data) {
-	const apiSave = new $fgta5.ApiEndpoint('/generator/save')
+	const url = `/${Context.moduleName}/save`
 	try {
-		const result = await apiSave.execute({ data })
+		const result = await self.apiCall(url, { data }) 
 		return result 
 	} catch (err) {
 		throw err	
-	} finally {
-		apiSave.dispose()
-	}
+	} 
 }
 
-async function Generate(self, data) {
+async function Generate(self, data, mask) {
 	return new Promise(async (resolve, reject)=>{
-		const apiGen = new $fgta5.ApiEndpoint('/generator/generate')
- 		// const ws = new WebSocket(`wss://localhost:8080/?userId=agung`)
-		const ws = new WebSocket(`ws://localhost:8080/?userId=agung`);
-    	const timeoutMs = 60000
-
-		let timeoutId
+		const jobId = Date.now()
+		const clientId = `${Context.notifierId}-${jobId}`
+		const notifierSocket = Context.notifierSocket
+ 		const ws = new WebSocket(`${notifierSocket}/?clientId=${clientId}`);
+ 
 		ws.onmessage = (event) => {
 			const data = JSON.parse(event.data);
 			if (data.status === 'done') {
-				clearTimeout(timeoutId);
 				ws.close();
-				resolve(data.result);
+				resolve(data);
+			} else if (data.status=='error') {
+				ws.close();
+				reject(new Error(data.info.message))
+			} else if (data.status=='message') {	
+				console.log(data)
+				mask.setText(data.info.message)
+			} else if (data.status==='timeout') {
+				ws.close();
+				reject(new Error('generate timeout'));
 			}
 		};
 
 		ws.onerror = (err) => {
-			clearTimeout(timeoutId);
 			ws.close();
+			console.error(err)
 			reject(err);
 		};
 
-		timeoutId = setTimeout(() => {
-			apiGen.abort()
-			ws.close(); // ⛔️ pastikan ini tidak race dengan onmessage
-			reject(new Error(`Task ${taskId} timed out after ${timeoutMs}ms`));
-		}, timeoutMs);
 
-
+		const apiGen = new $fgta5.ApiEndpoint(`/${Context.moduleName}/generate`)
 		try {
-			const result = await apiGen.execute({ data })
+			const result = await apiGen.execute({ data, notifierSocket, clientId })
+			console.log(result)
+
+			// di sini tidak perlu resolve, karena resolve akan menunggu message dari websocket
 		} catch (err) {
 			reject(err)
 		} finally {

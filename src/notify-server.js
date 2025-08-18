@@ -8,43 +8,42 @@ const clients = new Map();
 function setupWebSocket(wss) {
   wss.on('connection', (ws, req) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
-    const userId = url.searchParams.get('userId');
-	
-	const sessionId = req.sessionID;
+    const clientId = url.searchParams.get('clientId');
 
-	console.log(sessionId)
-
-    if (!userId) {
-      ws.close(1008, 'Missing userId');
+    if (!clientId) {
+      ws.close(1008, 'Missing clientId');
       return;
-    }
-
-    clients.set(userId, ws);
-    console.log(`Client connected: ${userId}`);
+    }    
+   
+    clients.set(clientId, ws);
+    console.log(`Client connected: ${clientId}`);
 
     ws.on('close', () => {
-      clients.delete(userId);
-      console.log(`Client disconnected: ${userId}`);
+      clients.delete(clientId);
+      console.log(`Client disconnected: ${clientId}`);
     });
   });
 }
 
-function sendToClient(userId, payload) {
-  const ws = clients.get(userId);
+function sendToClient(clientId, payload) {
+  const ws = clients.get(clientId);
   if (ws && ws.readyState === ws.OPEN) {
     ws.send(JSON.stringify(payload));
   }
 }
 
 function handleNotify(req, res) {
-  const { userId, jobId, status } = req.body;
+  const { clientId, status, info } = req.body;
 
-  if (!userId || !jobId || !status) {
+  if (!clientId || !status) {
     return res.status(400).json({ error: 'Missing fields' });
   }
 
-  const payload = { jobId, status };
-  sendToClient(userId, payload);
+  const payload = { status, info };
+
+  console.log('notify to ', clientId)
+  console.log(payload)
+  sendToClient(clientId, payload);
 
   res.sendStatus(200);
 }

@@ -1,17 +1,40 @@
-import pgp from 'pg-promise';
+import pgp from 'pg-promise'
 
 import db from '../app-db.js'
 import Api from '../api.js'
+import { runDetachedWorker } from '../workermanager.js'
 import sqlUtil from '@agung_dhewe/pgsqlc'
 
-import { Worker } from 'worker_threads';
+
 import jwt from 'jsonwebtoken';
 
+const MINUTES = 60 * 1000
+
+const moduleName = 'generator'
+const generateTimeoutMs = 5 * MINUTES 
 
 // api: account
 export default class extends Api {
 	constructor(req, res, next) {
 		super(req, res, next);
+
+		// jika req.session.user tidak ada datanya, berarti belum login 
+		if (req.session.user==null) {
+			const err = new Error('belum login')
+			err.code = 401
+			throw err
+		}
+
+		// set context dengan data session saat ini
+		this.context = {
+			userId: req.session.user.userId,
+			userName: req.session.user.userName,
+			userFullname: req.session.userFullname,
+			sid: req.sessionID,
+			notifierId: Api.generateNotifierId(moduleName, req.sessionID),
+			notifierSocket: req.app.locals.appConfig.notifierSocket,
+			notifierServer: req.app.locals.appConfig.notifierServer,
+		}
 	}
 
 	// dipanggil dengan model snake syntax
@@ -25,13 +48,17 @@ export default class extends Api {
 
 }
 
+
 async function generator_init(self, body) {
 	console.log('init generator')
 	self.req.session.sid = self.req.sessionID
 
 	return {
-		sid: self.req.sessionID,
-		notifierHost: self.req.app.locals.appConfig.notifierHost
+		userId: self.context.userId,
+		userFullname: self.context.userFullname,
+		sid: self.context.sid ,
+		notifierId: self.context.notifierId,
+		notifierSocket: self.context.notifierSocket
 	}
 }
 
@@ -138,7 +165,7 @@ async function generator_save(self, body) {
 
 
 async function generator_generate(self, body) {
-	const { data } = body
+	const { data, clientId } = body
 	const id = `${data.id}`
 
 	try {
@@ -148,25 +175,19 @@ async function generator_generate(self, body) {
 
 		// sebelumnya save dahulu
 		const result = await generator_save(self, body)
-		const jobId = '123456'
+		const generator_id = result.generator_id
 
-		result.jobId = jobId
-
-
-		// generate di thread lain
-		const params = {
-			jobId: jobId,
-			generator_id: result.generator_id,
-			sid: self.req.sessionID
-		};
-
-		result.wsparam = params
-		// const worker = new Worker('./src/apis/workers/generator-worker.js', {
-		// 	workerData: params
-		// });
+		// generate di detached thread
+		const notifierServer = self.context.notifierServer	
+		runDetachedWorker('./src/apis/workers/generator-worker.js', notifierServer, clientId, {
+			generator_id: generator_id,
+			timeout: generateTimeoutMs
+		})
 
 
-		return result
+		return {
+			generator_id: generator_id
+		}
 	} catch (err) {
 		throw err
 	}

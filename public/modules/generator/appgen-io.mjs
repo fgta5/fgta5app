@@ -41,6 +41,13 @@ export default class AppGenIO {
 	startDesign(entity_id) {}
 
 
+	#autoSavePaused = false
+	get autoSavePaused() { return this.#autoSavePaused }
+	pauseAutoSave(autoSavePaused) {
+		console.log(autoSavePaused? 'auto save paused' : 'auto save resume')
+		this.#autoSavePaused = autoSavePaused
+	}
+
 	async getCurrentData() {
 		const data = await AppGenIO_GetCurrentWorkData(this)
 		return data
@@ -192,8 +199,10 @@ function AppGenIO_AutoSave(self) {
 	// autosave ke local storage per 10 detik
 	const svr = setInterval(async ()=>{
 		try {
-			var data = await AppGenIO_GetCurrentWorkData(self)
-			AppGenIO_updateCache(data)
+			if (!self.autoSavePaused) {
+				var data = await AppGenIO_GetCurrentWorkData(self)
+				AppGenIO_updateCache(data)
+			}
 			// clearInterval(svr)
 		} catch (err) {
 			console.log(err.message)

@@ -23,8 +23,6 @@ export default class extends Module {
 
 		const self = this
 
-		// self.Extender untuk meampung fungsi-fungsi dalam generator-ext.mjs
-		self.Extender = {}
 
 		// module-module yang di load perlu di pack dulu ke dalam variable
 		// jangan import lagi module-module ini di dalam mjs tersebut
@@ -38,15 +36,16 @@ export default class extends Module {
 		try {
 			
 			// inisiasi sisi server
-			const apiGen = new $fgta5.ApiEndpoint('/generator/init')
 			try {
-				const result = await apiGen.execute({ })
-				console.log(result)
+				const result = await self.apiCall(`/${Context.moduleName}/init`, { })
+				Context.notifierId = result.notifierId
+				Context.notifierSocket = result.notifierSocket
+				Context.userId = result.userId
+				Context.userFullname = result.userFullname
+				Context.sid = result.sid
 			} catch (err) {
 				throw err
-			} finally {
-				apiGen.dispose()
-			}
+			} 
 
 
 			await Promise.all([
@@ -59,14 +58,7 @@ export default class extends Module {
 			await render(self)
 
 
-			// setup web socket
-			const userId = 'u001';
-			const ws = new WebSocket(`ws://localhost:8080/?userId=${userId}`);
 
-			ws.onmessage = (event) => {
-				const { jobId, status } = JSON.parse(event.data);
-				console.log(`Job ${jobId} status: ${status}`);
-			};
 
 		} catch (err) {
 			throw err

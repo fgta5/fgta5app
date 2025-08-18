@@ -41,14 +41,42 @@ export default class Module {
 
 	renderFooterButtons(footerButtonsContainer) { renderFooterButtons(this, footerButtonsContainer) }
 
-	// fnExecute(fnname, args) {
-	// 	var fn = this.Extender[fnname]
-	// 	if (typeof fn==='function') {
-	// 		fn(args)
-	// 	} else {
-	// 		throw new Error(`'${fnname}' belum diimplementasikan di extender`)
-	// 	}
-	// }
+
+	async sleep(ms) {
+		return new Promise(lanjut=>{
+			setTimeout(()=>{
+				lanjut()
+			}, ms)
+		})
+	}
+
+	isInFrame() {
+		return window.self !== window.top;
+	}
+
+	async apiCall(url, args) {
+		const api = new $fgta5.ApiEndpoint(url)
+		try {
+			const result = await api.execute(args)
+			return result 
+		} catch (err) {
+			if (err.code==401) {
+				console.error(err)
+				await $fgta5.MessageBox.error(err.message)
+				if (this.isInFrame()) {
+					window.parent.postMessage({
+						action:'REDIRECT_TO_LOGIN'
+					}, '*')
+				} else {
+					location.href = '/'
+				}
+				await this.sleep(10000)
+				throw err				
+			} else {
+				throw err
+			}
+		}
+	}
 }
 
 

@@ -13,6 +13,12 @@ export default class Api {
 	get res() { return this.#res }
 	get next() { return this.#next }
 
+
+	static generateNotifierId(moduleName, str) {
+		return `${moduleName}-${str}`
+	}
+
+
 	async handleRequest(methodName, body) {
 		try {
 			if (typeof this[methodName] === 'function') {

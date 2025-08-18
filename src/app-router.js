@@ -1,3 +1,4 @@
+
 import dotenv from 'dotenv';
 import express from 'express';
 import multer from 'multer';
@@ -21,6 +22,8 @@ const apiDebugMode = args.includes('--debug');
 const fgta5jsDebugMode = process.env.DEBUG_MODE_FGTA5JS === 'true'
 const fgta5jsVersion = process.env.FGTA5JS_VERSION || ''
 const appDebugMode = process.env.DEBUG_MODE_APP === 'true'
+
+
 
 const importModule = async (modulename) => {
 	// jika mode debug, 
@@ -77,10 +80,16 @@ const isFileExists = async (filepath) => {
 
 const handleApiError = (err, res, next) => {
 	const code = err.code ?? 500
-	res.json({
+	const response = {
 		code: code,
 		message: "API: " + err.message
-	})
+	}
+	
+	if ([401, 403].includes(code)) {
+		res.status(code).send(err.message)
+	} else {
+		res.json(response)
+	}
 }
 
 
@@ -94,13 +103,18 @@ router.use((req, res, next) => {
 
 
 router.get('/', (req, res) => {
+
+	// kedepannya set ini untuk keperluan login
 	req.session.user = {
-		id: '234',
-		name: 'agung',
+		userId: '234',
+		userName: 'agung',
+		userFullname: 'Agung Nugroho'
 	}
 
+	console.log(req.session)
+	
 	const sessionId = req.sessionID;
-	console.log('Session ID:', sessionId);
+	console.log('Created Session ID:', sessionId);
 
 	res.render('index', {
 		title: 'Fgta5js Development',
@@ -175,8 +189,9 @@ router.post('/:modulename/:method', async (req, res, next)=>{
 	const modulename = req.params.modulename;
 	const ModuleClass = await importModule(modulename)
 	const method = kebabToCamel(req.params.method);
-	const module = new ModuleClass(req, res, next)
+	
 	try {
+		const module = new ModuleClass(req, res, next)
 		const result = await module.handleRequest(method, req.body)
 		const response = {
 			code: 0,

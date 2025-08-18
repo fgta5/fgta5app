@@ -34,7 +34,8 @@ app.use(session);
 
 
 app.locals.appConfig = {
-  notifierHost: process.env.NOTIFIER_HOST || 'ws://localhost:8080'
+  notifierSocket: process.env.NOTIFIER_SOCKET || 'ws://localhost:8080',
+  notifierServer: process.env.NOTIFIER_SERVER || 'http://localhost:8080'
 };
 
 

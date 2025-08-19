@@ -1,9 +1,11 @@
 import pgp from 'pg-promise'
-import db from '../../app-db.js'
+import db from '../app-db.js'
 import { workerData, parentPort } from 'worker_threads';
-import { access } from 'fs/promises';
+import { access, mkdir } from 'fs/promises';
 import { constants } from 'fs';
 import path from 'path';
+import { createModuleRollup } from './createModuleRollup.js'
+import { createModuleContext } from './createModuleContext.js'
 
 const { generator_id } = workerData;
 
@@ -18,7 +20,7 @@ async function main(id) {
 		const data = await db.one(sql, queryParams);
 
 		await generate(data.generator_data)
-
+		
 		
 	} catch (err) {
 		err.message = `Generator Worker: ${err.message}`
@@ -35,24 +37,39 @@ async function sleep(s) {
 }
 
 async function generate(data) {
-	const directory = data.directory
-	const appname = data.appname
-	const modulename = data.name
+	const context = {
+		directory: data.directory,
+		appname: data.appname,
+		moduleName: data.name,
+		entities: data.entities,
+		postMessage: (info) => {
+			parentPort.postMessage(info)
+		}
+	}
 
 	try {
-		await prepareDirectory(appname, modulename, directory)
+		await prepareDirectory(context)
+		await createModuleRollup(context)
+		await createModuleContext(context)
+		
 
 
+		context.postMessage({message: `finish`, done:true})
 	} catch (err) {
 		throw err
 	}
 }
 
-async function prepareDirectory(appname, modulename, directory) {
+async function prepareDirectory(context) {
+	const appname = context.appname
+	const moduleName = context.moduleName
+	const directory = context.directory
+
+
 	try {
 
-		parentPort.postMessage({message: `preparing directory`})
-		await sleep(5)
+		context.postMessage({message: `preparing directory`})
+		// await sleep(1)
 
 		// cek jika directory project exists
 		const projectDirExists = await directoryExists(directory)
@@ -60,16 +77,16 @@ async function prepareDirectory(appname, modulename, directory) {
 			throw new Error(`directory tujuan '${directory}' tidak ditemukan`)
 		}
 
-		const moduleDir = path.join(directory, 'public', 'modules', modulename)
+		const moduleDir = path.join(directory, 'public', 'modules', moduleName)
 		const apiDir = path.join(directory, 'src', 'apis')
 		const apiExtenderDir = path.join(apiDir, 'extenders')
 
 		const moduleDirExists =  await directoryExists(moduleDir)
 		if (!moduleDirExists) {
 			// direktori modul tidak ditemukan, buat dulu
-			parentPort.postMessage({message: `creating new directory: '${moduleDir}`})
-			await sleep(5)
-
+			context.postMessage({message: `creating new directory: '${moduleDir}`})
+			await mkdir(moduleDir, {});
+			// await sleep(1)
 		}
 
 		const apiDirExists =  await directoryExists(apiDir)
@@ -82,10 +99,15 @@ async function prepareDirectory(appname, modulename, directory) {
 			throw new Error(`directory tujuan '${apiExtenderDir}' tidak ditemukan`)
 		}
 
+		context.moduleDir = moduleDir
+		context.apiDir = apiDir
+		context.apiExtenderDir = apiExtenderDir
 	} catch (err) {
 		throw err
 	}
 }
+
+
 
 async function directoryExists(path) {
 	try {

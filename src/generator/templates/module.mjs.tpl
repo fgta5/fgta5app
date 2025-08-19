@@ -1,0 +1,82 @@
+import Module from './../module.mjs'
+import Context from './{{moduleName}}-context.mjs'  {{#each sections}}
+import * as {{sectionName}} from './{{sectionName}}.mjs' {{/each}}
+import * as Extender from './{{moduleName}}-ext.mjs'
+
+const app = Context.app
+const Crsl = Context.Crsl
+
+
+export default class extends Module {
+	constructor() {
+		super()
+	}
+
+	async main(args={}) {
+		
+		console.log('initializing module...')
+		app.setTitle('{{title}}')
+		app.showFooter(true)
+		
+		args.autoLoadGridData = true
+
+		const self = this
+
+		// module-module yang di load perlu di pack dulu ke dalam variable
+		// jangan import lagi module-module ini di dalam mjs tersebut
+		// karena akan terjadi cyclic redudancy pada saat di rollup
+		self.Modules = { {{#each sections}}
+			{{sectionName}}, {{/each}}
+		}
+
+		try {
+			
+			await Promise.all([ {{#each sections}}
+				{{sectionName}}.init(self, args), {{/each}} 
+				Extender.init(self, args)
+			])
+
+			// render dan setup halaman
+			await render(self)
+
+		} catch (err) {
+			throw err
+		}
+	}
+
+}
+
+async function render(self) {
+	try {
+		const footerButtonsContainer =  document.getElementsByClassName('footer-buttons-container')
+		self.renderFooterButtons(footerButtonsContainer)
+	
+		Crsl.addEventListener($fgta5.SectionCarousell.EVT_SECTIONSHOWING, (evt)=>{
+			var sectionId = evt.detail.commingSection.Id
+			for (let cont of footerButtonsContainer) {
+				var currContainerSectionId = cont.getAttribute('data-section')
+				if (currContainerSectionId==sectionId) {
+					setTimeout(()=>{
+						cont.classList.remove('hidden')
+						cont.style.animation = 'dropped 0.3s forwards'
+						setTimeout(()=>{
+							cont.style.animation = 'unset'	
+						}, 300)
+					}, 500)
+				} else {
+					cont.classList.add('hidden')
+				}
+			}
+		})
+
+		// {{moduleName}}-ext.mjs, export function extendPage(self) {} 
+		if (typeof Extender.extendPage === 'function') {
+			Extender.extendPage(self)
+		} else {
+			console.warn(`'extendPage' tidak diimplementasikan di extender`)
+		}
+
+	} catch (err) {
+		throw err
+	}
+}

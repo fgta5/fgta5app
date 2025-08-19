@@ -1,16 +1,18 @@
 import { renderTemplate, kebabToCamel, isFileExist, getSectionData } from './helper.js'
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { writeFile } from 'fs/promises';
+import { access, writeFile } from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export async function createModuleContext(context, options) {
+export async function createModuleHeaderListMjs(context, sectionName='header', sectionPart='list', options) {
 	const overwrite = options.overwrite===true
 	const moduleName = context.moduleName
-	const targetFile = path.join(context.moduleDir, `${moduleName}-context.mjs`)
-	
+	const title = context.title
+	const modulePart = kebabToCamel(`${moduleName}-${sectionName}-${sectionPart}`)
+	const targetFile = path.join(context.moduleDir, `${modulePart}.mjs`)
+
 	try {
 		// cek dulu apakah file ada
 		var fileExists = await isFileExist(targetFile)
@@ -19,24 +21,24 @@ export async function createModuleContext(context, options) {
 			return
 		}
 
-
-		let sections = []
-		for (var entityName in context.entities) {
-			sections.push(getSectionData(moduleName, entityName, context.entities[entityName], 'list'))
-			sections.push(getSectionData(moduleName, entityName, context.entities[entityName], 'edit'))
-		}
+		const entityName = sectionName
+		const entityData = context.entities[entityName]
+		const sectionData = getSectionData(moduleName, entityName, entityData, 'list')
 
 		const variables = {
+			title: title,
+			modulePart: modulePart,
 			moduleName: moduleName,
-			sections: sections
 		}
 
-		const tplFilePath = path.join(__dirname, 'templates', 'module-context.tpl')
-		const content = await renderTemplate(tplFilePath, variables);
 		
+		const tplFilePath = path.join(__dirname, 'templates', 'moduleHeaderList.mjs.tpl')
+		const content = await renderTemplate(tplFilePath, variables);
+				
 		context.postMessage({message: `writing file: '${targetFile}`})
 		await writeFile(targetFile, content, 'utf8');
 	} catch (err) {
 		throw err
 	}
+
 }

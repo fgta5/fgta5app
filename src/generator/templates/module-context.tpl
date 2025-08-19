@@ -8,6 +8,6 @@ export default {
 	urlDir: urlDir,
 	Crsl: Crsl,
 	Sections: { {{#each sections}}
-		{{sectionName}}: '{{sectionData}}',{{/each}}
+		{{sectionName}}: '{{sectionElementId}}',{{/each}}
 	}
 }

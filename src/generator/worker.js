@@ -6,8 +6,27 @@ import { constants } from 'fs';
 import path from 'path';
 import { createModuleRollup } from './createModuleRollup.js'
 import { createModuleContext } from './createModuleContext.js'
+import { createModuleExtenderMjs } from './createModuleExtenderMjs.js'
+import { createModuleExtenderHtml } from './createModuleExtenderHtml.js'
+import { createModuleEjs } from './createModuleEjs.js'
+import { createModuleMjs } from './createModuleMjs.js'
+import { createModuleHeaderListHtml } from './createModuleHeaderListHtml.js'
+import { createModuleHeaderListMjs } from './createModuleHeaderListMjs.js'
+import { createModuleHeaderEditHtml } from './createModuleHeaderEditHtml.js'
+import { createModuleHeaderEditMjs } from './createModuleHeaderEditMjs.js'
+import { createModuleDetilListHtml } from './createModuleDetilListHtml.js'
+import { createModuleDetilListMjs } from './createModuleDetilListMjs.js'
+import { createModuleDetilEditHtml } from './createModuleDetilEditHtml.js'
+import { createModuleDetilEditMjs } from './createModuleDetilEditMjs.js'
+
+
+
 
 const { generator_id } = workerData;
+const HEADER = 'header'
+const DETIL = 'detil'
+const LIST = 'list'
+const EDIT = 'edit'
 
 
 main(generator_id)
@@ -38,6 +57,7 @@ async function sleep(s) {
 
 async function generate(data) {
 	const context = {
+		title: data.title,
 		directory: data.directory,
 		appname: data.appname,
 		moduleName: data.name,
@@ -48,12 +68,23 @@ async function generate(data) {
 	}
 
 	try {
-		await prepareDirectory(context)
-		await createModuleRollup(context)
-		await createModuleContext(context)
+		await prepareDirectory(context, {overwrite:true})
+		await createModuleRollup(context, {overwrite:true})
+		await createModuleContext(context, {overwrite:true})
+		await createModuleExtenderHtml(context, {overwrite:true})
+		await createModuleExtenderMjs(context, {overwrite:true})
+		await createModuleEjs(context, {overwrite:true})
+		await createModuleMjs(context, {overwrite:true})
+		await createModuleHeaderListHtml(context, HEADER, LIST, {overwrite:true})
+		await createModuleHeaderListMjs(context, HEADER, LIST, {overwrite:true})
+		await createModuleHeaderEditHtml(context, HEADER, EDIT, {overwrite:true})
+		await createModuleHeaderEditMjs(context, HEADER, EDIT, {overwrite:true})
+		await createModuleDetilListHtml(context, DETIL, LIST, {overwrite:true})
+		await createModuleDetilListMjs(context, DETIL, LIST, {overwrite:true})
+		await createModuleDetilEditHtml(context, DETIL, EDIT, {overwrite:true})
+		await createModuleDetilEditMjs(context, DETIL, EDIT, {overwrite:true})
+
 		
-
-
 		context.postMessage({message: `finish`, done:true})
 	} catch (err) {
 		throw err

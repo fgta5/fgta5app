@@ -1,22 +1,22 @@
 import Module from '../module.mjs'
-import Context from './{{moduleName}}-context.mjs'
-import * as Extender from './{{moduleName}}-ext.mjs'
+import Context from './<%= moduleName %>-context.mjs'
+import * as Extender from './<%= moduleName %>-ext.mjs'
 
 
 const Crsl =  Context.Crsl
-const CurrentSectionId = Context.Sections.{{modulePart}}
+const CurrentSectionId = Context.Sections.<%= modulePart %>
 const CurrentSection = Crsl.Items[CurrentSectionId]
 const CurrentState = {}
 
-const tbl =  new $fgta5.Gridview('{{modulePart}}-tbl')
-const pnl_search = document.getElementById('{{modulePart}}-pnl_search')
-const btn_gridload = new $fgta5.ActionButton('{{modulePart}}-btn_gridload') 
+const tbl =  new $fgta5.Gridview('<%= modulePart %>-tbl')
+const pnl_search = document.getElementById('<%= modulePart %>-pnl_search')
+const btn_gridload = new $fgta5.ActionButton('<%= modulePart %>-btn_gridload') 
 
 export const Section = CurrentSection
 export const SearchParams = {}
 
 export async function init(self, args) {
-	console.log('initializing {{modulePart}} ...')
+	console.log('initializing <%= modulePart %> ...')
 
 	// add event listener
 	tbl.addEventListener('nextdata', async evt=>{ tbl_nextdata(self, evt) })
@@ -44,7 +44,7 @@ export async function init(self, args) {
 			SearchParams[binding] =  new $fgta5[componentname](id)
 		}
 
-		// {{modulePart}}-ext.mjs, export function initSearchParams(self, SearchParams) {} 
+		// <%= modulePart %>-ext.mjs, export function initSearchParams(self, SearchParams) {} 
 		if (typeof Extender.initSearchParams === 'function') {
 			Extender.initSearchParams(self, SearchParams)
 		} else {
@@ -64,7 +64,7 @@ export async function init(self, args) {
 }
 
 export async function render(self) {
-	console.log('{{modulePart}} render')
+	console.log('<%= modulePart %> render')
 }
 
 
@@ -120,13 +120,13 @@ async function openRow(self, tr) {
 	const keyvalue = tr.getAttribute('keyvalue')
 	const key = tr.getAttribute('key')
 
-	const {{moduleEdit}} = self.Modules.{{moduleEdit}}
+	const <%= moduleEdit %> = self.Modules.<%= moduleEdit %>
 
 	try {
 		setCurrentRow(self, tr)
 		CurrentState.SelectedRow.keyValue = keyvalue
 		CurrentState.SelectedRow.key = key
-		await {{moduleEdit}}.openSelectedData(self, {key:key, keyvalue:keyvalue})
+		await <%= moduleEdit %>.openSelectedData(self, {key:key, keyvalue:keyvalue})
 	} catch (err) {
 		console.error(err)
 		await $fgta5.MessageBox.error(err.message)
@@ -163,8 +163,8 @@ async function tbl_cellclick(self, evt) {
 async function tbl_celldblclick(self, evt) {
 	const tr = evt.detail.tr
 
-	const {{moduleEdit}} = self.Modules.{{moduleEdit}}
-	{{moduleEdit}}.Section.show()
+	const <%= moduleEdit %> = self.Modules.<%= moduleEdit %>
+	<%= moduleEdit %>.Section.show()
 
 	await openRow(self, tr)
 }
@@ -176,7 +176,7 @@ async function btn_gridload_click(self, evt) {
 
 
 async function tbl_loadData(self, params={}) {
-	console.log('loading {{moduleSection}} data')
+	console.log('loading <%= moduleSection %> data')
 	console.log(params)
 
 	const { criteria={}, limit=0, offset=0, sort={} } = params
@@ -215,7 +215,7 @@ async function tbl_loadData(self, params={}) {
 	let mask = $fgta5.Modal.createMask()
 	let loader = new $fgta5.Dataloader() 
 	try {
-		const resp = await loader.load('/{{moduleName}}/header-list', args)
+		const resp = await loader.load('/<%= moduleName %>/header-list', args)
 		const code = resp.code
 		const message = resp.message
 		const result = resp.result

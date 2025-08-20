@@ -1,8 +1,9 @@
-import { renderTemplate } from './templateProcessor.js'
 import { kebabToCamel, isFileExist, getSectionData } from './helper.js'
 import { fileURLToPath } from 'url';
-import path from 'path';
-import fs from 'fs/promises';
+import path from 'path'
+import fs from 'fs/promises'
+import ejs from 'ejs'
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

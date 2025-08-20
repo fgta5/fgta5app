@@ -1,6 +1,7 @@
 import { renderTemplate } from './templateProcessor.js'
 import { kebabToCamel, isFileExist, getSectionData } from './helper.js'
 import { fileURLToPath } from 'url';
+import ejs from 'ejs';
 import path from 'path';
 import fs from 'fs/promises';
 
@@ -30,20 +31,31 @@ export async function createModuleHeaderListHtml(context, sectionName='header', 
 		const fields = []
 		for (var fieldName in entityData.Items) {
 			const item = entityData.Items[fieldName]
-			var dataName = item.name
-			var binding = item.data_fieldname
-			var label = item.input_label
 
-			let columnDefinition = ''
-			if (item.component==='Checkbox') {
-				var formatter = `formatter="checkmark(value)"`
-				columnDefinition = `<th data-name="${dataName}" binding="${binding}" ${formatter} text-align="center">${label}</th>`
-			} else {
-				columnDefinition = `<th data-name="${dataName}" binding="${binding}">${label}</th>`
+			if (!item.showInGrid) {
+				continue
 			}
-			fields.push({ columnDefinition 
 
-				
+			let component = item.component
+			let dataName = item.name
+			let binding = item.data_fieldname
+			let label = item.input_label
+			let formatter = null
+
+			if (component==='Checkbox') {
+				formatter = 'formatter="checkmark(value)"'
+			} 
+		
+			// columnDefinition = `<th data-name="${dataName}" binding="${binding}" ${formatter} text-align="center">${label}</th>`
+			// columnDefinition = `<th data-name="${dataName}" binding="${binding}">${label}</th>`
+
+
+			fields.push({  
+				component: component,
+				dataName: dataName,
+				binding: binding,
+				label: label,
+				formatter:formatter
 			})
 		}
 
@@ -59,7 +71,7 @@ export async function createModuleHeaderListHtml(context, sectionName='header', 
 		
 		const tplFilePath = path.join(__dirname, 'templates', 'moduleHeaderList.html.tpl')
 		const template = await fs.readFile(tplFilePath, 'utf-8');
-		const content = renderTemplate(template, variables);
+		const content = ejs.render(template, variables)
 				
 		context.postMessage({message: `writing file: '${targetFile}`})
 		await fs.writeFile(targetFile, content, 'utf8');

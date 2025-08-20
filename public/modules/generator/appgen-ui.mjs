@@ -135,20 +135,7 @@ export default class AppGenUI {
 	} 
 }
 
-// async function AppGenLayout_GetContent(self, url) {
-// 	const response = await fetch(url)
-// 	if (!response.ok) {
-// 		console.error(`HTTP Error: ${response.status}`)
-// 	}
-// 	const data = await response.text(); 
-// 	return data
-// }
 
-// async function AppGenLayout_FetchAll(self) {
-// 	const main = self.App.Nodes.Main
-// 	const data = await AppGenLayout_GetContent(self, URL_LAYOUT)
-// 	main.innerHTML += data
-// }
 
 async function AppGenLayout_Render(self) {
 	ME.IconButton = document.getElementById('upload-icon') 
@@ -221,16 +208,20 @@ function AppGenLayout_createButtons(self) {
 		btn_ShowDetail_click(self, evt)
 	})
 
+
+	// menampilkan design fields
 	const btn_ShowFields = document.getElementById('btn_ShowFields')
 	btn_ShowFields.addEventListener('click', (evt)=>{
 		btn_ShowFields_click(self, evt)
 	})
 
+	// menampilkan design uniq
 	const btn_ShowUniq = document.getElementById('btn_ShowUniq')
 	btn_ShowUniq.addEventListener('click', (evt)=>{
 		btn_ShowUniq_click(self, evt)
 	})
 
+	// menampilkan design search
 	const btn_ShowSearch = document.getElementById('btn_ShowSearch')
 	btn_ShowSearch.addEventListener('click', (evt)=>{
 		btn_ShowSearch_click(self, evt)
@@ -277,6 +268,15 @@ function showOnly(toShow) {
 
 function btn_ShowFields_click(self, evt) {
 	showOnly(['designer-info', 'design-data-field'])
+
+	// tampilkan kembali drop target
+	const entity_id = CURRENT.entity_id
+	const designer = ME.EntityDesigner.querySelector(`div[${ATTR_ENTITYID}="${entity_id}"]`)
+	let droptarget = designer.querySelector(`[name="${ATTR_DROPTARGET}"]`)
+	if (droptarget!=null) {
+		droptarget.classList.remove('hidden')
+	}
+	
 }
 
 function btn_ShowUniq_click(self, evt) {
@@ -322,16 +322,6 @@ async function AppGenLayout_AddEntity(self, entity={}) {
 	const tbody = tbl_entity.querySelector('tbody')
 	const cols = tbl_entity.querySelectorAll('thead > tr th')
 
-	/*
-	isi entity untuk set ulang
-	entyty {
-		col_id: 'xxxx',
-		col_name: 'nama entity',
-		col_title: 'judul entity',
-		col_table: 'nama tabel',
-		col_ok: 'PK dari table'
-	}
-	*/
 
 	const newtr = document.createElement('tr')
 	newtr.setAttribute(ATTR_ENTITYID, ID)
@@ -586,6 +576,9 @@ function AppGenLayout_addDesigner(self, ID, isheader) {
 
 
 	
+	// console.log(ME.EntityDesigner)
+	// eluniq.innerHTML = `designer unig ${ID}` 
+
 
 	
 	editem.appendChild(elinfo)
@@ -613,12 +606,59 @@ function AppGenLayout_addDesigner(self, ID, isheader) {
 		}
 	}
 
-	
+	// setup designer uniq & search
+	AppGenGenLayout_setupUniqueDesigner(eluniq, ID)
+	AppGenGenLayout_setupSearchDesigner(elsearch, ID)
+
+	// tambahkan editor ke designer
 	ME.EntityDesigner.appendChild(editem)
 }
 
 
+function AppGenGenLayout_setupUniqueDesigner(eluniq, entity_id) {
+	const btnAdd = eluniq.querySelector('button[name="btnAdd"]')
+	btnAdd.addEventListener('click', AppGenGenLayout_addUniqueButtonClick)
 
+}
+
+function AppGenGenLayout_addUniqueButtonClick(evt) {
+	const tr = evt.target.closest('tr')
+	const elName = tr.querySelector('input[name="unique_name"]')
+	const elFields = tr.querySelector('input[name="unique_fields"]')
+	const uniq_name = elName.value
+	const uniq_fields = elFields.value
+	console.log(uniq_name, uniq_fields)
+
+	// tambahkan unique
+	const newRow = document.createElement('tr')
+	const tdName = document.createElement('td')
+	const tdFields = document.createElement('td')
+	const tdControl = document.createElement('td')
+	const btnRemove = document.createElement('div')
+	btnRemove.classList.add('action-button-remove')
+	btnRemove.innerHTML = ICON_CLOSE
+	btnRemove.addEventListener('click', (evt)=>{ console.log('remove') })
+
+	tdName.innerHTML = uniq_name
+	tdFields.innerHTML = uniq_fields
+	tdControl.appendChild(btnRemove)
+
+	newRow.appendChild(tdName)
+	newRow.appendChild(tdFields)
+	newRow.appendChild(tdControl)
+
+	tr.parentNode.insertBefore(newRow, tr);
+
+	// reset
+	elName.value = ''
+	elFields.value = ''
+
+}
+
+
+function AppGenGenLayout_setupSearchDesigner(elsearch, entity_id) {
+	
+}
 
 
 
@@ -627,40 +667,17 @@ async function AppGenLayout_NewData(self) {
 	// jika belum ada header
 	const tbl_entity = ME.tbl_entity
 	const tbody = tbl_entity.querySelector('tbody')
-	const jsoncachedata =  IO.GetDataFromCache()
-	const data = JSON.parse(jsoncachedata)
-	
-	const header = data?.entities?.header;
-	var entity_id
-	if (header) {
-		// entity_id = header.id
-		// await AppGenLayout_AddEntity(self, {
-		// 	isheader: true,
-		// 	col_id: header.id,
-		// 	col_name: header.name,
-		// 	col_title: header.title,
-		// 	col_table: header.table,
-		// 	col_pk: header.pk
-		// })
-		IO.ReadData(jsoncachedata)
-	} else {
- 		entity_id = await AppGenLayout_AddEntity(self, {
-			isheader: true,
-			col_name: 'header',
-			col_title: 'test_title',
-			col_table: 'test_table',
-			col_pk: 'test_pk'
-		})
+	const entity_id = await AppGenLayout_AddEntity(self, {
+		isheader: true,
+		col_name: 'header',
+		col_title: 'test_title',
+		col_table: 'test_table',
+		col_pk: 'test_pk'
+	})
 
-		const btn = tbody.querySelector(`[name="col_btndesign"][${ATTR_ENTITYID}="${entity_id}"]`)
-		btn.click()
-	}
+	const btn = tbody.querySelector(`[name="col_btndesign"][${ATTR_ENTITYID}="${entity_id}"]`)
+	btn.click()
 	
-	
-	
-
-
-
 	setTimeout(()=>{
 		IO.AutoSave()
 	}, 2000)

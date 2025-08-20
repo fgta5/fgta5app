@@ -433,6 +433,10 @@ function AppGenIO_GetFieldData(self, el) {
 	field.input_label = getValueFrom(el, 'input[name="labeltext"]', 'value') ?? ''
 	field.input_placeholder = getValueFrom(el, 'input[name="placeholder"]', 'value') ?? ''
 	field.input_caption = getValueFrom(el, 'input[name="caption"]', 'value') ?? ''
+	field.input_information = getValueFrom(el, 'input[name="information"]', 'value') ?? ''
+	field.input_containercss = getValueFrom(el, 'input[name="input-containercss"]', 'value') ?? ''
+	field.input_inlinestyle = getValueFrom(el, 'input[name="input-inlinestyle"]', 'value') ?? ''
+	
 	
 	var sel_charcase = el.querySelector('select[name="charcasing"]')
 	if (sel_charcase!=null) {
@@ -450,6 +454,13 @@ function AppGenIO_GetFieldData(self, el) {
 	var chk_showinform =  el.querySelector('input[name="showinform"]')
 	field.showInForm = chk_showinform.checked ? true : false
 
+	// grid related
+	field.grid_formatter = getValueFrom(el, 'input[name="gridformatter"]', 'value') ?? ''
+	field.grid_css = getValueFrom(el, 'input[name="gridcss"]', 'value') ?? ''
+	field.grid_inlinestyle = getValueFrom(el, 'input[name="gridinlinestyle"]', 'value') ?? ''
+	field.grid_sorting = getCheckedFrom(el, 'input[name="gridsorting"]')
+
+
 
 	field.Validation = {}
 
@@ -463,6 +474,9 @@ function AppGenIO_GetFieldData(self, el) {
 	field.Validation.messageRequired = getValueFrom(el, 'input[name="msg_invalid_required"]', 'value')
 	field.Validation.messageMinimum = getValueFrom(el, 'input[name="msg_invalid_minimum"]', 'value')
 	field.Validation.messageMaximum = getValueFrom(el, 'input[name="msg_invalid_maximum"]', 'value')
+	field.Validation.hasCustomValidator = getCheckedFrom(el, 'input[name="hascustomvalidator"]')
+	field.Validation.customValidator = getValueFrom(el, 'input[name="validator"]', 'value')
+
 	
 
 	field.Reference = {}
@@ -592,6 +606,7 @@ async function AppGenIO_Load(self, data) {
 		// console.log(entity)
 		for (var item_id in entity.Items) {
 			let item = entity.Items[item_id]
+
 			var componentname = item.component
 			
 			let comp = Components[componentname]
@@ -607,8 +622,8 @@ async function AppGenIO_Load(self, data) {
 
 function AppGenIO_FillDataField(self, datafield, field) {
 
-	setValueTo(field.input_name, datafield, 'input[name="fieldname"]', 'value')
-	setValueTo(field.input_name, datafield, 'input[name="fieldname-summary"]', 'value')
+	setValueTo(field.data_fieldname, datafield, 'input[name="fieldname"]', 'value')
+	setValueTo(field.data_fieldname, datafield, 'input[name="fieldname-summary"]', 'value')
 
 	setSelectedTo(field.data_type, datafield, 'select[name="datatype"]')
 
@@ -630,13 +645,23 @@ function AppGenIO_FillDataField(self, datafield, field) {
 	setValueTo(field.input_label, datafield, 'input[name="labeltext"]', 'value')
 	setValueTo(field.input_placeholder, datafield, 'input[name="placeholder"]', 'value')
 	setValueTo(field.input_caption, datafield, 'input[name="caption"]', 'value')
-
+	setValueTo(field.input_information, datafield, 'input[name="information"]', 'value')
+	setValueTo(field.input_containercss, datafield, 'input[name="input-containercss"]', 'value')
+	setValueTo(field.input_inlinestyle, datafield, 'input[name="input-inlinestyle"]', 'value')
 
 	setSelectedTo(field.input_charcase, datafield, 'select[name="charcasing"]')
 
 	setCheckedTo(field.input_disabled, datafield, 'input[name="disabledinform"]')
 	setCheckedTo(field.showInGrid, datafield, 'input[name="showingrid"]')
 	setCheckedTo(field.showInForm, datafield, 'input[name="showinform"]')
+
+
+	// grid related
+	setValueTo(field.grid_formatter, datafield, 'input[name="gridformatter"]', 'value')
+	setValueTo(field.grid_css, datafield, 'input[name="gridcss"]', 'value')
+	setValueTo(field.grid_inlinestyle, datafield, 'input[name="gridinlinestyle"]', 'value')
+	setCheckedTo(field.grid_sorting, datafield, 'input[name="gridsorting"]')
+
 
 	setCheckedTo(field.Validation.isRequired, datafield, 'input[name="isrequired"]')
 	setCheckedTo(field.Validation.isMinimum, datafield, 'input[name="isbatasmin"]')
@@ -648,6 +673,10 @@ function AppGenIO_FillDataField(self, datafield, field) {
 	setValueTo(field.Validation.messageRequired, datafield, 'input[name="msg_invalid_required"]', 'value')
 	setValueTo(field.Validation.messageMinimum, datafield, 'input[name="msg_invalid_minimum"]', 'value')
 	setValueTo(field.Validation.messageMaximum, datafield, 'input[name="msg_invalid_maximum"]', 'value')
+
+	setCheckedTo(field.Validation.hasCustomValidator, datafield, 'input[name="hascustomvalidator"]')
+	setValueTo(field.Validation.customValidator, datafield, 'input[name="validator"]', 'value')
+
 
 	setValueTo(field.Reference.table, datafield, 'input[name="ref_table"]', 'value')
 	setValueTo(field.Reference.pk, datafield, 'input[name="ref_id"]', 'value')

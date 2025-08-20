@@ -30,6 +30,8 @@ export async function init(self, args) {
 
 	await ui.Init()
 
+	ui.pauseAutoSave(true)
+
 }
 
 export async function openSelectedData(self, params) {
@@ -89,6 +91,7 @@ async function btn_new_click(self, evt) {
 		const id = document.getElementById('obj_programid')
 		if (id!='') {
 			await ui.reset()
+			await ui.NewData()
 			ui.updateCache()
 		}
 
@@ -96,6 +99,7 @@ async function btn_new_click(self, evt) {
 		const resp = await $fgta5.MessageBox.confirm('apakah anda yakin akan membuat data baru?')
 		if (resp=='ok') {
 			await ui.reset()
+			await ui.NewData()
 			ui.updateCache()
 		}
 	} 

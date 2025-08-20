@@ -50,11 +50,11 @@ export async function createModuleHeaderListHtml(context, sectionName='header', 
 
 
 			fields.push({  
-				component: component,
-				dataName: dataName,
-				binding: binding,
-				label: label,
-				formatter:formatter
+				component,
+				dataName,
+				binding,
+				label,
+				formatter
 			})
 		}
 

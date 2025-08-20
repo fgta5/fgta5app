@@ -8,7 +8,7 @@
 	
 	"settings": {
 		"javascript.implicitProjectConfig.checkJs": false,
-		"editor.insertSpaces": false,
+
 		"files.exclude": {
 			"public/libs/fgta5js/.vscode": true,
 			"public/libs/fgta5js/apps": true,
@@ -35,7 +35,9 @@
 			"public/libs/fgta5js/*.*": true,
 			"public/libs/fgta5js/LICENSE": true,
 			"public/libs/-*": true,
-		}
+		},
+        "editor.detectIndentation": false,
+        "editor.insertSpaces": false
 
 		
 	},

@@ -1,4 +1,4 @@
-import { kebabToCamel, isFileExist, getSectionData } from './helper.js'
+import { kebabToCamel, isFileExist, getSectionData, createAdditionalFieldConfiguration } from './helper.js'
 import { fileURLToPath } from 'url';
 import path from 'path'
 import fs from 'fs/promises'
@@ -31,10 +31,31 @@ export async function createModuleHeaderEditHtml(context, sectionName='header', 
 
 		const fields = []
 		for (var fieldName in entityData.Items) {
-			var item = entityData.Items[fieldName]
-			var dataName = item.name
-			var binding = item.data_fieldname
-			var label = item.input_label
+			const item = entityData.Items[fieldName]
+
+			if (item.data_fieldname=='group_name') {
+				console.log(item)
+			}
+
+			if (!item.showInForm) {
+				continue
+			}
+
+			const component = item.component
+			const elementId = item.input_name
+			const placeholder = item.input_placeholder
+			const label = item.input_label
+			const binding = item.data_fieldname
+			const additionalFieldConfiguration = createAdditionalFieldConfiguration(item)
+
+			fields.push({  
+				component,
+				elementId,
+				placeholder,
+				label,
+				binding,
+				additionalFieldConfiguration
+			})
 
 		}
 

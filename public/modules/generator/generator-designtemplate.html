@@ -61,7 +61,25 @@
 
 <!-- UNIQUE-DESIGN -->
 <div name="designer-unique" class="designer-unique hidden">
-	unique design
+	<table>
+		<tr>
+			<td style="vertical-align: top;">
+				<input name="unique_name" class="action-input" placeholder="unique name">
+			</td>
+			<td style="vertical-align: top;">
+				<div>
+					<input name="unique_fields" class="action-input" style="width: 400px" placeholder="fields">
+				</div>
+				<div style="font-size: 0.8em; font-style: italic; padding-left: 5px;">
+					untuk multiple fields, pisahkan dengan koma (,)
+				</div>
+				
+			</td>
+			<td style="vertical-align: top;">
+				<button name="btnAdd" class="action-button-add">Add</button>
+			</td>
+		</tr>
+	</table>
 </div>
 
 
@@ -171,39 +189,6 @@ ishandlekeydown
 			<input name="description" type="text" >
 		</div>
 
-		
-
-		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
-
-
-		<label>Object Name</label><div>
-		<input type="text" name="objectname"></div>  
-		<div></div>	
-		<div></div>
-		<div></div>	
-		<div></div>	
-
-		<label>Label Text</label><div>
-		<input type="text" name="labeltext"></div> 
-		
-		<label>Placeholder</label>
-		<div style="grid-column: span 3;">
-			<input type="text" name="placeholder">
-		</div> 
-
-		<label>Char Case</label>
-		<div>
-			<select name="charcasing">
-				<option value="normal" selected>Normal</option>
-				<option value="lowercase">lowercase</option>
-				<option value="uppercase">UPPERCASE</option>
-			</select>
-		</div> 
-		<div></div>
-		<div></div>
-		<div></div>
-		<div></div>
-
 
 		<div>
 			<input type="text" style="visibility: hidden;"> <!-- agar tinggi baris tidak terlihat sempet, karena di baris ini hanya checkbox-->
@@ -222,10 +207,79 @@ ishandlekeydown
 				Disabled
 			</label>
 		</div>
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
 
 
-	
 
+		<label>Object Name</label><div>
+		<input type="text" name="objectname"></div>  
+		<div></div>	
+		<div></div>
+		<div></div>	
+		<div></div>	
+
+		<label>Label Text</label><div>
+		<input type="text" name="labeltext"></div> 
+		
+		<label>Placeholder</label>
+		<div style="grid-column: span 3;">
+			<input type="text" name="placeholder">
+		</div> 
+
+
+		<label>Char Case</label>
+		<div>
+			<select name="charcasing">
+				<option value="normal" selected>Normal</option>
+				<option value="lowercase">lowercase</option>
+				<option value="uppercase">UPPERCASE</option>
+			</select>
+		</div> 
+		<div style="grid-column: span 4;"></div>
+
+
+
+		<label>Information</label>
+		<div style="grid-column: span 5;">
+			<input name="information" type="text" >
+		</div>		
+
+
+		<label>Container CSS</label><div>
+		<input type="text" name="input-containercss"></div> 
+		
+		<label>InLine Style</label>
+		<div style="grid-column: span 3;">
+			<input type="text" name="input-inlinestyle">
+		</div> 
+
+
+
+
+
+
+
+
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
+		<label>Grid</label>
+		<div style="grid-column: span 5;" name="validation">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">Formatter</label>
+			<input name="gridformatter" type="text">
+		
+			<label style="grid-column: span 2; transform: translateY(5px); ">CSS</label>
+			<input name="gridcss" type="text">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">Inline Style</label>
+			<input name="gridinlinestyle" type="text">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">&nbsp;</label>
+			<label>
+				<input name="gridsorting" type="checkbox" value="1" style="transform: translateY(2px);" >
+				Sorting
+			</label>
+
+		</div>	
 
 
 		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
@@ -243,18 +297,25 @@ ishandlekeydown
 			<input name="msg_invalid_required" type="text" placeholder="invalid message">
 
 			<label>
-				<input name="isbatasmin" type="checkbox" value="1" style="transform: translateY(2px);" value="1">
+				<input name="isbatasmin" type="checkbox" value="1" style="transform: translateY(2px);" >
 				Min Length
 			</label>
 			<input type="number" name="minimum">
 			<input type="text" name="msg_invalid_minimum" placeholder="invalid message">
 
 			<label>
-				<input name="isbatasmax" type="checkbox" checked disabled value="1" style="transform: translateY(2px);" value="1">
+				<input name="isbatasmax" type="checkbox" value="1" checked disabled style="transform: translateY(2px);" >
 				Max Length
 			</label>
 			<input type="number" name="maximum" disabled>
 			<input type="text" name="msg_invalid_maximum" placeholder="invalid message">
+
+			<label style="grid-column: span 2;">
+				<input name="hascustomvalidator" type="checkbox" value="1" style="transform: translateY(2px);" >
+				Custom Validator
+			</label>
+			<input name="validator" type="text" >
+		
 		</div>
 
 		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
@@ -361,25 +422,6 @@ ishandlekeydown
 		</div>
 
 
-		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
-
-
-		<label>Object Name</label><div>
-		<input type="text" name="objectname"></div>  
-		<div></div>
-		<div></div>
-		<div></div>
-		<div></div>
-
-		<label>Label Text</label><div>
-		<input type="text" name="labeltext"></div> 
-		
-		<label>Placeholder</label>
-		<div style="grid-column: span 3;">
-			<input type="text" name="placeholder">
-		</div> 
-
-
 		<div>
 			<input type="text" style="visibility: hidden;"> <!-- agar tinggi baris tidak terlihat sempet, karena di baris ini hanya checkbox-->
 		</div>
@@ -397,6 +439,59 @@ ishandlekeydown
 				Disabled
 			</label>
 		</div>
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
+
+
+		<label>Object Name</label><div>
+		<input type="text" name="objectname"></div>  
+		<div style="grid-column: span 4;"></div>
+
+
+		<label>Label Text</label><div>
+		<input type="text" name="labeltext"></div> 
+		
+		<label>Placeholder</label>
+		<div style="grid-column: span 3;">
+			<input type="text" name="placeholder">
+		</div> 
+
+		<label>Information</label>
+		<div style="grid-column: span 5;">
+			<input name="information" type="text" >
+		</div>
+
+
+		<label>Container CSS</label><div>
+		<input type="text" name="input-containercss"></div> 
+		
+		<label>InLine Style</label>
+		<div style="grid-column: span 3;">
+			<input type="text" name="input-inlinestyle">
+		</div> 
+
+		
+
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
+		<label>Grid</label>
+		<div style="grid-column: span 5;" name="validation">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">Formatter</label>
+			<input name="gridformatter" type="text">
+			
+			<label style="grid-column: span 2; transform: translateY(5px); ">CSS</label>
+			<input name="gridcss" type="text">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">Inline Style</label>
+			<input name="gridinlinestyle" type="text">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">&nbsp;</label>
+			<label>
+				<input name="gridsorting" type="checkbox" value="1" style="transform: translateY(2px);" >
+				Sorting
+			</label>
+
+		</div>	
+
 
 
 		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
@@ -419,6 +514,12 @@ ishandlekeydown
 			</label>
 			<input type="number" name="maximum">
 			<input type="text" name="msg_invalid_maximum" placeholder="invalid message">
+
+			<label style="grid-column: span 2;">
+				<input name="hascustomvalidator" type="checkbox" value="1" style="transform: translateY(2px);" >
+				Custom Validator
+			</label>
+			<input name="validator" type="text" >
 
 		</div>
 
@@ -509,21 +610,7 @@ ishandlekeydown
 		<label>Description</label>
 		<div style="grid-column: span 5;"><input type="text" name="description"></div>
 
-		<div style="display: block; height: 1rem;"></div>
-		<div></div>
-		<div></div>
-		<div></div>
-		<div></div>
-		<div></div>
 
-		<label>Object Name</label><div>
-		<input type="text" name="objectname"></div>  
-
-		<label>Text</label><div>
-		<input type="text" name="labeltext"></div> 
-		
-		<label>Caption</label><div>
-		<input type="text" name="caption"></div> 
 
 
 		<div>
@@ -543,7 +630,71 @@ ishandlekeydown
 				Disabled
 			</label>
 		</div>
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
 
+
+		<label>Object Name</label><div>
+		<input type="text" name="objectname"></div>  
+
+		<label>Text</label><div>
+		<input type="text" name="labeltext"></div> 
+		
+		<label>Caption</label><div>
+		<input type="text" name="caption"></div> 
+
+
+		<label>Information</label>
+		<div style="grid-column: span 5;">
+			<input name="information" type="text" >
+		</div>
+
+
+		<label>Container CSS</label><div>
+		<input type="text" name="input-containercss"></div> 
+		
+		<label>InLine Style</label>
+		<div style="grid-column: span 3;">
+			<input type="text" name="input-inlinestyle">
+		</div> 
+	
+
+
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
+		<label>Grid</label>
+		<div style="grid-column: span 5;" name="validation">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">Formatter</label>
+			<input name="gridformatter" type="text">
+			
+			<label style="grid-column: span 2; transform: translateY(5px); ">CSS</label>
+			<input name="gridcss" type="text">
+						
+			<label style="grid-column: span 2; transform: translateY(5px); ">Inline Style</label>
+			<input name="gridinlinestyle" type="text">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">&nbsp;</label>
+			<label>
+				<input name="gridsorting" type="checkbox" value="1" style="transform: translateY(2px);" >
+				Sorting
+			</label>
+
+		</div>	
+
+
+
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
+		<label>Validation</label>
+		<div style="grid-column: span 5;" name="validation">
+			<div name="defaultinvalidmessage" style="grid-column: span 2;">Default Invalid Message</div>
+			<input type="text" name="msg_invalid_default" placeholder="invalid message">
+
+			<label style="grid-column: span 2;">
+				<input name="hascustomvalidator" type="checkbox" value="1" style="transform: translateY(2px);" >
+				Custom Validator
+			</label>
+			<input name="validator" type="text" >
+
+		</div>	
 
 		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
 		<label name="validation" style="transform: translateY(10px);">Handle Event</label>
@@ -632,26 +783,6 @@ ishandlekeydown
 		</div>
 
 		
-
-		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
-
-
-		<label>Object Name</label><div>
-		<input type="text" name="objectname"></div>  
-		<div></div>	
-		<div></div>
-		<div></div>	
-		<div></div>	
-
-		<label>Label Text</label><div>
-		<input type="text" name="labeltext"></div> 
-		
-		<label>Placeholder</label>
-		<div style="grid-column: span 3;">
-			<input type="text" name="placeholder">
-		</div> 
-
-
 		<div>
 			<input type="text" style="visibility: hidden;"> <!-- agar tinggi baris tidak terlihat sempet, karena di baris ini hanya checkbox-->
 		</div>
@@ -669,6 +800,57 @@ ishandlekeydown
 				Disabled
 			</label>
 		</div>
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
+
+
+		<label>Object Name</label><div>
+		<input type="text" name="objectname"></div>  
+		<div style="grid-column: span 4;"></div>	
+
+
+		<label>Label Text</label><div>
+		<input type="text" name="labeltext"></div> 
+		
+		<label>Placeholder</label>
+		<div style="grid-column: span 3;">
+			<input type="text" name="placeholder">
+		</div> 
+
+		<label>Information</label>
+		<div style="grid-column: span 5;">
+			<input name="information" type="text" >
+		</div>
+
+
+		<label>Container CSS</label><div>
+		<input type="text" name="input-containercss"></div> 
+		
+		<label>InLine Style</label>
+		<div style="grid-column: span 3;">
+			<input type="text" name="input-inlinestyle">
+		</div> 
+
+
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
+		<label>Grid</label>
+		<div style="grid-column: span 5;" name="validation">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">Formatter</label>
+			<input name="gridformatter" type="text">
+			
+			<label style="grid-column: span 2; transform: translateY(5px); ">CSS</label>
+			<input name="gridcss" type="text">
+						
+			<label style="grid-column: span 2; transform: translateY(5px); ">Inline Style</label>
+			<input name="gridinlinestyle" type="text">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">&nbsp;</label>
+			<label>
+				<input name="gridsorting" type="checkbox" value="1" style="transform: translateY(2px);" >
+				Sorting
+			</label>
+
+		</div>	
 
 
 		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
@@ -685,6 +867,11 @@ ishandlekeydown
 			<div></div>
 			<input name="msg_invalid_required" type="text" placeholder="invalid message">
 
+			<label style="grid-column: span 2;">
+				<input name="hascustomvalidator" type="checkbox" value="1" style="transform: translateY(2px);" >
+				Custom Validator
+			</label>
+			<input name="validator" type="text" >
 		</div>
 
 
@@ -802,26 +989,6 @@ ishandlekeydown
 		</div>
 
 		
-
-		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
-
-
-		<label>Object Name</label><div>
-		<input type="text" name="objectname"></div>  
-		<div></div>	
-		<div></div>
-		<div></div>	
-		<div></div>	
-
-		<label>Label Text</label><div>
-		<input type="text" name="labeltext"></div> 
-		
-		<label>Placeholder</label>
-		<div style="grid-column: span 3;">
-			<input type="text" name="placeholder">
-		</div> 
-
-
 		<div>
 			<input type="text" style="visibility: hidden;"> <!-- agar tinggi baris tidak terlihat sempet, karena di baris ini hanya checkbox-->
 		</div>
@@ -840,6 +1007,58 @@ ishandlekeydown
 			</label>
 		</div>			
 
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
+
+
+		<label>Object Name</label><div>
+		<input type="text" name="objectname"></div>  
+		<div style="grid-column: span 4;"></div>	
+
+
+		<label>Label Text</label><div>
+		<input type="text" name="labeltext"></div> 
+		
+		<label>Placeholder</label>
+		<div style="grid-column: span 3;">
+			<input type="text" name="placeholder">
+		</div> 
+
+
+		<label>Information</label>
+		<div style="grid-column: span 5;">
+			<input name="information" type="text" >
+		</div>
+
+		<label>Container CSS</label><div>
+		<input type="text" name="input-containercss"></div> 
+		
+		<label>InLine Style</label>
+		<div style="grid-column: span 3;">
+			<input type="text" name="input-inlinestyle">
+		</div> 
+
+
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
+		<label>Grid</label>
+		<div style="grid-column: span 5;" name="validation">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">Formatter</label>
+			<input name="gridformatter" type="text">
+			
+			<label style="grid-column: span 2; transform: translateY(5px); ">CSS</label>
+			<input name="gridcss" type="text">
+						
+			<label style="grid-column: span 2; transform: translateY(5px); ">Inline Style</label>
+			<input name="gridinlinestyle" type="text">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">&nbsp;</label>
+			<label>
+				<input name="gridsorting" type="checkbox" value="1" style="transform: translateY(2px);" >
+				Sorting
+			</label>
+
+		</div>	
+
 
 		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
 		<label>Validation</label>
@@ -854,6 +1073,12 @@ ishandlekeydown
 			</label>
 			<div></div>
 			<input name="msg_invalid_required" type="text" placeholder="invalid message">
+
+			<label style="grid-column: span 2;">
+				<input name="hascustomvalidator" type="checkbox" value="1" style="transform: translateY(2px);" >
+				Custom Validator
+			</label>
+			<input name="validator" type="text" >
 
 		</div>
 
@@ -938,26 +1163,6 @@ ishandlekeydown
 		</div>
 
 		
-
-		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
-
-
-		<label>Object Name</label><div>
-		<input type="text" name="objectname"></div>  
-		<div></div>	
-		<div></div>
-		<div></div>	
-		<div></div>	
-
-		<label>Label Text</label><div>
-		<input type="text" name="labeltext"></div> 
-		
-		<label>Placeholder</label>
-		<div style="grid-column: span 3;">
-			<input type="text" name="placeholder">
-		</div> 
-
-
 		<div>
 			<input type="text" style="visibility: hidden;"> <!-- agar tinggi baris tidak terlihat sempet, karena di baris ini hanya checkbox-->
 		</div>
@@ -975,6 +1180,60 @@ ishandlekeydown
 				Disabled
 			</label>
 		</div>			
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
+
+
+		<label>Object Name</label><div>
+		<input type="text" name="objectname"></div>  
+		<div style="grid-column: span 4;"></div>	
+
+
+
+
+		<label>Label Text</label><div>
+		<input type="text" name="labeltext"></div> 
+		
+		<label>Placeholder</label>
+		<div style="grid-column: span 3;">
+			<input type="text" name="placeholder">
+		</div> 
+
+		<label>Information</label>
+		<div >
+			<input name="information" type="text" >
+		</div>
+
+
+		<label>Container CSS</label><div>
+		<input type="text" name="input-containercss"></div> 
+		
+		<label>InLine Style</label>
+		<div style="grid-column: span 3;">
+			<input type="text" name="input-inlinestyle">
+		</div> 
+		
+		
+
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
+		<label>Grid</label>
+		<div style="grid-column: span 5;" name="validation">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">Formatter</label>
+			<input name="gridformatter" type="text">
+			
+			<label style="grid-column: span 2; transform: translateY(5px); ">CSS</label>
+			<input name="gridcss" type="text">
+						
+			<label style="grid-column: span 2; transform: translateY(5px); ">Inline Style</label>
+			<input name="gridinlinestyle" type="text">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">&nbsp;</label>
+			<label>
+				<input name="gridsorting" type="checkbox" value="1" style="transform: translateY(2px);" >
+				Sorting
+			</label>
+
+		</div>			
 
 		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
 		<label>Validation</label>
@@ -989,6 +1248,12 @@ ishandlekeydown
 			</label>
 			<div></div>
 			<input name="msg_invalid_required" type="text" placeholder="invalid message">
+
+			<label style="grid-column: span 2;">
+				<input name="hascustomvalidator" type="checkbox" value="1" style="transform: translateY(2px);" >
+				Custom Validator
+			</label>
+			<input name="validator" type="text" >
 
 		</div>
 
@@ -1072,24 +1337,6 @@ ishandlekeydown
 
 		
 
-		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
-
-
-		<label>Object Name</label><div>
-		<input type="text" name="objectname"></div>  
-		<div></div>	
-		<div></div>
-		<div></div>	
-		<div></div>	
-
-		<label>Label Text</label><div>
-		<input type="text" name="labeltext"></div> 
-		
-		<label>Placeholder</label>
-		<div style="grid-column: span 3;">
-			<input type="text" name="placeholder">
-		</div> 
-
 
 		<div>
 			<input type="text" style="visibility: hidden;"> <!-- agar tinggi baris tidak terlihat sempet, karena di baris ini hanya checkbox-->
@@ -1108,6 +1355,56 @@ ishandlekeydown
 				Disabled
 			</label>
 		</div>
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
+
+
+		<label>Object Name</label><div>
+		<input type="text" name="objectname"></div>  
+		<div style="grid-column: span 4;"></div>	
+
+
+		<label>Label Text</label><div>
+		<input type="text" name="labeltext"></div> 
+		
+		<label>Placeholder</label>
+		<div style="grid-column: span 3;">
+			<input type="text" name="placeholder">
+		</div> 
+
+		<label>Information</label>
+		<div style="grid-column: span 5;">
+			<input name="information" type="text" >
+		</div>
+
+		<label>Container CSS</label><div>
+		<input type="text" name="input-containercss"></div> 
+		
+		<label>InLine Style</label>
+		<div style="grid-column: span 3;">
+			<input type="text" name="input-inlinestyle">
+		</div> 
+
+
+		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
+		<label>Grid</label>
+		<div style="grid-column: span 5;" name="validation">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">Formatter</label>
+			<input name="gridformatter" type="text">
+			
+			<label style="grid-column: span 2; transform: translateY(5px); ">CSS</label>
+			<input name="gridcss" type="text">
+						
+			<label style="grid-column: span 2; transform: translateY(5px); ">Inline Style</label>
+			<input name="gridinlinestyle" type="text">
+
+			<label style="grid-column: span 2; transform: translateY(5px); ">&nbsp;</label>
+			<label>
+				<input name="gridsorting" type="checkbox" value="1" style="transform: translateY(2px);" >
+				Sorting
+			</label>
+
+		</div>	
 
 
 		<div style="display: block; height: 1rem; grid-column: span 6;"></div>
@@ -1124,6 +1421,11 @@ ishandlekeydown
 			<div></div>
 			<input name="msg_invalid_required" type="text" placeholder="invalid message">
 
+			<label style="grid-column: span 2;">
+				<input name="hascustomvalidator" type="checkbox" value="1" style="transform: translateY(2px);" >
+				Custom Validator
+			</label>
+			<input name="validator" type="text" >			
 		</div>
 
 		<div style="display: block; height: 1rem; grid-column: span 6;"></div>

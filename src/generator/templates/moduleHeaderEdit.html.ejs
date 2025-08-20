@@ -1,6 +1,40 @@
 <form id="<%= modulePart %>-frm" class="module-form" locked="true" autoid="true" primarykey="<%= primaryKeyElementId %>">
+<% fields.forEach(field => { %>
+	<!-- <%= field.component %> -->
+	<% if (field.component === 'Textbox') { %>
+	<div class="demo-input-field" field="<%= field.elementId %>">
+		<label for="<%= field.elementId %>"><%= field.label %></label>
+		<input id="<%= field.elementId %>"  fgta5-component="Textbox" placeholder="<%= field.placeholder %>" autocomplete="off" spellcheck="false" 
+			binding="<%= field.binding %>"<% field.additionalFieldConfiguration.forEach(config => { %>
+			<%- config %> <% }) %>	
 
+			<%= field.required %>  <%= field.minlength %> <%= field.maxlength %> <%= field.validator %> 
+			
+			
+			description="isi dengan nama anda, minimal 3 karakter, maksimal 15 karakter"
+			invalid-message="Nama harus diisi, minimal 3 karakter, maksimal 15 karakter"
+			invalid-message-required="Nama harus diisi"
+			invalid-message-minlength="Nama minimal 3 karakter"
+			invalid-message-maxlength="Nama maksimal 15 karakter"
+			>
+	</div>		
 
+	<% } else if (field.component === 'Numberbox') { %>
+
+	<% } else if (field.component === 'Checkbox') { %>	
+
+	<% } else if (field.component === 'Combobox') { %>		
+
+	<% } else if (field.component === 'Datepicker') { %>			
+
+	<% } else if (field.component === 'Timepicker') { %>
+		
+	<% } else if (field.component === 'Filebox') { %>	
+
+	<% } else { %>	
+		<div style="color:red">Component <%= field.component %> is not supported</div>
+	<% } %>	
+<% }) %>	
 </form>
 
 

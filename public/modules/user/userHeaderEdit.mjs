@@ -25,7 +25,7 @@ const btn_prev = new $fgta5.ActionButton('userHeaderEdit-btn_prev')
 const btn_next = new $fgta5.ActionButton('userHeaderEdit-btn_next')
 
 const frm = new $fgta5.Form('userHeaderEdit-frm');
-const cbo_group_id = frm.Inputs.cbo_group_id
+const cbo_group_id = frm.Inputs['userHeaderEdit-cbo_group_id']
 
 
 

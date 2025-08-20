@@ -2,7 +2,7 @@ import { renderTemplate } from './templateProcessor.js'
 import { kebabToCamel, isFileExist, getSectionData } from './helper.js'
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { writeFile } from 'fs/promises';
+import fs from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,10 +33,11 @@ export async function createModuleContext(context, options) {
 		}
 
 		const tplFilePath = path.join(__dirname, 'templates', 'module-context.tpl')
-		const content = renderTemplate(tplFilePath, variables);
+		const template = await fs.readFile(tplFilePath, 'utf-8');
+		const content = renderTemplate(template, variables);
 		
 		context.postMessage({message: `writing file: '${targetFile}`})
-		await writeFile(targetFile, content, 'utf8');
+		await fs.writeFile(targetFile, content, 'utf8');
 	} catch (err) {
 		throw err
 	}

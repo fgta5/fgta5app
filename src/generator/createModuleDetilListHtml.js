@@ -1,7 +1,8 @@
-import { renderTemplate, kebabToCamel, isFileExist, getSectionData } from './helper.js'
+import { renderTemplate } from './templateProcessor.js'
+import { kebabToCamel, isFileExist, getSectionData } from './helper.js'
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { access, writeFile } from 'fs/promises';
+import fs from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,10 +41,11 @@ export async function createModuleDetilListHtml(context, sectionName='detil', se
 		
 		
 		const tplFilePath = path.join(__dirname, 'templates', 'moduleDetilList.html.tpl')
-		const content = await renderTemplate(tplFilePath, variables);
+		const template = await fs.readFile(tplFilePath, 'utf-8');
+		const content = renderTemplate(template, variables);
 				
 		context.postMessage({message: `writing file: '${targetFile}`})
-		await writeFile(targetFile, content, 'utf8');
+		await fs.writeFile(targetFile, content, 'utf8');
 	} catch (err) {
 		throw err
 	}

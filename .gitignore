@@ -145,3 +145,7 @@ curl.mjs
 public/libs/fgta5js
 public/libs/fgta5js/fgta5js-v1.0.6-min.css
 public/libs/fgta5js/fgta5js-v1.0.6.js
+
+
+# ignore sementara
+public/modules/group

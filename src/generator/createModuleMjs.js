@@ -1,8 +1,8 @@
-import { renderTemplate } from './templateProcessor.js'
 import { kebabToCamel, isFileExist, getSectionData } from './helper.js'
 import { fileURLToPath } from 'url';
-import path from 'path';
-import fs from 'fs/promises';
+import path from 'path'
+import fs from 'fs/promises'
+import ejs from 'ejs'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,7 +37,7 @@ export async function createModuleMjs(context, options) {
 		
 		const tplFilePath = path.join(__dirname, 'templates', 'module.mjs.tpl')
 		const template = await fs.readFile(tplFilePath, 'utf-8');
-		const content = renderTemplate(template, variables);
+		const content = ejs.render(template, variables)
 				
 		context.postMessage({message: `writing file: '${targetFile}`})
 		await fs.writeFile(targetFile, content, 'utf8');

@@ -34,7 +34,7 @@ export async function createModuleContext(context, options) {
 
 		const tplFilePath = path.join(__dirname, 'templates', 'module-context.tpl')
 		const template = await fs.readFile(tplFilePath, 'utf-8');
-		const content = renderTemplate(template, variables);
+		const content = ejs.render(template, variables)
 		
 		context.postMessage({message: `writing file: '${targetFile}`})
 		await fs.writeFile(targetFile, content, 'utf8');

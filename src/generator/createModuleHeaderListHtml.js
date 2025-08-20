@@ -68,7 +68,7 @@ export async function createModuleHeaderListHtml(context, sectionName='header', 
 		}
 		
 		
-		const tplFilePath = path.join(__dirname, 'templates', 'moduleHeaderList.html.tpl')
+		const tplFilePath = path.join(__dirname, 'templates', 'moduleHeaderList.html.ejs')
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 				

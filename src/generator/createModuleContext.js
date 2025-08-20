@@ -32,7 +32,7 @@ export async function createModuleContext(context, options) {
 			sections: sections
 		}
 
-		const tplFilePath = path.join(__dirname, 'templates', 'module-context.tpl')
+		const tplFilePath = path.join(__dirname, 'templates', 'module-context.ejs')
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 		

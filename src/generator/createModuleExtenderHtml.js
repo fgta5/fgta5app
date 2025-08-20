@@ -25,7 +25,7 @@ export async function createModuleExtenderHtml(context, options) {
 			moduleName: moduleName,
 		}
 
-		const tplFilePath = path.join(__dirname, 'templates', 'module-ext.html.tpl')
+		const tplFilePath = path.join(__dirname, 'templates', 'module-ext.html.ejs')
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 				

@@ -26,7 +26,7 @@ export async function createModuleRollup(context, options) {
 			moduleName: moduleName
 		}
 		
-		const tplFilePath = path.join(__dirname, 'templates', '__rollup-module.tpl')
+		const tplFilePath = path.join(__dirname, 'templates', '__rollup-module.ejs')
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 		

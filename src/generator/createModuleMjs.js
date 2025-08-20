@@ -35,7 +35,7 @@ export async function createModuleMjs(context, options) {
 		}
 		
 		
-		const tplFilePath = path.join(__dirname, 'templates', 'module.mjs.tpl')
+		const tplFilePath = path.join(__dirname, 'templates', 'module.mjs.ejs')
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 				

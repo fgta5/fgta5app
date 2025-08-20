@@ -40,7 +40,7 @@ export async function createModuleDetilListHtml(context, sectionName='detil', se
 		}
 		
 		
-		const tplFilePath = path.join(__dirname, 'templates', 'moduleDetilList.html.tpl')
+		const tplFilePath = path.join(__dirname, 'templates', 'moduleDetilList.html.ejs')
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 				

@@ -49,7 +49,7 @@ export async function createModuleHeaderEditHtml(context, sectionName='header', 
 		}
 		
 		
-		const tplFilePath = path.join(__dirname, 'templates', 'moduleHeaderEdit.html.tpl')
+		const tplFilePath = path.join(__dirname, 'templates', 'moduleHeaderEdit.html.ejs')
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 				

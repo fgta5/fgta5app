@@ -32,7 +32,7 @@ export async function createModuleEjs(context, options) {
 			sections: sections
 		}
 
-		const tplFilePath = path.join(__dirname, 'templates', 'module.ejs.tpl')
+		const tplFilePath = path.join(__dirname, 'templates', 'module.ejs.ejs')
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 				

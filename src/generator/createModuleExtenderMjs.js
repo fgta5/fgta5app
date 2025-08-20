@@ -25,7 +25,7 @@ export async function createModuleExtenderMjs(context, options) {
 			moduleName: moduleName,
 		}
 
-		const tplFilePath = path.join(__dirname, 'templates', 'module-ext.mjs.tpl')
+		const tplFilePath = path.join(__dirname, 'templates', 'module-ext.mjs.ejs')
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 				

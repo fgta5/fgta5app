@@ -40,7 +40,7 @@ export async function createModuleDetilEditMjs(context, sectionName='detil', sec
 		}
 		
 		
-		const tplFilePath = path.join(__dirname, 'templates', 'moduleDetilEdit.mjs.tpl')
+		const tplFilePath = path.join(__dirname, 'templates', 'moduleDetilEdit.mjs.ejs')
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 				

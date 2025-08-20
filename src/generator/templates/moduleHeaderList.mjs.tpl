@@ -44,7 +44,7 @@ export async function init(self, args) {
 			SearchParams[binding] =  new $fgta5[componentname](id)
 		}
 
-		// user-ext.mjs, export function initSearchParams(self, SearchParams) {} 
+		// {{modulePart}}-ext.mjs, export function initSearchParams(self, SearchParams) {} 
 		if (typeof Extender.initSearchParams === 'function') {
 			Extender.initSearchParams(self, SearchParams)
 		} else {
@@ -64,7 +64,7 @@ export async function init(self, args) {
 }
 
 export async function render(self) {
-	console.log('userHeaderList render')
+	console.log('{{modulePart}} render')
 }
 
 
@@ -120,13 +120,13 @@ async function openRow(self, tr) {
 	const keyvalue = tr.getAttribute('keyvalue')
 	const key = tr.getAttribute('key')
 
-	const userHeaderEdit = self.Modules.userHeaderEdit
+	const {{moduleEdit}} = self.Modules.{{moduleEdit}}
 
 	try {
 		setCurrentRow(self, tr)
 		CurrentState.SelectedRow.keyValue = keyvalue
 		CurrentState.SelectedRow.key = key
-		await userHeaderEdit.openSelectedData(self, {key:key, keyvalue:keyvalue})
+		await {{moduleEdit}}.openSelectedData(self, {key:key, keyvalue:keyvalue})
 	} catch (err) {
 		console.error(err)
 		await $fgta5.MessageBox.error(err.message)
@@ -163,8 +163,8 @@ async function tbl_cellclick(self, evt) {
 async function tbl_celldblclick(self, evt) {
 	const tr = evt.detail.tr
 
-	const userHeaderEdit = self.Modules.userHeaderEdit
-	userHeaderEdit.Section.show()
+	const {{moduleEdit}} = self.Modules.{{moduleEdit}}
+	{{moduleEdit}}.Section.show()
 
 	await openRow(self, tr)
 }
@@ -176,7 +176,7 @@ async function btn_gridload_click(self, evt) {
 
 
 async function tbl_loadData(self, params={}) {
-	console.log('loading userHeader data')
+	console.log('loading {{moduleSection}} data')
 	console.log(params)
 
 	const { criteria={}, limit=0, offset=0, sort={} } = params
@@ -215,7 +215,7 @@ async function tbl_loadData(self, params={}) {
 	let mask = $fgta5.Modal.createMask()
 	let loader = new $fgta5.Dataloader() 
 	try {
-		const resp = await loader.load('/user/header-list', args)
+		const resp = await loader.load('/{{moduleName}}/header-list', args)
 		const code = resp.code
 		const message = resp.message
 		const result = resp.result

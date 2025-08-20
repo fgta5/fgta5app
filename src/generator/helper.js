@@ -13,17 +13,89 @@ function resolvePath(obj, path) {
 }
 
 
-/**
- * Render template content with variables
- * Supports:
- * - {{key}} for simple replacement
- * - {{info.nama}} for nested access
- * - {{#each items}}...{{/each}} for array looping
- * - {{#if key}}...{{/if}} for conditional rendering
- * @param {string} filePath - path to template file
- * @param {Object} variables - data to inject
- * @returns {Promise<string>} rendered content
- */
+function evaluateExpression(expr, context) {
+  const match = expr.match(/^([\w.]+)\s*(==|!=)\s*['"](.+?)['"]$/);
+  if (!match) {
+    const value = resolvePath(context, expr.trim());
+    return !!value;
+  }
+
+  const [_, leftPath, operator, rightValue] = match;
+  const leftValue = resolvePath(context, leftPath);
+
+  if (operator === '==') return leftValue === rightValue;
+  if (operator === '!=') return leftValue !== rightValue;
+  return false;
+}
+
+function interpolate(content, context) {
+  return content.replace(/{{\s*([\w.]+)\s*}}/g, (_, path) => {
+    const value = resolvePath(context, path);
+    return value !== undefined ? value : '';
+  });
+}
+
+export function renderTemplate(template, variables) {
+  let content = template;
+
+  // Handle {{#each array}}...{{/each}}
+  content = content.replace(/{{#each (\w+)}}([\s\S]*?){{\/each}}/g,
+    (_, arrayName, block) => {
+      const items = resolvePath(variables, arrayName);
+      if (!Array.isArray(items)) return '';
+      return items.map(item => interpolate(block, item)).join('');
+    }
+  );
+
+  // Handle {{#if}}...{{else if}}...{{else}}...{{/if}}
+  content = content.replace(/{{#if (.+?)}}([\s\S]*?){{\/if}}/g, (_, fullExpr, fullBlock) => {
+    // Split into blocks: if, else if, else
+    const parts = [];
+    const regex = /{{(else if|else)?\s*(.*?)?}}/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(fullBlock)) !== null) {
+      const [tag, type, condition] = match;
+      const index = match.index;
+
+      parts.push({
+        type: parts.length === 0 ? 'if' : parts[parts.length - 1].nextType,
+        condition: parts.length === 0 ? fullExpr : parts[parts.length - 1].nextCondition,
+        content: fullBlock.slice(lastIndex, index)
+      });
+
+      parts[parts.length - 1].nextType = type || 'else';
+      parts[parts.length - 1].nextCondition = condition;
+      lastIndex = index + tag.length;
+    }
+
+    // Push final block
+    parts.push({
+      type: parts[parts.length - 1].nextType || 'else',
+      condition: parts[parts.length - 1].nextCondition,
+      content: fullBlock.slice(lastIndex)
+    });
+
+    // Evaluate in order
+    for (const part of parts) {
+      if (part.type === 'else') return interpolate(part.content, variables);
+      if (evaluateExpression(part.condition, variables)) {
+        return interpolate(part.content, variables);
+      }
+    }
+
+    return '';
+  });
+
+  // Final interpolation
+  content = interpolate(content, variables);
+
+  return content;
+}
+
+
+/*
 export async function renderTemplate(filePath, variables) {
   let content = await fs.readFile(filePath, 'utf-8');
 
@@ -73,6 +145,56 @@ export async function renderTemplate(filePath, variables) {
 }
 
 
+
+
+
+function evaluateExpression(expr, context) {
+  const match = expr.match(/^([\w.]+)\s*(==|!=)\s*['"](.+?)['"]$/);
+  if (!match) {
+    // Fallback: treat as truthy check
+    const value = resolvePath(context, expr.trim());
+    return !!value;
+  }
+
+  const [_, leftPath, operator, rightValue] = match;
+  const leftValue = resolvePath(context, leftPath);
+
+  if (operator === '==') return leftValue === rightValue;
+  if (operator === '!=') return leftValue !== rightValue;
+  return false;
+}
+
+function processTemplate(template, variables) {
+  let content = template;
+
+  // Handle {{#if condition}}...{{else}}...{{/if}}
+  content = content.replace(/{{#if (.+?)}}([\s\S]*?){{else}}([\s\S]*?){{\/if}}/g,
+    (_, conditionExpr, ifBlock, elseBlock) => {
+      const result = evaluateExpression(conditionExpr, variables);
+      return result ? ifBlock : elseBlock;
+    }
+  );
+
+  // Handle {{#if condition}}...{{/if}} (no else)
+  content = content.replace(/{{#if (.+?)}}([\s\S]*?){{\/if}}/g,
+    (_, conditionExpr, ifBlock) => {
+      const result = evaluateExpression(conditionExpr, variables);
+      return result ? ifBlock : '';
+    }
+  );
+
+  // Handle {{variable}} interpolation
+  content = content.replace(/{{\s*([\w.]+)\s*}}/g,
+    (_, path) => {
+      const value = resolvePath(variables, path);
+      return value !== undefined ? value : '';
+    }
+  );
+
+  return content;
+}
+*/
+
 export function kebabToCamel(str) {
   return str
     .split('-')
@@ -95,6 +217,8 @@ export async function isFileExist(filepath) {
 export function getSectionData(moduleName, entityName, data, sectionPart) {
   const sectionName = kebabToCamel(`${moduleName}-${entityName}-${sectionPart}`)
   const sectionTitle = capitalizeWords(`${sectionPart} ${data.title}`)
+
+  // console.log(data)
 
   return {
     sectionName: sectionName,

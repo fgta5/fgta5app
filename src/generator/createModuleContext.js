@@ -1,4 +1,5 @@
-import { renderTemplate, kebabToCamel, isFileExist, getSectionData } from './helper.js'
+import { renderTemplate } from './templateProcessor.js'
+import { kebabToCamel, isFileExist, getSectionData } from './helper.js'
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { writeFile } from 'fs/promises';
@@ -32,7 +33,7 @@ export async function createModuleContext(context, options) {
 		}
 
 		const tplFilePath = path.join(__dirname, 'templates', 'module-context.tpl')
-		const content = await renderTemplate(tplFilePath, variables);
+		const content = renderTemplate(tplFilePath, variables);
 		
 		context.postMessage({message: `writing file: '${targetFile}`})
 		await writeFile(targetFile, content, 'utf8');

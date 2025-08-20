@@ -22,10 +22,29 @@ export async function createModuleHeaderEditHtml(context, sectionName='header', 
 		}
 
 		const entityName = sectionName
+		const entityData = context.entities[entityName]
+		const sectionData = getSectionData(moduleName, entityName, entityData, 'edit')
+
+		const primaryKeyFieldData = entityData.Items[sectionData.primaryKey] 
+		const primaryKeyElementId = primaryKeyFieldData.input_name
+
+		const fields = []
+		for (var fieldName in entityData.Items) {
+			var item = entityData.Items[fieldName]
+			var dataName = item.name
+			var binding = item.data_fieldname
+			var label = item.input_label
+
+		}
+
 		const variables = {
 			title: title,
 			moduleName: moduleName,
-			section: getSectionData(moduleName, entityName, context.entities[entityName], 'edit')
+			modulePart: modulePart,
+			moduleSection:  kebabToCamel(`${moduleName}-${sectionName}`),
+			section: sectionData,
+			primaryKeyElementId: primaryKeyElementId,
+			fields: fields
 		}
 		
 		

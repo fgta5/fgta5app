@@ -29,6 +29,8 @@ export async function createModuleHeaderListMjs(context, sectionName='header', s
 			title: title,
 			modulePart: modulePart,
 			moduleName: moduleName,
+			moduleEdit: kebabToCamel(`${moduleName}-${sectionName}-edit`),
+			moduleSection:  kebabToCamel(`${moduleName}-${sectionName}`)
 		}
 
 		

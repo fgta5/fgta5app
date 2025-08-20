@@ -28,7 +28,7 @@ export async function createModuleHeaderListHtml(context, sectionName='header', 
 		
 		const fields = []
 		for (var fieldName in entityData.Items) {
-			var item = entityData.Items[fieldName]
+			const item = entityData.Items[fieldName]
 			var dataName = item.name
 			var binding = item.data_fieldname
 			var label = item.input_label
@@ -40,13 +40,17 @@ export async function createModuleHeaderListHtml(context, sectionName='header', 
 			} else {
 				columnDefinition = `<th data-name="${dataName}" binding="${binding}">${label}</th>`
 			}
-			fields.push({ columnDefinition })
+			fields.push({ columnDefinition 
+
+				
+			})
 		}
 
 		const variables = {
 			title: title,
 			moduleName: moduleName,
 			modulePart: modulePart,
+			moduleSection:  kebabToCamel(`${moduleName}-${sectionName}`),
 			section: sectionData,
 			fields: fields
 		}

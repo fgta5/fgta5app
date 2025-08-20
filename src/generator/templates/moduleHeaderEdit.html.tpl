@@ -1,0 +1,21 @@
+<form id="{{modulePart}}-frm" class="module-form" locked="true" autoid="true" primarykey="{{primaryKeyElementId}}">
+
+
+</form>
+
+
+<div class="footer-buttons-container hidden">
+	<div>
+		<button id="{{modulePart}}-btn_prev"><span>&laquo;&laquo;</span></button>
+	</div>
+	<div>
+		<button id="{{modulePart}}-btn_save">Save</button>
+		<button id="{{modulePart}}-btn_edit">Edit</button>
+		<button id="{{modulePart}}-btn_new" data-action="{{moduleSection}}-new">New</button>
+		<button id="{{modulePart}}-btn_reset">Reset</button>
+		<button id="{{modulePart}}-btn_delete">Delete</button>
+	</div>
+	<div>
+		<button id="{{modulePart}}-btn_next"><span>&raquo;&raquo;</span></button>
+	</div>
+</div>

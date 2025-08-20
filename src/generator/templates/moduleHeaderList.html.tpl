@@ -19,7 +19,7 @@
 <div class="footer-buttons-container">
 	<div></div>
 	<div>
-		<button id="{{modulePart}}-btn_new" data-action="userHeader-new" data-sectionsource="{{modulePart}}-section">New</button>
+		<button id="{{modulePart}}-btn_new" data-action="{{moduleSection}}-new" data-sectionsource="{{modulePart}}-section">New</button>
 	</div>
 	<div></div>
 </div>

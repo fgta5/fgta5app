@@ -3,6 +3,7 @@ import AppGenIO from './appgen-io.mjs'
 
 const IO = new AppGenIO()
 
+
 const URL_LAYOUT = 'appgen-layout'
 const ME = {}
 
@@ -20,6 +21,8 @@ const ATTR_DROPTARGET = 'drop-target'
 const ATTR_DRAGOVER = 'data-dragover'
 const ATTR_CURRENTENTITY = 'data-currententity'
 const ATTR_COMPNAME = 'data-component-name'
+const ATTR_ROWUNIQUE = 'data-rowuniqueindex'
+const ATTR_ROWSEARCH = 'data-rowsearch'
 
 const ID_ENTITYEDITOR = 'entity-editor'
 const ID_DESIGNERINFO = 'designer-info'
@@ -96,6 +99,8 @@ export default class AppGenUI {
 	constructor(app) {
 		this.#app = app
 		
+		IO.addFunction('addUnique', AppGenGenLayout_addUnique)
+		IO.addFunction('addSearch', AppGenGenLayout_addSearch)
 	}
 
 	get App() { return this.#app}
@@ -616,18 +621,26 @@ function AppGenLayout_addDesigner(self, ID, isheader) {
 
 
 function AppGenGenLayout_setupUniqueDesigner(eluniq, entity_id) {
+	const tbl = eluniq.querySelector('table[name="tbl-unique"]')
 	const btnAdd = eluniq.querySelector('button[name="btnAdd"]')
+	const trLineAdd = btnAdd.closest('tr')
+	
+	tbl.setAttribute(ATTR_ENTITYID, entity_id)
+	btnAdd.setAttribute(ATTR_ENTITYID, entity_id)
+	trLineAdd.setAttribute(ATTR_ENTITYID, entity_id)
+	
 	btnAdd.addEventListener('click', AppGenGenLayout_addUniqueButtonClick)
 
 }
 
-function AppGenGenLayout_addUniqueButtonClick(evt) {
-	const tr = evt.target.closest('tr')
-	const elName = tr.querySelector('input[name="unique_name"]')
-	const elFields = tr.querySelector('input[name="unique_fields"]')
-	const uniq_name = elName.value
-	const uniq_fields = elFields.value
-	console.log(uniq_name, uniq_fields)
+function AppGenGenLayout_addUnique(data, entity_id) {
+	const tbl = ME.EntityDesigner.querySelector(`table[name="tbl-unique"][${ATTR_ENTITYID}="${entity_id}"`)
+	const btn = tbl.querySelector('button[name="btnAdd"]')
+	const tr = btn.closest('tr')
+
+
+	const uniq_name = data.uniq_name
+	const uniq_fields = data.uniq_fields
 
 	// tambahkan unique
 	const newRow = document.createElement('tr')
@@ -637,29 +650,137 @@ function AppGenGenLayout_addUniqueButtonClick(evt) {
 	const btnRemove = document.createElement('div')
 	btnRemove.classList.add('action-button-remove')
 	btnRemove.innerHTML = ICON_CLOSE
-	btnRemove.addEventListener('click', (evt)=>{ console.log('remove') })
+	btnRemove.addEventListener('click', AppGenGenLayout_removeUniqueButtonClick)
 
 	tdName.innerHTML = uniq_name
+	tdName.setAttribute('data-name', 'name')
+
 	tdFields.innerHTML = uniq_fields
+	tdFields.setAttribute('data-name', 'fields')
+
 	tdControl.appendChild(btnRemove)
 
 	newRow.appendChild(tdName)
 	newRow.appendChild(tdFields)
 	newRow.appendChild(tdControl)
 
-	tr.parentNode.insertBefore(newRow, tr);
+	newRow.setAttribute(ATTR_ENTITYID, entity_id)
+	newRow.setAttribute(ATTR_ROWUNIQUE, '')
 
-	// reset
+	tr.parentNode.insertBefore(newRow, tr);
+}
+
+function AppGenGenLayout_addUniqueButtonClick(evt) {
+	const tr = evt.target.closest('tr')
+	const entity_id = tr.getAttribute(ATTR_ENTITYID)
+	const elName = tr.querySelector('input[name="unique_name"]')
+	const elFields = tr.querySelector('input[name="unique_fields"]')
+	
+	const data = {
+		uniq_name: elName.value,
+		uniq_fields: elFields.value
+	}
+	AppGenGenLayout_addUnique(data, entity_id)
+
+		// reset
 	elName.value = ''
 	elFields.value = ''
+}
 
+async function AppGenGenLayout_removeUniqueButtonClick(evt) {
+	var res = await $fgta5.MessageBox.confirm('removing item is irreversible. Are you sure ?')
+	if (res=='ok') {
+		const btn = evt.target
+		const tr = evt.target.closest('tr')
+		tr.remove()
+	}
 }
 
 
 function AppGenGenLayout_setupSearchDesigner(elsearch, entity_id) {
+	const tbl = elsearch.querySelector('table[name="tbl-search"]')
+	const btnAdd = elsearch.querySelector('button[name="btnAdd"]')
+	const trLineAdd = btnAdd.closest('tr')
 	
+	tbl.setAttribute(ATTR_ENTITYID, entity_id)
+	btnAdd.setAttribute(ATTR_ENTITYID, entity_id)
+	trLineAdd.setAttribute(ATTR_ENTITYID, entity_id)
+	
+	btnAdd.addEventListener('click', AppGenGenLayout_addSearchButtonClick)
+
 }
 
+function AppGenGenLayout_addSearchButtonClick(evt) {
+	const tr = evt.target.closest('tr')
+	const entity_id = tr.getAttribute(ATTR_ENTITYID)
+	const elName = tr.querySelector('input[name="criteria_name"]')
+	const elLabel = tr.querySelector('input[name="criteria_label"]')
+	const elFields = tr.querySelector('input[name="criteria_fields"]')
+	
+	const data = {
+		criteria_name: elName.value,
+		criteria_label: elLabel.value,
+		criteria_fields: elFields.value
+	}
+	AppGenGenLayout_addSearch(data, entity_id)
+
+		// reset
+	elName.value = ''
+	elLabel.value = ''
+	elFields.value = ''
+}
+
+async function AppGenGenLayout_removeSearchButtonClick(evt) {
+	var res = await $fgta5.MessageBox.confirm('removing item is irreversible. Are you sure ?')
+	if (res=='ok') {
+		const btn = evt.target
+		const tr = evt.target.closest('tr')
+		tr.remove()
+	}
+}
+
+function AppGenGenLayout_addSearch(data, entity_id) {
+	const tbl = ME.EntityDesigner.querySelector(`table[name="tbl-search"][${ATTR_ENTITYID}="${entity_id}"`)
+	const btn = tbl.querySelector('button[name="btnAdd"]')
+	const tr = btn.closest('tr')
+
+	const criteria_name = data.criteria_name
+	const criteria_label = data.criteria_label
+	const criteria_fields = data.criteria_fields
+
+	// tambahkan unique
+	const newRow = document.createElement('tr')
+	const tdName = document.createElement('td')
+	const tdLabel = document.createElement('td')
+	const tdFields = document.createElement('td')
+	const tdControl = document.createElement('td')
+	const btnRemove = document.createElement('div')
+	btnRemove.classList.add('action-button-remove')
+	btnRemove.innerHTML = ICON_CLOSE
+	btnRemove.addEventListener('click', AppGenGenLayout_removeSearchButtonClick)
+
+	tdName.innerHTML = criteria_name
+	tdName.setAttribute('data-name', 'name')
+
+	tdLabel.innerHTML = criteria_label
+	tdLabel.setAttribute('data-name', 'label')
+
+	tdFields.innerHTML = criteria_fields
+	tdFields.setAttribute('data-name', 'fields')
+
+	tdControl.appendChild(btnRemove)
+
+
+	newRow.appendChild(tdName)
+	newRow.appendChild(tdLabel)
+	newRow.appendChild(tdFields)
+	newRow.appendChild(tdControl)
+
+	newRow.setAttribute(ATTR_ENTITYID, entity_id)
+	newRow.setAttribute(ATTR_ROWUNIQUE, '')
+
+	tr.parentNode.insertBefore(newRow, tr);
+}
 
 
 async function AppGenLayout_NewData(self) {
@@ -1022,10 +1143,12 @@ function AppGenLayout_handleActionForm(self) {
 	btn_action_add.addEventListener('click', (evt)=>{
 		const txt_action_name = document.getElementById('txt_action_name')
 		const txt_action_title = document.getElementById('txt_action_title')
+		const txt_action_permission = document.getElementById('txt_action_permission')
 
 		AppGenLayout_addAction(self, {
 			name: txt_action_name.value,
-			title: txt_action_title.value
+			title: txt_action_title.value,
+			permission: txt_action_permission.value
 		})
 	})
 }
@@ -1034,6 +1157,7 @@ async function AppGenLayout_addAction(self, data) {
 	const tbody = document.getElementById('action-lists')	
 	const name = data.name
 	const title = data.title
+	const permission = data.permission ?? ''
 
 	if (!isValidName(name)) {
 		await $fgta5.MessageBox.warning('nama action tidak valid')
@@ -1049,14 +1173,14 @@ async function AppGenLayout_addAction(self, data) {
 	const tr = document.createElement('tr')
 	const tdName = document.createElement('td')
 	const tdTitle = document.createElement('td')
+	const tdPermission = document.createElement('td')
 	const tdButton = document.createElement('td')
 	const rmButton = document.createElement('div')
 	
 
-
-
 	tdName.innerHTML = `<div name="action-name" class="action-cell">${name}</div>`
 	tdTitle.innerHTML = `<div name="action-title" class="action-cell">${title}</div>`
+	tdPermission.innerHTML = `<div name="action-title" class="action-cell">${permission}</div>`
 
 	rmButton.innerHTML = ICON_CLOSE
 	rmButton.classList.add("action-button-remove")
@@ -1072,11 +1196,13 @@ async function AppGenLayout_addAction(self, data) {
 
 	tr.appendChild(tdName)
 	tr.appendChild(tdTitle)
+	tr.appendChild(tdPermission)
 	tr.appendChild(tdButton)
 	tbody.appendChild(tr)
 
 	txt_action_name.value = ''
 	txt_action_title.value = ''
+	txt_action_permission.value = ''
 }
 
 function AppGenGenLayout_HandleDataField(self, entity_id, comp, datafield) {

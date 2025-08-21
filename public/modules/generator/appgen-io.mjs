@@ -3,7 +3,11 @@ import Components from './appgen-components.mjs'
 const btn = {}
 const ATTR_ENTITYID = 'data-entity-id'
 const ATTR_COMPNAME = 'data-component-name'
+const ATTR_ROWUNIQUE = 'data-rowuniqueindex'
+const ATTR_ROWSEARCH = 'data-rowsearch'
 
+
+const Context = {}
 
 const isValidName = str => /^[_a-z0-9]+$/.test(str) ;
 
@@ -64,6 +68,11 @@ export default class AppGenIO {
 
 	load(data) {
 		AppGenIO_Load(this, data)
+	}
+
+
+	addFunction(fnName, fn) {
+		Context[fnName] = fn
 	}
 
 }
@@ -344,6 +353,7 @@ function AppGenIO_GetEntityData(self, entity_id) {
 
 	var de = document.getElementById('entities-design')
 	var editor = de.querySelector(`div[name="entity-editor"][${ATTR_ENTITYID}="${entity_id}"]`)
+	editor.entity_id = entity_id
 
 
 	// get data info
@@ -379,6 +389,7 @@ function AppGenIO_GetEntityData(self, entity_id) {
 
 	entity.Items = {}
 
+
 	// ambil data items
 	let elAllFields = editor.querySelectorAll('div[name="design-data-field"]')
 	for (let elfield of elAllFields) {
@@ -394,8 +405,49 @@ function AppGenIO_GetEntityData(self, entity_id) {
 		entity.Items[field.name] = field
 	}
 
+	// ambil data unique
+	entity.Uniques = AppGenIO_GetEntityUnique(self, editor)
+	entity.Search = AppGenIO_GetEntitySearch(self, editor)
+
+
+
 	return entity
 }
+
+function AppGenIO_GetEntityUnique(self, editor) {
+	const uniques = {}
+	const tbl = editor.querySelector('table[name="tbl-unique"]')
+	const trs = tbl.querySelectorAll(`tr[${ATTR_ROWUNIQUE}]`)
+	for (var tr of trs) {
+		const tdName = tr.querySelector('td[data-name="name"]')
+		const tdFields = tr.querySelector('td[data-name="fields"]')
+		const name = tdName.innerHTML
+		const fields = tdFields.innerHTML
+
+		uniques[name] = {name, fields}
+	}
+
+	return uniques
+}
+
+function AppGenIO_GetEntitySearch(self, editor) {
+	const search = {}
+	const tbl = editor.querySelector('table[name="tbl-search"]')
+	const trs = tbl.querySelectorAll(`tr[${ATTR_ROWUNIQUE}]`)
+	for (var tr of trs) {
+		const tdName = tr.querySelector('td[data-name="name"]')
+		const tdLabel = tr.querySelector('td[data-name="label"]')
+		const tdFields = tr.querySelector('td[data-name="fields"]')
+		const name = tdName.innerHTML
+		const label = tdLabel.innerHTML
+		const fields = tdFields.innerHTML
+
+		search[name] = {name, label, fields}
+	}
+
+	return search
+}
+
 
 
 function AppGenIO_GetFieldData(self, el) {
@@ -522,8 +574,6 @@ async function AppGenIO_Reset(self) {
 		primary_entity_name: '',
 		actions: [],
 		entities: {},
-		uniques: {},
-		search: {},
 	}
 	await AppGenIO_ReadData(self, JSON.stringify(datainit))
 }
@@ -614,6 +664,27 @@ async function AppGenIO_Load(self, data) {
 
 			// isi datafieldnya
 			AppGenIO_FillDataField(self, datafield, item)
+		}
+
+		// uniques
+		for (var uniq_name in entity.Uniques) {
+			let uniq = entity.Uniques[uniq_name]
+			let name = uniq.name
+			let fields = uniq.fields
+			Context.addUnique({uniq_name:name, uniq_fields:fields}, entity.id)
+		}
+
+		// search
+		for (var search_name in entity.Search) {
+			let search = entity.Search[search_name]
+			let name = search.name
+			let label = search.label
+			let fields = search.fields
+			Context.addSearch({
+				criteria_name: name,
+				criteria_label: label, 
+				criteria_fields:fields
+			}, entity.id)
 		}
 		
 	}

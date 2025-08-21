@@ -66,13 +66,15 @@ export function createAdditionalAttributes(item) {
 		}
 	}
 
-	if (item.input_information!=null) {
+	if (item.input_information.trim()!='') {
 		cfg.push(`description="${item.input_information}"`)
 	}
 
 
 	// data length in character
 	if (item.component=='Textbox') {
+		cfg.push(`autocomplete="off" spellcheck="false"`)
+
 		cfg.push(`maxlength="${item.data_length}"`)
 
 		if (item.Validation.isMinimum) {
@@ -98,6 +100,8 @@ export function createAdditionalAttributes(item) {
 				cfg.push(`invalid-message-max="${item.Validation.messageMaximum}"`)
 			}
 		}
+	} else if (item.component=='Checkbox') {
+		cfg.push(`type="checkbox"`)
 	}
 
 	if (item.Validation.hasCustomValidator) {

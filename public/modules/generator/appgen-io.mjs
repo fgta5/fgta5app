@@ -536,6 +536,7 @@ function AppGenIO_GetFieldData(self, el) {
 	field.Reference.pk = getValueFrom(el, 'input[name="ref_id"]', 'value')
 	field.Reference.bindingValue = getValueFrom(el, 'input[name="ref_id"]', 'value')
 	field.Reference.bindingText = getValueFrom(el, 'input[name="ref_text"]', 'value')
+	field.Reference.bindingDisplay = getValueFrom(el, 'input[name="ref_display"]', 'value')
 	field.Reference.loaderApiModule = getValueFrom(el, 'input[name="loaderapimodule"]', 'value')
 	field.Reference.loaderApiPath = getValueFrom(el, 'input[name="loaderapipath"]', 'value')
 
@@ -755,7 +756,10 @@ function AppGenIO_FillDataField(self, datafield, field) {
 	// TODO: ini nanti kalau perlu diperbaiki disini
 	// setValueTo(field.Reference.bindingValue, datafield, 'input[name="ref_id"]', 'value')
 	
+	setValueTo(field.Reference.bindingDisplay, datafield, 'input[name="ref_display"]', 'value')
 	setValueTo(field.Reference.bindingText, datafield, 'input[name="ref_text"]', 'value')
+
+
 	setValueTo(field.Reference.loaderApiModule, datafield, 'input[name="loaderapimodule"]', 'value')
 	setValueTo(field.Reference.loaderApiPath, datafield, 'input[name="loaderapipath"]', 'value')
 

@@ -1,61 +1,13 @@
 <form id="<%= modulePart %>-frm" class="module-form" locked="true" autoid="true" primarykey="<%= primaryKeyElementId %>"><% fields.forEach(field => { %>
 
-	<% if (field.component === 'Textbox') { %><!-- <%= field.component %>: <%= field.fieldname %>-->	
-	<div class="<%= field.cssContainer %>" field="<%= field.elementId %>">
+	<!-- <%= field.component %>: <%= field.fieldname %>-->	
+	<div id="<%= field.elementId %>-container" class="<%= field.cssContainer %>" field="<%= field.elementId %>">
 		<label for="<%= field.elementId %>"><%= field.label %></label>
-		<input id="<%= field.elementId %>"  fgta5-component="Textbox" placeholder="<%= field.placeholder %>" autocomplete="off" spellcheck="false" 
+		<input id="<%= field.elementId %>"  fgta5-component="<%= field.component %>" placeholder="<%= field.placeholder %>" autocomplete="off" spellcheck="false" 
 			binding="<%= field.binding %>"<% field.additionalAttributes.forEach(config => { %>
 			<%- config %> <% }) %>
 		>
-	</div><% } else 
-	
-
-	if (field.component === 'Numberbox') { %><!-- <%= field.component %>: <%= field.fieldname %>-->		
-	<div class="<%= field.cssContainer %>" field="<%= field.elementId %>">
-		<label for="<%= field.elementId %>"><%= field.label %></label>
-		<input id="<%= field.elementId %>"  fgta5-component="Numberbox" placeholder="<%= field.placeholder %>" autocomplete="off" spellcheck="false" 
-			binding="<%= field.binding %>"<% field.additionalAttributes.forEach(config => { %>
-			<%- config %> <% }) %>
-		>
-	</div><% } 
-	
-
-	else if (field.component === 'Checkbox') { %><!-- <%= field.component %>: <%= field.fieldname %> -->	
-	<div class="<%= field.cssContainer %>" field="<%= field.elementId %>">
-		<label for="<%= field.elementId %>"><%= field.label %></label>
-		<input id="<%= field.elementId %>" fgta5-component="Checkbox" type="checkbox" 
-			binding="<%= field.binding %>"<% field.additionalAttributes.forEach(config => { %>
-			<%- config %> <% }) %>
-		>
-	</div><% } 
-	
-	
-	else if (field.component === 'Combobox') { %><!-- <%= field.component %>: <%= field.fieldname %> -->			
-	<div class="<%= field.cssContainer %>" field="<%= field.elementId %>">
-
-	</div><% } 
-	
-	
-	else if (field.component === 'Datepicker') { %><!-- <%= field.component %>: <%= field.fieldname %> -->				
-	<div class="<%= field.cssContainer %>" field="<%= field.elementId %>">
-
-	</div><% } 
-	
-	
-	else if (field.component === 'Timepicker') { %><!-- <%= field.component %>: <%= field.fieldname %> -->		
-	<div class="<%= field.cssContainer %>" field="<%= field.elementId %>">
-
-	</div><% } 
-	
-	
-	else if (field.component === 'Filebox') { %><!-- <%= field.component %>: <%= field.fieldname %> -->			
-	<div class="<%= field.cssContainer %>" field="<%= field.elementId %>">
-
-	</div><% } 
-	
-	
-	else { %><!-- <%= field.component %>: <%= field.fieldname %> -->		
-	<div style="color:red">Component <%= field.component %> is not supported</div><% } %>	
+	</div>
 <% }) %>	
 </form>
 

@@ -113,16 +113,16 @@
 			// <% } %>
 
 			window.addEventListener("load", async (event) => {
-				await preRender()
-
-				const Application = await import('./public/modules/<%= `${modulename}/${mjsFileName}` %>'	)
 				try {
+					await preRender()
+
+					const Application = await import('./public/modules/<%= `${modulename}/${mjsFileName}` %>'	)
 					const $app = new Application.default();
 					await $app.main();
 				} catch (err) {
 					console.error(err)
 					const mainapp = document.getElementById('mainapp')
-					mainapp.innerHTML = '<h1>Module Error</h1><div>' + err.message + '</div>'
+					mainapp.innerHTML = '<div><h1 style="color:red">Module Error</h1><div>' + err.message + '</div></div>'
 				} finally {
 					removeLoadingIndicator()
 				}

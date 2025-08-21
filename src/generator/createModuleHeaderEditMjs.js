@@ -22,12 +22,37 @@ export async function createModuleHeaderEditMjs(context, sectionName='header', s
 			return
 		}
 
-
 		const entityName = sectionName
+		const entityData = context.entities[entityName]
+
+		// 			section: getSectionData(moduleName, entityName, context.entities[entityName], 'edit')
+		const fields = []
+		for (var fieldName in entityData.Items) {
+			const item = entityData.Items[fieldName]
+
+			if (!item.showInForm) {
+				continue
+			}
+
+			const fieldname = item.data_fieldname
+			const inputname = item.input_name
+			const elementId = `${modulePart}-${item.input_name}`
+
+			fields.push({  
+				fieldname,
+				inputname,
+				elementId
+			})
+		}
+
+
+		
 		const variables = {
 			title: title,
+			modulePart: modulePart,
 			moduleName: moduleName,
-			section: getSectionData(moduleName, entityName, context.entities[entityName], 'edit')
+			moduleSection:  kebabToCamel(`${moduleName}-${sectionName}`),
+			fields: fields
 		}
 
 		

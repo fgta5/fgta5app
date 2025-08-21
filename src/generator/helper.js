@@ -43,11 +43,15 @@ export function capitalizeWords(input) {
 		.join(' ');
 }
 
-export function createAdditionalFieldConfiguration(item) {
+export function createAdditionalAttributes(item) {
 	const cfg = []
 	
 	if (item.data_defaultvalue!='') {
 		cfg.push(`value="${item.data_defaultvalue}"`)
+	}
+
+	if (item.input_inlinestyle.trim()!='') {
+		cfg.push(`style="${item.input_inlinestyle}"`)
 	}
 
 	if (item.input_charcase != 'normal') {
@@ -56,6 +60,10 @@ export function createAdditionalFieldConfiguration(item) {
 	
 	if (item.Validation.isRequired) {
 		cfg.push('required')
+
+		if (item.Validation.messageRequired.trim()!='') {
+			cfg.push(`invalid-message-required="${item.Validation.messageRequired}"`)
+		}
 	}
 
 	if (item.input_information!=null) {
@@ -65,23 +73,45 @@ export function createAdditionalFieldConfiguration(item) {
 
 	// data length in character
 	if (item.component=='Textbox') {
-		
-		if (item.Validation.isMaximum) {
-			cfg.push(`maxlength="${item.Validation.Maximum}"`)
-		}
+		cfg.push(`maxlength="${item.data_length}"`)
 
 		if (item.Validation.isMinimum) {
 			cfg.push(`minlength="${item.Validation.Minimum}"`)
+
+			if (item.Validation.messageMinimum.trim()!='') {
+				cfg.push(`invalid-message-minlength="${item.Validation.messageMinimum}"`)
+			}
+		}
+	} else if (item.component=='Numberbox') {
+		cfg.push(`maxlength="${item.data_length}"`)
+
+		if (item.Validation.isMinimum) {
+			cfg.push(`min="${item.Validation.Minimum}"`)
+			if (item.Validation.messageMinimum.trim()!='') {
+				cfg.push(`invalid-message-min="${item.Validation.messageMinimum}"`)
+			}
 		}
 
-	} else if (item.component=='Numberbox') {
-
+		if (item.Validation.isMaximum) {
+			cfg.push(`max="${item.Validation.Maximum}"`)
+			if (item.Validation.messageMaximum.trim()!='') {
+				cfg.push(`invalid-message-max="${item.Validation.messageMaximum}"`)
+			}
+		}
 	}
 
-	
+	if (item.Validation.hasCustomValidator) {
+		cfg.push(`validator="${item.Validation.customValidator}"`)
+	}
 
-	
+	if (item.Validation.messageDefault.trim()!='') {
+		cfg.push(`invalid-message="${item.Validation.messageDefault}"`)
+	}	
 
+
+	if (item.input_disabled) {
+		cfg.push('disabled')
+	}
 
 	return cfg      
 }

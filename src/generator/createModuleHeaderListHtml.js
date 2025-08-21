@@ -35,26 +35,39 @@ export async function createModuleHeaderListHtml(context, sectionName='header', 
 				continue
 			}
 
-			let component = item.component
-			let dataName = item.name
-			let binding = item.data_fieldname
-			let label = item.input_label
-			let formatter = null
+			const component = item.component
+			const dataName = item.name
+			const binding = item.data_fieldname
+			const label = item.input_label
+			
+			// additional attributes
+			const attrs = []
+			if (item.grid_formatter.trim()!='') {
+				attrs.push(`formatter="${item.grid_formatter}"`)
+			}
+			
+			if (item.grid_css.trim()!='') {
+				attrs.push(`class="${item.grid_css}"`)
+			}
 
-			if (component==='Checkbox') {
-				formatter = 'formatter="checkmark(value)"'
-			} 
-		
-			// columnDefinition = `<th data-name="${dataName}" binding="${binding}" ${formatter} text-align="center">${label}</th>`
-			// columnDefinition = `<th data-name="${dataName}" binding="${binding}">${label}</th>`
+			if (item.grid_inlinestyle.trim()!='') {
+				attrs.push(`style="${item.grid_inlinestyle}"`)
+			}
+
+			if (item.grid_sorting) {
+				attrs.push(`sorting="true"`)
+			}
+
+			let additionalAttributes = attrs.join(' ')
 
 
+			// masukkan ke fields
 			fields.push({  
 				component,
 				dataName,
 				binding,
 				label,
-				formatter
+				additionalAttributes
 			})
 		}
 

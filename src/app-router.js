@@ -142,6 +142,8 @@ router.get('/:modulename', async(req, res, next)=>{
 	const mjsExists = await isFileExists(mjsPath);
 	const htmlExtenderExists = await isFileExists(htmlExtenderPath);
 
+	const mjsPrerenderPath = path.join(__dirname, '..', 'public', 'modules', modulename, `${modulename}-prerender.mjs`);
+	const mjsPrerenderExists = await isFileExists(mjsPrerenderPath)
 
 
 	try {
@@ -154,6 +156,7 @@ router.get('/:modulename', async(req, res, next)=>{
 		await fs.access(ejsPath, fs.constants.F_OK);
 		res.render('application', {
 			modulename: modulename,
+			mjsPrerenderExists: mjsPrerenderExists,
 			cssExists,
 			mjsExists,
 			mjsFileName,

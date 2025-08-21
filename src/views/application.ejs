@@ -79,43 +79,57 @@
 
 	<script type="module">
 
-			// loading mjs...  <% if (mjsExists) { %> 
-			import Application from './public/modules/<%= `${modulename}/${mjsFileName}` %>'	
+		function removeLoadingIndicator() {
+			const mainapp = document.getElementById('mainapp')
+			const pagemask = document.getElementById('loadingindicator')
+			mainapp.classList.remove('hidden')
+			setTimeout(()=>{
+				pagemask.style.opacity = 0
+				pagemask.style.visibility = 'hidden'
+				setTimeout(()=>{
+					pagemask.parentNode.removeChild(pagemask)
+				}, 500)
+			}, 50)
+		}
+
+		async function preRender() {
+			// loading  prerender mjs...  <% if (mjsPrerenderExists) { %> 
+			const Prerenderer = await import('./public/modules/<%= `${modulename}/${modulename}-prerender.mjs` %>')
+			await Prerenderer.prerender()
 			// <% } else { %>
-			// module './public/modules/<%= `${modulename}/${modulename}.mjs` %>' not found. 
-			// Create dummy module
-			class Application {
-				async main() {
-					console.warn("empty module: './public/modules/<%= `${modulename}/${mjsFileName}` %>' not found!")
-				}
-			}
+			// prerender does not exist
+			// if you need to prerender page before processing,
+			// you can create file <%= `${modulename}-prerender.mjs` %>
+			// and export function prerender()
+			// <% } %>
+		}
+
+		async function Start() {
+			// loading mjs...  <% if (!mjsExists) { %> 
+			// Module belum didefinisikan
+			console.warn("empty module: './public/modules/<%= `${modulename}/${mjsFileName}` %>' not found!")
+			removeLoadingIndicator()
+			return
 			// <% } %>
 
 			window.addEventListener("load", async (event) => {
-				const mainapp = document.getElementById('mainapp')
-				const pagemask = document.getElementById('loadingindicator')
+				await preRender()
+
+				const Application = await import('./public/modules/<%= `${modulename}/${mjsFileName}` %>'	)
 				try {
-					const $app = new Application();
+					const $app = new Application.default();
 					await $app.main();
 				} catch (err) {
 					console.error(err)
-					mainapp.innerHTML = '<h1>Module Error</h1>' + err.message
+					const mainapp = document.getElementById('mainapp')
+					mainapp.innerHTML = '<h1>Module Error</h1><div>' + err.message + '</div>'
 				} finally {
-					// remove loading indikator
-
-					mainapp.classList.remove('hidden')
-					setTimeout(()=>{
-						pagemask.style.opacity = 0
-						pagemask.style.visibility = 'hidden'
-						setTimeout(()=>{
-							pagemask.parentNode.removeChild(pagemask)
-						}, 500)
-					}, 50)
+					removeLoadingIndicator()
 				}
-				
-
 			});
+		}
 
-	
+		Start()
+
 	</script>		
 </html>

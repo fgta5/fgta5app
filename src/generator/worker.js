@@ -1,9 +1,9 @@
+import path from 'path';
 import pgp from 'pg-promise'
 import db from '../app-db.js'
 import { workerData, parentPort } from 'worker_threads';
 import { access, mkdir } from 'fs/promises';
 import { constants } from 'fs';
-import path from 'path';
 import { createModuleRollup } from './createModuleRollup.js'
 import { createModuleContext } from './createModuleContext.js'
 import { createModuleExtenderMjs } from './createModuleExtenderMjs.js'
@@ -26,7 +26,7 @@ import { createTable } from './createTable.js';
 
 
 
-const { generator_id } = workerData;
+const { generator_id, jeda } = workerData;
 const HEADER = 'header'
 const DETIL = 'detil'
 const LIST = 'list'
@@ -52,6 +52,10 @@ async function main(id) {
 }
 
 async function sleep(s) {
+	if (s==0) {
+		return
+	}
+
 	return new Promise(lanjut=>{
 		setTimeout(()=>{
 			lanjut()
@@ -71,27 +75,63 @@ async function generate(data) {
 		}
 	}
 
+	const jedaWaktu = jeda ?? 0
+
 	try {
 		await prepareDirectory(context, {overwrite:true})
-		await createTable(context, {overwrite:true})
-		await createApiModule(context, {overwrite:true})
-		await createApiExtenderModule(context, {overwrite:true})
-		await createModuleRollup(context, {overwrite:true})
-		await createModuleContext(context, {overwrite:true})
-		await createModuleExtenderHtml(context, {overwrite:true})
-		await createModuleExtenderMjs(context, {overwrite:true})
-		await createModuleEjs(context, {overwrite:true})
-		await createModuleMjs(context, {overwrite:true})
-		await createModuleHeaderListHtml(context, HEADER, LIST, {overwrite:true})
-		await createModuleHeaderListMjs(context, HEADER, LIST, {overwrite:true})
-		await createModuleHeaderEditHtml(context, HEADER, EDIT, {overwrite:true})
-		await createModuleHeaderEditMjs(context, HEADER, EDIT, {overwrite:true})
-		await createModuleDetilListHtml(context, DETIL, LIST, {overwrite:true})
-		await createModuleDetilListMjs(context, DETIL, LIST, {overwrite:true})
-		await createModuleDetilEditHtml(context, DETIL, EDIT, {overwrite:true})
-		await createModuleDetilEditMjs(context, DETIL, EDIT, {overwrite:true})
-		
+		await sleep(jedaWaktu)
 
+		await createTable(context, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createApiModule(context, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createApiExtenderModule(context, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createModuleRollup(context, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createModuleContext(context, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createModuleExtenderHtml(context, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createModuleExtenderMjs(context, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createModuleEjs(context, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createModuleMjs(context, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createModuleHeaderListHtml(context, HEADER, LIST, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createModuleHeaderListMjs(context, HEADER, LIST, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createModuleHeaderEditHtml(context, HEADER, EDIT, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createModuleHeaderEditMjs(context, HEADER, EDIT, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createModuleDetilListHtml(context, DETIL, LIST, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createModuleDetilListMjs(context, DETIL, LIST, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createModuleDetilEditHtml(context, DETIL, EDIT, {overwrite:true})
+		await sleep(jedaWaktu)
+
+		await createModuleDetilEditMjs(context, DETIL, EDIT, {overwrite:true})
+		await sleep(jedaWaktu)
+		
 		
 		context.postMessage({message: `finish`, done:true})
 	} catch (err) {

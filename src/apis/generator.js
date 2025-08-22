@@ -179,9 +179,10 @@ async function generator_generate(self, body) {
 
 		// generate di detached thread
 		const notifierServer = self.context.notifierServer	
-		runDetachedWorker('./src/apis/workers/generator-worker.js', notifierServer, clientId, {
+		runDetachedWorker('./src/generator/worker.js', notifierServer, clientId, {
 			generator_id: generator_id,
-			timeout: generateTimeoutMs
+			timeout: generateTimeoutMs,
+			jeda: 0.5, // jeda 1 detik per masing-masing generate
 		})
 
 

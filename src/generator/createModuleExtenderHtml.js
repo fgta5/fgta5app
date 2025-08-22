@@ -21,6 +21,11 @@ export async function createModuleExtenderHtml(context, options) {
 			return
 		}
 
+		// reporting progress to parent process
+		context.postMessage({message: `generating file: '${targetFile}`})
+
+
+		// start geneate program code		
 		const variables = {
 			moduleName: moduleName,
 		}
@@ -29,7 +34,6 @@ export async function createModuleExtenderHtml(context, options) {
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 				
-		context.postMessage({message: `writing file: '${targetFile}`})
 		await fs.writeFile(targetFile, content, 'utf8');
 	} catch (err) {
 		throw err

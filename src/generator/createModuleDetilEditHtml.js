@@ -25,6 +25,11 @@ export async function createModuleDetilEditHtml(context, sectionName='detil', se
 		// sementara skip detil
 		return
 
+		// reporting progress to parent process
+		context.postMessage({message: `generating file: '${targetFile}`})
+
+
+		// start geneate program code
 		let sections = []
 		for (var entityName in context.entities) {
 			// console.log(context.entities[entityName])
@@ -43,7 +48,6 @@ export async function createModuleDetilEditHtml(context, sectionName='detil', se
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 				
-		context.postMessage({message: `writing file: '${targetFile}`})
 		await fs.writeFile(targetFile, content, 'utf8');
 	} catch (err) {
 		throw err

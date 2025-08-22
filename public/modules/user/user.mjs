@@ -33,6 +33,18 @@ export default class extends Module {
 
 		try {
 			
+			// inisiasi sisi server
+			try {
+				const result = await self.apiCall(`/${Context.moduleName}/init`, { })
+				Context.notifierId = result.notifierId
+				Context.notifierSocket = result.notifierSocket
+				Context.userId = result.userId
+				Context.userFullname = result.userFullname
+				Context.sid = result.sid
+			} catch (err) {
+				throw err
+			} 
+
 			await Promise.all([
 				userHeaderList.init(self, args),
 				userHeaderEdit.init(self, args),

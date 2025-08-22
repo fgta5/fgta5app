@@ -1,17 +1,17 @@
-import { kebabToCamel, isFileExist } from './helper.js'
+import { kebabToCamel, isFileExist, getSectionData } from './helper.js'
 import { fileURLToPath } from 'url';
 import path from 'path'
 import fs from 'fs/promises'
 import ejs from 'ejs'
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export async function createModuleExtenderMjs(context, options) {
+export async function createApiModule(context, options) {
 	const overwrite = options.overwrite===true
 	const moduleName = context.moduleName
-	const targetFile = path.join(context.moduleDir, `${moduleName}-ext.mjs`)
+	const title = context.title
+	const targetFile = path.join(context.apiDir, `${moduleName}.js`)
 
 	try {
 		// cek dulu apakah file ada
@@ -26,11 +26,21 @@ export async function createModuleExtenderMjs(context, options) {
 
 
 		// start geneate program code		
-		const variables = {
-			moduleName: moduleName,
+		let sections = []
+		for (var entityName in context.entities) {
+			// console.log(context.entities[entityName])
+			sections.push(getSectionData(moduleName, entityName, context.entities[entityName], 'list'))
+			sections.push(getSectionData(moduleName, entityName, context.entities[entityName], 'edit'))
 		}
 
-		const tplFilePath = path.join(__dirname, 'templates', 'module-ext.mjs.ejs')
+		const variables = {
+			title: title,
+			moduleName: moduleName,
+			sections: sections
+		}
+		
+		
+		const tplFilePath = path.join(__dirname, 'templates', 'api-module.js.ejs')
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 				

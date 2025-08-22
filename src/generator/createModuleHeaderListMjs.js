@@ -22,6 +22,11 @@ export async function createModuleHeaderListMjs(context, sectionName='header', s
 			return
 		}
 
+		// reporting progress to parent process
+		context.postMessage({message: `generating file: '${targetFile}`})
+
+
+		// start geneate program code		
 		const entityName = sectionName
 		const entityData = context.entities[entityName]
 		const sectionData = getSectionData(moduleName, entityName, entityData, 'list')
@@ -39,7 +44,6 @@ export async function createModuleHeaderListMjs(context, sectionName='header', s
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 				
-		context.postMessage({message: `writing file: '${targetFile}`})
 		await fs.writeFile(targetFile, content, 'utf8');
 	} catch (err) {
 		throw err

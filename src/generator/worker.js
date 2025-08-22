@@ -18,6 +18,10 @@ import { createModuleDetilListHtml } from './createModuleDetilListHtml.js'
 import { createModuleDetilListMjs } from './createModuleDetilListMjs.js'
 import { createModuleDetilEditHtml } from './createModuleDetilEditHtml.js'
 import { createModuleDetilEditMjs } from './createModuleDetilEditMjs.js'
+import { createApiModule } from './createApiModule.js'
+import { createApiExtenderModule } from './createApiExtenderModule.js'
+import { createTable } from './createTable.js';
+
 
 
 
@@ -69,6 +73,9 @@ async function generate(data) {
 
 	try {
 		await prepareDirectory(context, {overwrite:true})
+		await createTable(context, {overwrite:true})
+		await createApiModule(context, {overwrite:true})
+		await createApiExtenderModule(context, {overwrite:true})
 		await createModuleRollup(context, {overwrite:true})
 		await createModuleContext(context, {overwrite:true})
 		await createModuleExtenderHtml(context, {overwrite:true})
@@ -83,6 +90,7 @@ async function generate(data) {
 		await createModuleDetilListMjs(context, DETIL, LIST, {overwrite:true})
 		await createModuleDetilEditHtml(context, DETIL, EDIT, {overwrite:true})
 		await createModuleDetilEditMjs(context, DETIL, EDIT, {overwrite:true})
+		
 
 		
 		context.postMessage({message: `finish`, done:true})

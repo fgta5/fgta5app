@@ -22,10 +22,14 @@ export async function createModuleHeaderEditMjs(context, sectionName='header', s
 			return
 		}
 
+		// reporting progress to parent process
+		context.postMessage({message: `generating file: '${targetFile}`})
+
+
+		// start geneate program code
 		const entityName = sectionName
 		const entityData = context.entities[entityName]
 
-		// 			section: getSectionData(moduleName, entityName, context.entities[entityName], 'edit')
 		const fields = []
 		for (var fieldName in entityData.Items) {
 			const item = entityData.Items[fieldName]
@@ -52,6 +56,7 @@ export async function createModuleHeaderEditMjs(context, sectionName='header', s
 			modulePart: modulePart,
 			moduleName: moduleName,
 			moduleSection:  kebabToCamel(`${moduleName}-${sectionName}`),
+			moduleList: kebabToCamel(`${moduleName}-${sectionName}-list`),
 			fields: fields
 		}
 
@@ -61,7 +66,6 @@ export async function createModuleHeaderEditMjs(context, sectionName='header', s
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 				
-		context.postMessage({message: `writing file: '${targetFile}`})
 		await fs.writeFile(targetFile, content, 'utf8');
 	} catch (err) {
 		throw err

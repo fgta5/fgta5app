@@ -19,6 +19,16 @@ export default class Api {
 	}
 
 
+	cekLogin(req) {
+		// jika req.session.user tidak ada datanya, berarti belum login 
+		if (req.session.user==null) {
+			const err = new Error('belum login')
+			err.code = 401
+			throw err
+		}	
+	}
+
+
 	async handleRequest(methodName, body) {
 		try {
 			if (typeof this[methodName] === 'function') {

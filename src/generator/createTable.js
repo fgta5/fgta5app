@@ -7,12 +7,11 @@ import ejs from 'ejs'
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export async function createModuleDetilEditMjs(context, sectionName='detil', sectionPart='edit', options) {
+export async function createTable(context, options) {
 	const overwrite = options.overwrite===true
 	const moduleName = context.moduleName
 	const title = context.title
-	const modulePart = kebabToCamel(`${moduleName}-${sectionName}-${sectionPart}`)
-	const targetFile = path.join(context.moduleDir, `${modulePart}.mjs`)
+	const targetFile = path.join(context.moduleDir, `${moduleName}.sql`)
 
 	try {
 		// cek dulu apakah file ada
@@ -22,14 +21,12 @@ export async function createModuleDetilEditMjs(context, sectionName='detil', sec
 			return
 		}
 
-		// sementara skip detil
-		return
 
 		// reporting progress to parent process
 		context.postMessage({message: `generating file: '${targetFile}`})
 
 
-		// start geneate program code
+		// start geneate program code		
 		let sections = []
 		for (var entityName in context.entities) {
 			// console.log(context.entities[entityName])
@@ -44,11 +41,11 @@ export async function createModuleDetilEditMjs(context, sectionName='detil', sec
 		}
 		
 		
-		const tplFilePath = path.join(__dirname, 'templates', 'moduleDetilEdit.mjs.ejs')
-		const template = await fs.readFile(tplFilePath, 'utf-8');
-		const content = ejs.render(template, variables)
+		// const tplFilePath = path.join(__dirname, 'templates', 'module.mjs.ejs')
+		// const template = await fs.readFile(tplFilePath, 'utf-8');
+		// const content = ejs.render(template, variables)
 				
-		await fs.writeFile(targetFile, content, 'utf8');
+		// await fs.writeFile(targetFile, content, 'utf8');
 	} catch (err) {
 		throw err
 	}

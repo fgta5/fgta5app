@@ -22,12 +22,18 @@ export async function createModuleHeaderEditHtml(context, sectionName='header', 
 			return
 		}
 
+		// reporting progress to parent process
+		context.postMessage({message: `generating file: '${targetFile}`})
+
+
+		// start geneate program code
 		const entityName = sectionName
 		const entityData = context.entities[entityName]
 		const sectionData = getSectionData(moduleName, entityName, entityData, 'edit')
 
 		const primaryKeyFieldData = entityData.Items[sectionData.primaryKey] 
-		const primaryKeyElementId = primaryKeyFieldData.input_name
+		const primaryKeyName = primaryKeyFieldData.input_name
+		const primaryKeyElementId = `${modulePart}-${primaryKeyName}`
 
 		const fields = []
 		for (var fieldName in entityData.Items) {
@@ -78,7 +84,6 @@ export async function createModuleHeaderEditHtml(context, sectionName='header', 
 		const template = await fs.readFile(tplFilePath, 'utf-8');
 		const content = ejs.render(template, variables)
 				
-		context.postMessage({message: `writing file: '${targetFile}`})
 		await fs.writeFile(targetFile, content, 'utf8');
 	} catch (err) {
 		throw err

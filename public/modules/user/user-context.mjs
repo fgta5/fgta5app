@@ -3,7 +3,7 @@ const urlDir = 'public/modules/user'
 const Crsl = new $fgta5.SectionCarousell(app.Nodes.Main) 
 
 export default {
-	Source: 'USER',
+	moduleName: 'user',
 	app: app,
 	urlDir: urlDir,
 	Crsl: Crsl,

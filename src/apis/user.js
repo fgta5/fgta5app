@@ -6,27 +6,55 @@ import sqlUtil from '@agung_dhewe/pgsqlc'
 
 import * as Extender from './extenders/user-apiext.js'
 
-
+const moduleName = 'user'
 const headerSectionName = 'header'
-
+const tablename = 'core.user'
 
 // api: account
 export default class extends Api {
 	constructor(req, res, next) {
 		super(req, res, next);
+		this.cekLogin(req)
+
+		// set context dengan data session saat ini
+		this.context = {
+			userId: req.session.user.userId,
+			userName: req.session.user.userName,
+			userFullname: req.session.userFullname,
+			sid: req.sessionID,
+			notifierId: Api.generateNotifierId(moduleName, req.sessionID),
+			notifierSocket: req.app.locals.appConfig.notifierSocket,
+			notifierServer: req.app.locals.appConfig.notifierServer,
+		}
 	}
+
 
 	// dipanggil dengan model snake syntax
 	// contoh: header-list
 	//         header-open-data
+	async init(body) { return await module_init(this, body) }
 	async headerList(body) { return await headerList(this, body) }
 	async headerOpen(body) { return await headerOpen(this, body) }
 	async headerUpdate(body) { return await headerUpdate(this, body)}
 	async headerCreate(body) { return await headerCreate(this, body)}
 	async headerDelete(body) { return await headerDelete(this, body) }
 
-
 }
+
+
+async function module_init(self, body) {
+	console.log('init generator')
+	self.req.session.sid = self.req.sessionID
+
+	return {
+		userId: self.context.userId,
+		userFullname: self.context.userFullname,
+		sid: self.context.sid ,
+		notifierId: self.context.notifierId,
+		notifierSocket: self.context.notifierSocket
+	}
+}
+
 
 
 async function headerList(self, body) {
@@ -48,7 +76,6 @@ async function headerList(self, body) {
 
 
 		var max_rows = limit==0 ? 10 : limit
-		const tablename = 'core."user"'
 		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
 		const sql = sqlUtil.createSqlSelect({tablename, columns, whereClause, sort, limit:max_rows+1, offset, queryParams})
 		const rows = await db.any(sql, queryParams);
@@ -89,14 +116,34 @@ async function headerList(self, body) {
 async function headerOpen(self, body) {
 	try {
 		const { id } = body 
-		const queryParams = {user_id: id}
-		const sql = 'select * from core."user" where user_id = \${user_id}'
+		const criteria = { user_id: id }
+		const searchMap = { user_id: `user_id = \${user_id}`}
+		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
+		const sql = sqlUtil.createSqlSelect({
+			tablename, 
+			columns:[], 
+			whereClause, 
+			sort:{}, 
+			limit:0, 
+			offset:0, 
+			queryParams
+		})
 		const data = await db.one(sql, queryParams);
+		if (data==null) { 
+			throw new Error("data tidak ditemukan") 
+		}	
 
-		if (data==null) { throw new Error("data tidak ditemukan") }	
-		const { group_name } = await sqlUtil.lookupdb(db, 'core."group"', 'group_id', data.group_id)
-		data.group_name = group_name
+		// lokkup group_name
+		{
+			const { group_name } = await sqlUtil.lookupdb(db, 'core."group"', 'group_id', data.group_id)
+			data.group_name = group_name
+		}
 
+		// lokkup group_name
+		{
+			const { group_name } = await sqlUtil.lookupdb(db, 'core."group"', 'group_id', data.group_id)
+			data.group_name = group_name
+		}	
 
 		// pasang extender untuk olah data
 		if (typeof Extender.headerOpen === 'function') {
@@ -112,8 +159,6 @@ async function headerOpen(self, body) {
 
 async function headerCreate(self, body) {
 	const { source, data } = body
-	const tablename = 'core."user"'
-
 
 	try {
 		sqlUtil.connect(db)
@@ -125,7 +170,6 @@ async function headerCreate(self, body) {
 		const cmd = sqlUtil.createInsertCommand(tablename, data, ['user_id'])
 		const result = await cmd.execute(data)
 		
-
 		// record log
 		await self.log({source, tablename, section:headerSectionName, action:'CREATE', id: result.user_id})
 		
@@ -137,7 +181,6 @@ async function headerCreate(self, body) {
 
 async function headerUpdate(self, body) {
 	const { source, data } = body
-	const tablename = 'core."user"'
 
 	try {
 		sqlUtil.connect(db)
@@ -163,7 +206,6 @@ async function headerUpdate(self, body) {
 
 
 async function headerDelete(self, body) {
-	const tablename = 'core."user"'
 
 	try {
 		const { source, id } = body 

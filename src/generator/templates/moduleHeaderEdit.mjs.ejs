@@ -54,17 +54,6 @@ export async function init(self, args) {
 	CurrentState.obj_pk =  frm.getPrimaryInput()
 	CurrentState.key = CurrentState.obj_pk.getBindingData()
 
-	cbo_group_id.addEventListener('selecting', (evt)=>{ 
-		// user-ext.mjs, pada init, 
-		// .cbo_group_id_selecting = ({evt}) => { cbo_group_id_selecting(self, evt) }
-		// try { self.Extender.execute('cbo_group_id_selecting', { evt }) } catch (err) { console.error(err)}
-
-		if (typeof Extender.cbo_group_id_selecting === 'function') {
-			Extender.cbo_group_id_selecting(self, evt)
-		}
-
-	}) 
-		
 	
 }
 
@@ -123,7 +112,7 @@ async function openData(self, id) {
 	let loader = new $fgta5.Dataloader() 
 	try {
 
-		const resp = await loader.load('/user/header-open', args)
+		const resp = await loader.load('/<%= moduleName %>/header-open', args)
 		if (resp.code!=0) {
 			throw new Error(resp.message)
 		}
@@ -155,7 +144,7 @@ async function createData(self, data) {
 	let loader = new $fgta5.Dataloader() 
 	try {
 
-		const resp = await loader.load('/user/header-create', args)
+		const resp = await loader.load('/<%= moduleName %>/header-create', args)
 		if (resp.code!=0) {
 			throw new Error(resp.message)
 		}
@@ -182,7 +171,7 @@ async function updateData(self, data) {
 	let loader = new $fgta5.Dataloader() 
 	try {
 
-		const resp = await loader.load('/user/header-update', args)
+		const resp = await loader.load('/<%= moduleName %>/header-update', args)
 		if (resp.code!=0) {
 			throw new Error(resp.message)
 		}
@@ -208,7 +197,7 @@ async function deleteData(self, id) {
 	let loader = new $fgta5.Dataloader() 
 	try {
 
-		const resp = await loader.load('/user/header-delete', args)
+		const resp = await loader.load('/<%= moduleName %>/header-delete', args)
 		if (resp.code!=0) {
 			throw new Error(resp.message)
 		}
@@ -311,8 +300,8 @@ async function btn_new_click(self, evt) {
 	console.log('btn_new_click')
 	const sourceSection = evt.target.getAttribute('data-sectionsource') 
 
-	const userHeaderList = self.Modules.userHeaderList
-	const listsecid = userHeaderList.Section.Id
+	const <%= moduleList %> = self.Modules.<%= moduleList %>
+	const listsecid = <%= moduleList %>.Section.Id
 	const fromListSection = sourceSection===listsecid
 	if (fromListSection) {
 		// klik new dari list (tidak perlu cek ada perubahan data)
@@ -361,7 +350,7 @@ async function btn_new_click(self, evt) {
 		await $fgta5.MessageBox.error(err.message)
 		if (fromListSection) {
 			// jika saat tombol baru dipilih saat di list, tampilan kembalikan ke list
-			self.Modules.userHeaderList.Section.show()
+			self.Modules.<%= moduleList %>.Section.show()
 		}
 	}
 }
@@ -441,10 +430,10 @@ async function btn_save_click(self, evt) {
 
 			// buat baris baru di grid
 			console.log('tamabah baris baru di grid')
-			self.Modules.userHeaderList.addNewRow(self, data)
+			self.Modules.<%= moduleList %>.addNewRow(self, data)
 		} else {
 			console.log('update data baris yang dibuka')
-			self.Modules.userHeaderList.updateCurrentRow(self, data)
+			self.Modules.<%= moduleList %>.updateCurrentRow(self, data)
 		}
 
 	} catch (err) {
@@ -479,10 +468,10 @@ async function btn_del_click(self, evt) {
 		const result = await deleteData(self, idValue)
 		
 		// hapus current row yang dipilih di list
-		self.Modules.userHeaderList.removeCurrentRow(self)
+		self.Modules.<%= moduleList %>.removeCurrentRow(self)
 		
 		// kembali ke list
-		self.Modules.userHeaderList.Section.show()
+		self.Modules.<%= moduleList %>.Section.show()
 
 
 		// lock kembali form
@@ -524,12 +513,12 @@ async function btn_reset_click(self, evt) {
 
 async function btn_prev_click(self, evt) {
 	console.log('btn_prev_click')
-	self.Modules.userHeaderList.selectPreviousRow(self)
+	self.Modules.<%= moduleList %>.selectPreviousRow(self)
 }
 
 async function btn_next_click(self, evt) {
 	console.log('btn_next_click')
-	self.Modules.userHeaderList.selectNextRow(self)
+	self.Modules.<%= moduleList %>.selectNextRow(self)
 }
 
 

@@ -1217,7 +1217,7 @@ function AppGenGenLayout_HandleDataField(self, entity_id, comp, datafield) {
 	
 	const nameChanged = (value) => {
 		if (objectname.value.trim()=='') {
-			objectname.value = fieldname.value
+			objectname.value = 'obj_' + fieldname.value
 		}
 
 		if (labeltext.value.trim()=='') {

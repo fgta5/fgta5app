@@ -459,7 +459,7 @@ function AppGenIO_GetFieldData(self, el) {
 
 	// ambil type variable
 	var sel_datatyle = el.querySelector('select[name="datatype"]')
-	field.data_type = sel_datatyle.options[sel_datatyle.selectedIndex].text
+	field.data_type = sel_datatyle.options[sel_datatyle.selectedIndex].value
 
 	field.data_length = getValueFrom(el, 'input[name="datalength"]', 'value') ?? 0
 	field.data_precision = getValueFrom(el, 'input[name="dataprecission"]', 'value') ?? 0

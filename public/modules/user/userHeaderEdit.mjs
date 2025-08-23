@@ -52,8 +52,8 @@ export async function init(self, args) {
 	btn_next.addEventListener('click', (evt)=>{ btn_next_click(self, evt)})
 
 
-	CurrentState.obj_pk =  frm.getPrimaryInput()
-	CurrentState.key = CurrentState.obj_pk.getBindingData()
+	// CurrentState.obj_pk =  frm.getPrimaryInput()
+	// CurrentState.key = CurrentState.obj_pk.getBindingData()
 
 	cbo_group_id.addEventListener('selecting', (evt)=>{ 
 		// user-ext.mjs, pada init, 

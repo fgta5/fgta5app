@@ -4,7 +4,24 @@ import { Worker } from 'worker_threads';
 
 dotenv.config();
 
-const generator_id = 4
+
+const args = process.argv.slice(2); // Buang 'node' dan path ke script
+let generatorId;
+
+args.forEach(arg => {
+  if (arg.startsWith('--id=')) {
+    generatorId = arg.split('=')[1];
+  }
+});
+
+console.log('generator_id:', generatorId);
+if (generatorId===undefined || generatorId===null || generatorId=='') {
+	console.error('paremeter id untuk program yang digenerate belum diisi')
+	process.exit(1)
+}
+
+
+const generator_id = generatorId
 const workerTimeoutMs = 1 * 60 * 1000
 
 await main(generator_id)

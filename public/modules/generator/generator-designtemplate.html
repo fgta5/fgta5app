@@ -37,10 +37,11 @@
 		<div>
 			<select name="identifier-method">
 				<option value="manual" selected>Manual</option>
-				<option value="auto-bigint">Auto Big Integer</option>
-				<option value="auto-int">Auto Integer</option>
-				<option value="auto-yearly">Auto Yearly</option>
-				<option value="auto-monthly">Auto Monthly</option>
+				<option value="auto-by-default">Auto By Default (Numeric)</option>
+				<option value="auto-always">Auto Always (Numeric)</option>
+				<option value="auto-yearly">Auto Yearly (String)</option>
+				<option value="auto-monthly">Auto Monthly (String)</option>
+				<option value="custom">Custom</option>
 			</select>
 
 			<label style="margin-left: 40px; margin-right: 5px;">Prefix</label>
@@ -414,7 +415,7 @@ ishandlekeydown
 		<label>Type</label>
 		<div>
 			<select name="datatype">
-				<option value="integer" selected>integer</option>
+				<option value="int" selected>integer</option>
 				<option value="bigint">big integer</option>
 				<option value="decimal">decimal</option>
 			</select>
@@ -606,7 +607,7 @@ ishandlekeydown
 		<label>Type</label>
 		<div>
 			<select name="datatype">
-				<option value="tinyint" selected>tinyint</option>
+				<option value="boolean" selected>boolean</option>
 			</select>
 		</div>  
 		
@@ -777,7 +778,9 @@ ishandlekeydown
 			<select name="datatype">
 				<option value="varchar" selected>varchar</option>
 				<option value="char">char</option>
-				<option value="integer">integer</option>
+				<option value="text">text</option>
+				<option value="int">integer</option>
+				<option value="bigint">bigint</option>
 			</select>
 		</div>  
 		

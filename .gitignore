@@ -149,3 +149,4 @@ public/libs/fgta5js/fgta5js-v1.0.6.js
 
 # ignore sementara
 public/modules/group
+public/modules/grouptype

@@ -39,9 +39,9 @@ export async function createModuleHeaderEditHtml(context, sectionName='header', 
 		for (var fieldName in entityData.Items) {
 			const item = entityData.Items[fieldName]
 
-			if (item.data_fieldname=='grouptype_id') {
-				console.log(item)
-			}
+			// if (item.data_fieldname=='grouptype_id') {
+			// 	console.log(item)
+			// }
 
 			if (!item.showInForm) {
 				continue

@@ -62,6 +62,8 @@ export async function init(self, args) {
 
 		if (typeof Extender.cbo_group_id_selecting === 'function') {
 			Extender.cbo_group_id_selecting(self, evt)
+		} else {
+			console.warn('Extender.cbo_group_id_selecting is not implemented')
 		}
 
 	}) 

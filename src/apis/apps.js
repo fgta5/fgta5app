@@ -161,7 +161,7 @@ async function apps_headerCreate(self, body) {
 		data._createdate = (new Date()).toISOString()
 
 
-		const cmd = sqlUtil.createInsertCommand(headerTableName, data, ['apps_id'])
+		const cmd = sqlUtil.createInsertCommand(headerTableName, data)
 		const result = await cmd.execute(data)
 		
 		// record log

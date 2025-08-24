@@ -102,7 +102,9 @@ export function createAdditionalAttributes(item) {
 		}
 	} else if (item.component=='Checkbox') {
 		cfg.push(`type="checkbox"`)
-	}
+	} else if (item.component=='Combobox') {
+		cfg.push(`data-display="${item.Reference.bindingText}"`)
+	}	
 
 	if (item.Validation.hasCustomValidator) {
 		cfg.push(`validator="${item.Validation.customValidator}"`)

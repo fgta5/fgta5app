@@ -30,9 +30,9 @@ export async function createApiModule(context, options) {
 		const headerTableName = entityHeader.table
 		const headerPrimaryKey = entityHeader.pk
 		const headerSearchMap = createSearchMap(entityHeader.Search, entityHeader.Items, headerTableName)
+		const autoid = entityHeader.identifierMethod=='manual' ? false : true
 
-
-		// console.log(entityHeader)
+		const headerFieldsLookup = createLookup(entityHeader.Items)
 
 		// get detil information
 		for (let entityName in context.entities) {
@@ -47,9 +47,11 @@ export async function createApiModule(context, options) {
 		const variables = {
 			title: title,
 			moduleName: moduleName,
+			autoid,
 			headerTableName,
 			headerPrimaryKey,
-			headerSearchMap
+			headerSearchMap,
+			headerFieldsLookup
 		}
 		
 		
@@ -69,10 +71,6 @@ function createSearchMap(searchdata, items, tablename) {
 	// searchtext: `user_fullname ILIKE '%' || \${searchtext} || '%' OR user_id=try_cast_bigint(\${searchtext}, 0)`,
 	// searchgroup: `group_id = \${searchgroup}`,
 	// user_isdisabled: `user_isdisabled = \${user_isdisabled}`
-
-
-
-
 	const searchMap = []
 	for (let searchname in searchdata) {
 		const search = searchdata[searchname]
@@ -115,11 +113,6 @@ function createSearchMap(searchdata, items, tablename) {
 }
 
 function parseSearchField(rawFields) {
-	// fields: 'grouptype_id, %grouptype_name, %grouptype_descr'
-	// searchtext: `user_fullname ILIKE '%' || \${searchtext} || '%' OR user_id=try_cast_bigint(\${searchtext}, 0)`,
-	// searchgroup: `group_id = \${searchgroup}`,
-	// user_isdisabled: `user_isdisabled = \${user_isdisabled}`
-
 	const parsedFields = rawFields
 		.split(',')
 		.map(field => field.trim())
@@ -137,4 +130,18 @@ function parseSearchField(rawFields) {
 	);
 
 	return parsedFields
+}
+
+function createLookup(items) {
+	const lookup = []
+	for (let fieldname in items) {
+		const item = items[fieldname]
+		if (item.component=='Combobox') {
+			const {bindingValue, bindingText, bindingDisplay, table} = item.Reference
+			lookup.push({
+				fieldname, bindingValue, bindingText, bindingDisplay, table
+			})
+		}
+	}
+	return lookup
 }

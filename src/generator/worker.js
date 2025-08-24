@@ -78,6 +78,7 @@ async function generate(data) {
 	const jedaWaktu = jeda ?? 0
 
 	try {
+
 		await prepareDirectory(context, {overwrite:true})
 		await sleep(jedaWaktu)
 
@@ -85,15 +86,17 @@ async function generate(data) {
 		await createApiModule(context, {overwrite:true})
 		await sleep(jedaWaktu)
 
+		
 		await createApiExtenderModule(context, {overwrite:true})
 		await sleep(jedaWaktu)
 
-		
 		await createTable(context, {overwrite:true})
 		await sleep(jedaWaktu)
 
 		await createModuleRollup(context, {overwrite:true})
 		await sleep(jedaWaktu)
+
+
 
 		await createModuleContext(context, {overwrite:true})
 		await sleep(jedaWaktu)
@@ -119,21 +122,25 @@ async function generate(data) {
 		await createModuleHeaderEditHtml(context, HEADER, EDIT, {overwrite:true})
 		await sleep(jedaWaktu)
 
+		
+
 		await createModuleHeaderEditMjs(context, HEADER, EDIT, {overwrite:true})
 		await sleep(jedaWaktu)
 
+		
 		await createModuleDetilListHtml(context, DETIL, LIST, {overwrite:true})
 		await sleep(jedaWaktu)
 
 		await createModuleDetilListMjs(context, DETIL, LIST, {overwrite:true})
 		await sleep(jedaWaktu)
 
+
 		await createModuleDetilEditHtml(context, DETIL, EDIT, {overwrite:true})
 		await sleep(jedaWaktu)
-
+		
 		await createModuleDetilEditMjs(context, DETIL, EDIT, {overwrite:true})
 		await sleep(jedaWaktu)
-		
+			
 		
 		context.postMessage({message: `finish`, done:true})
 	} catch (err) {

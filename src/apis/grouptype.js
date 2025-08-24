@@ -48,25 +48,46 @@ async function grouptype_init(self, body) {
 	console.log('init generator')
 	self.req.session.sid = self.req.sessionID
 
-	return {
-		userId: self.context.userId,
-		userFullname: self.context.userFullname,
-		sid: self.context.sid ,
-		notifierId: self.context.notifierId,
-		notifierSocket: self.context.notifierSocket
+	try {
+		// ambil data app dari database
+		const sql = 'select apps_id, apps_url from core."apps"'
+		const result = await db.any(sql)
+
+		const appsUrls = {}
+		for (let row of result) {
+			appsUrls[row.apps_id] = {
+				url: row.apps_url
+			}
+		}
+
+		return {
+			userId: self.context.userId,
+			userFullname: self.context.userFullname,
+			sid: self.context.sid ,
+			notifierId: self.context.notifierId,
+			notifierSocket: self.context.notifierSocket,
+			appsUrls: appsUrls
+		}
+	} catch (err) {
+		throw err
 	}
 }
-
 
 
 async function grouptype_headerList(self, body) {
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
 	const searchMap = {
-		search: `grouptype_id=try_cast_int(\${search}, 0) OR grouptype_name ILIKE '%' || \${search} || '%' OR grouptype_descr ILIKE '%' || \${search} || '%'`,
+		searchtext: `grouptype_id=try_cast_int(\${searchtext}, 0) OR grouptype_name ILIKE '%' || \${searchtext} || '%' OR grouptype_descr ILIKE '%' || \${searchtext} || '%'`,
 	};
 
 	try {
 	
+		// jika tidak ada default searchtext
+		if (searchMap.searchtext===undefined) {
+			throw new Error(`'searchtext' belum didefinisikan di searchMap`)	
+		}
+		
+
 		// hilangkan criteria '' atau null
 		for (var cname in criteria) {
 			if (criteria[cname]==='' || criteria[cname]===null) {

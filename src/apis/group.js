@@ -8,7 +8,7 @@ import * as Extender from './extenders/group-apiext.js'
 
 const moduleName = 'group'
 const headerSectionName = 'header'
-const headerTableName = 'core.testgroup'
+const headerTableName = 'core.group'
 
 // api: account
 export default class extends Api {
@@ -48,25 +48,46 @@ async function group_init(self, body) {
 	console.log('init generator')
 	self.req.session.sid = self.req.sessionID
 
-	return {
-		userId: self.context.userId,
-		userFullname: self.context.userFullname,
-		sid: self.context.sid ,
-		notifierId: self.context.notifierId,
-		notifierSocket: self.context.notifierSocket
+	try {
+		// ambil data app dari database
+		const sql = 'select apps_id, apps_url from core."apps"'
+		const result = await db.any(sql)
+
+		const appsUrls = {}
+		for (let row of result) {
+			appsUrls[row.apps_id] = {
+				url: row.apps_url
+			}
+		}
+
+		return {
+			userId: self.context.userId,
+			userFullname: self.context.userFullname,
+			sid: self.context.sid ,
+			notifierId: self.context.notifierId,
+			notifierSocket: self.context.notifierSocket,
+			appsUrls: appsUrls
+		}
+	} catch (err) {
+		throw err
 	}
 }
-
 
 
 async function group_headerList(self, body) {
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
 	const searchMap = {
-		search: `group_id=try_cast_int(\${search}, 0) OR group_name ILIKE '%' || \${search} || '%'`,
+		searchtext: `group_id=try_cast_int(\${searchtext}, 0) OR group_name ILIKE '%' || \${searchtext} || '%'`,
 	};
 
 	try {
 	
+		// jika tidak ada default searchtext
+		if (searchMap.searchtext===undefined) {
+			throw new Error(`'searchtext' belum didefinisikan di searchMap`)	
+		}
+		
+
 		// hilangkan criteria '' atau null
 		for (var cname in criteria) {
 			if (criteria[cname]==='' || criteria[cname]===null) {
@@ -132,12 +153,16 @@ async function group_headerOpen(self, body) {
 		})
 		const data = await db.one(sql, queryParams);
 		if (data==null) { 
-			throw new Error("data tidak ditemukan") 
+			throw new Error(`[${headerTableName}] data dengan id '${id}' tidak ditemukan`) 
 		}	
 
+		// lookup: grouptype_name dari field grouptype_name pada table core.grouptype dimana (core.grouptype.grouptype_id = core.group.grouptype_id)
+		{
+			const { grouptype_name } = await sqlUtil.lookupdb(db, 'core.grouptype', 'grouptype_id', data.grouptype_id)
+			data.grouptype_name = grouptype_name
+		}
+		
 
-		// lookup data
-		// TODO: buat program untuk lookup data disini
 
 
 		// pasang extender untuk olah data

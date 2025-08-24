@@ -49,6 +49,45 @@ export async function init(self, args) {
 	btn_reset.addEventListener('click', (evt)=>{ btn_reset_click(self, evt)})
 	btn_prev.addEventListener('click', (evt)=>{ btn_prev_click(self, evt)})
 	btn_next.addEventListener('click', (evt)=>{ btn_next_click(self, evt)})
+
+
+	// addEventListener
+	<% fieldHandles.forEach(field => { %>
+	// <%= field.component %>: <%= field.inputname %><% field.handles.forEach(hnd => { %>
+	<%= field.inputname %>.addEventListener('<%= hnd.eventname %>', <% if (hnd.eventname=='selecting') { %>async <% } %>(evt)=>{
+		if (typeof Extender.<%= field.inputname %>_<%= hnd.eventname %> === 'function') {
+			Extender.<%= field.inputname %>_<%= hnd.eventname %>(self, evt)
+		} else {<% if (field.component=='Combobox' && hnd.eventname=='selecting') { %>
+			// default selecting
+			const cbo = evt.detail.sender
+			const dialog = evt.detail.dialog
+			const searchtext = evt.detail.searchtext!=null ? evt.detail.searchtext : ''
+			const url = `${Context.appsUrls.<%= hnd.appId %>.url}/<%- hnd.path %>`
+
+			cbo.wait()
+			try {
+				const result = await self.apiCall(url, {
+					searchtext: searchtext,
+					offset: evt.detail.offset,
+					limit: evt.detail.limit,
+				}) 
+
+				for (var row of result.data) {
+					evt.detail.addRow(row.<%= hnd.field_value %>, row.<%= hnd.field_text %>, row)
+				}
+
+				dialog.setNext(result.nextoffset, result.limit)
+			} catch (err) {
+				$fgta5.MessageBox.error(err.message)
+			} finally {
+				cbo.wait(false)
+			}
+
+			<% } else { %>	
+			console.warn('Extender.<%= field.inputname %>_<%= hnd.eventname %> is not implemented')<% } %>
+		}		
+	})<% }) %>
+	<% }) %>	
 	
 }
 

@@ -31,6 +31,7 @@ export async function createModuleHeaderEditMjs(context, sectionName='header', s
 		const entityData = context.entities[entityName]
 
 		const fields = []
+		const fieldHandles = []
 		for (var fieldName in entityData.Items) {
 			const item = entityData.Items[fieldName]
 
@@ -38,11 +39,38 @@ export async function createModuleHeaderEditMjs(context, sectionName='header', s
 				continue
 			}
 
+
+			const component = item.component
 			const fieldname = item.data_fieldname
 			const inputname = item.input_name
 			const elementId = `${modulePart}-${item.input_name}`
 
+
+			const handles = []
+			for (let eventname in item.Handle) {
+				let createhandle = item.Handle[eventname]
+				if (createhandle) {
+					if (eventname=='selecting' && component=='Combobox') {
+						handles.push({
+							eventname,
+							appId: item.Reference.loaderApiModule,
+							path: item.Reference.loaderApiPath,
+							field_value: item.Reference.bindingValue,
+							field_text: item.Reference.bindingText, 
+						})
+					} else {
+						handles.push({eventname})
+					}
+				}
+			}
+
+			if (handles.length>0) {
+				fieldHandles.push({component, inputname, handles})
+			}
+
+
 			fields.push({  
+				component,
 				fieldname,
 				inputname,
 				elementId
@@ -50,14 +78,15 @@ export async function createModuleHeaderEditMjs(context, sectionName='header', s
 		}
 
 
-		
+
 		const variables = {
 			title: title,
 			modulePart: modulePart,
 			moduleName: moduleName,
 			moduleSection:  kebabToCamel(`${moduleName}-${sectionName}`),
 			moduleList: kebabToCamel(`${moduleName}-${sectionName}-list`),
-			fields: fields
+			fields: fields,
+			fieldHandles
 		}
 
 		

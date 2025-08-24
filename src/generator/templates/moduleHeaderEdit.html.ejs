@@ -1,4 +1,4 @@
-<form id="<%= modulePart %>-frm" class="module-form" locked="true" autoid="true" primarykey="<%= primaryKeyElementId %>"><% fields.forEach(field => { %>
+<form id="<%= modulePart %>-frm" class="module-form" locked="true" autoid="<%= autoid %>" primarykey="<%= primaryKeyElementId %>"><% fields.forEach(field => { %>
 
 	<!-- <%= field.component %>: <%= field.fieldname %>-->	
 	<div id="<%= field.elementId %>-container" class="<%= field.cssContainer %>" field="<%= field.elementId %>">

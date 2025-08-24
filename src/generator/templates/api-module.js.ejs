@@ -48,15 +48,30 @@ async function <%= moduleName %>_init(self, body) {
 	console.log('init generator')
 	self.req.session.sid = self.req.sessionID
 
-	return {
-		userId: self.context.userId,
-		userFullname: self.context.userFullname,
-		sid: self.context.sid ,
-		notifierId: self.context.notifierId,
-		notifierSocket: self.context.notifierSocket
+	try {
+		// ambil data app dari database
+		const sql = 'select apps_id, apps_url from core."apps"'
+		const result = await db.any(sql)
+
+		const appsUrls = {}
+		for (let row of result) {
+			appsUrls[row.apps_id] = {
+				url: row.apps_url
+			}
+		}
+
+		return {
+			userId: self.context.userId,
+			userFullname: self.context.userFullname,
+			sid: self.context.sid ,
+			notifierId: self.context.notifierId,
+			notifierSocket: self.context.notifierSocket,
+			appsUrls: appsUrls
+		}
+	} catch (err) {
+		throw err
 	}
 }
-
 
 
 async function <%= moduleName %>_headerList(self, body) {
@@ -67,6 +82,12 @@ async function <%= moduleName %>_headerList(self, body) {
 
 	try {
 	
+		// jika tidak ada default searchtext
+		if (searchMap.searchtext===undefined) {
+			throw new Error(`'searchtext' belum didefinisikan di searchMap`)	
+		}
+		
+
 		// hilangkan criteria '' atau null
 		for (var cname in criteria) {
 			if (criteria[cname]==='' || criteria[cname]===null) {
@@ -132,12 +153,16 @@ async function <%= moduleName %>_headerOpen(self, body) {
 		})
 		const data = await db.one(sql, queryParams);
 		if (data==null) { 
-			throw new Error("data tidak ditemukan") 
+			throw new Error(`[${headerTableName}] data dengan id '${id}' tidak ditemukan`) 
 		}	
 
+		<% headerFieldsLookup.forEach(lookup => { %>// lookup: <%= lookup.bindingDisplay %> dari field <%= lookup.bindingText %> pada table <%= lookup.table %> dimana (<%= lookup.table %>.<%= lookup.bindingValue %> = <%= headerTableName %>.<%=lookup.fieldname%>)
+		{
+			const { <%= lookup.bindingText %> } = await sqlUtil.lookupdb(db, '<%= lookup.table %>', '<%=lookup.bindingValue%>', data.<%=lookup.fieldname%>)
+			data.<%= lookup.bindingDisplay %> = <%= lookup.bindingText %>
+		}
+		<% }) %>
 
-		// lookup data
-		// TODO: buat program untuk lookup data disini
 
 
 		// pasang extender untuk olah data
@@ -162,7 +187,9 @@ async function <%= moduleName %>_headerCreate(self, body) {
 		data._createdate = (new Date()).toISOString()
 
 
-		const cmd = sqlUtil.createInsertCommand(headerTableName, data, ['<%= headerPrimaryKey %>'])
+		<% if (autoid) { %>const cmd = sqlUtil.createInsertCommand(headerTableName, data, ['<%= headerPrimaryKey %>'])<% }
+		else
+		{ %>const cmd = sqlUtil.createInsertCommand(headerTableName, data)<% } %>
 		const result = await cmd.execute(data)
 		
 		// record log

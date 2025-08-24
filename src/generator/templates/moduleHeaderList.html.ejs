@@ -7,8 +7,7 @@
 
 <table id="<%= modulePart %>-tbl" fgta5-component="Gridview">
 	<thead>
-		<tr data-header key="<%= section.primaryKey %>">
-			<th autonumber>No</th><% fields.forEach(field => { %>
+		<tr data-header key="<%= section.primaryKey %>"><% fields.forEach(field => { %>
 			<th data-name="<%= field.dataName %>" binding="<%= field.binding %>" <%- field.additionalAttributes %>><%= field.label %></th><% }); %>
 		</tr>
 	</thead>

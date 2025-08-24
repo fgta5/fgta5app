@@ -137,6 +137,23 @@ async function openRow(self, tr) {
 }
 
 
+async function listRows(self, criteria, offset,limit, sort) {
+	const url = `/${Context.moduleName}/header-list`
+	try {
+		const columns = []
+		const result = await self.apiCall(url, {  
+			columns,
+			criteria,
+			offset,
+			limit,
+			sort
+		}) 
+		return result 
+	} catch (err) {
+		throw err	
+	} 
+}
+
 async function tbl_nextdata(self, evt) {
 	const criteria = evt.detail.criteria
 	const limit = evt.detail.limit
@@ -198,6 +215,24 @@ async function tbl_loadData(self, params={}) {
 		sort = tbl.getSort()
 	}
 
+	let mask = $fgta5.Modal.createMask()
+	try {
+		const result = await listRows(self, criteria, offset,limit, sort)
+
+		if (offset===0) {
+			tbl.clear()
+		}
+		tbl.addRows(result.data)
+		tbl.setNext(result.nextoffset, result.limit)
+	} catch (err) {
+		console.error(err)
+		$fgta5.MessageBox.error(err.message)
+	} finally {
+		mask.close()
+		mask = null
+	}
+
+	/*
 	const args = {
 		method: 'POST',
 		headers: {
@@ -241,5 +276,5 @@ async function tbl_loadData(self, params={}) {
 		loader = null
 		mask = null
 	}
-	
+	*/	
 }

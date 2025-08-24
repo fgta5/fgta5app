@@ -111,116 +111,125 @@ async function newData(self, datainit) {
 
 async function openData(self, id) {
 	CurrentState.currentOpenedId = id
-	const args = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			id: id
-		})
-	}
 
-	let loader = new $fgta5.Dataloader() 
+	const url = `/${Context.moduleName}/header-open`
 	try {
-
-		const resp = await loader.load('/user/header-open', args)
-		if (resp.code!=0) {
-			throw new Error(resp.message)
-		}
-
-		return resp.result
-		// frm.setData(resp.result)
-		// frm.acceptChanges()
+		const result = await self.apiCall(url, { id }) 
+		return result 
 	} catch (err) {
 		CurrentState.currentOpenedId = null
-		throw err
-	} finally {
-		loader.dispose()
-		loader = null
-	}
+		throw err	
+	} 
 }
 
 async function createData(self, data) {
-	const args = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			source: Source,
-			data: data
-		})
-	}
 
-	let loader = new $fgta5.Dataloader() 
+	const url = `/${Context.moduleName}/header-create`
 	try {
-
-		const resp = await loader.load('/user/header-create', args)
-		if (resp.code!=0) {
-			throw new Error(resp.message)
-		}
-
-		return resp.result 
+		const result = await self.apiCall(url, { data, source: Source }) 
+		return result 
 	} catch (err) {
-		throw err
-	}
+		throw err	
+	} 
+
+	// const args = {
+	// 	method: 'POST',
+	// 	headers: {
+	// 		'Content-Type': 'application/json'
+	// 	},
+	// 	body: JSON.stringify({
+	// 		source: Source,
+	// 		data: data
+	// 	})
+	// }
+
+	// let loader = new $fgta5.Dataloader() 
+	// try {
+
+	// 	const resp = await loader.load('/user/header-create', args)
+	// 	if (resp.code!=0) {
+	// 		throw new Error(resp.message)
+	// 	}
+
+	// 	return resp.result 
+	// } catch (err) {
+	// 	throw err
+	// }
+	
 }
 
 
 async function updateData(self, data) {
-	const args = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			source: Source,
-			data: data
-		})
-	}
 
-	let loader = new $fgta5.Dataloader() 
+	const url = `/${Context.moduleName}/header-update`
 	try {
-
-		const resp = await loader.load('/user/header-update', args)
-		if (resp.code!=0) {
-			throw new Error(resp.message)
-		}
-
-		return resp.result 
+		const result = await self.apiCall(url, { data, source: Source }) 
+		return result 
 	} catch (err) {
-		throw err
-	}
+		throw err	
+	} 
+
+	// const args = {
+	// 	method: 'POST',
+	// 	headers: {
+	// 		'Content-Type': 'application/json'
+	// 	},
+	// 	body: JSON.stringify({
+	// 		source: Source,
+	// 		data: data
+	// 	})
+	// }
+
+	// let loader = new $fgta5.Dataloader() 
+	// try {
+
+	// 	const resp = await loader.load('/user/header-update', args)
+	// 	if (resp.code!=0) {
+	// 		throw new Error(resp.message)
+	// 	}
+
+	// 	return resp.result 
+	// } catch (err) {
+	// 	throw err
+	// }
 }
 
 async function deleteData(self, id) {
-	const args = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			source: Source,
-			id: id
-		})
-	}
 
-	let loader = new $fgta5.Dataloader() 
+	const url = `/${Context.moduleName}/header-delete`
 	try {
-
-		const resp = await loader.load('/user/header-delete', args)
-		if (resp.code!=0) {
-			throw new Error(resp.message)
-		}
-
-		return resp.result
+		const result = await self.apiCall(url, { id, source: Source }) 
+		return result 
 	} catch (err) {
-		throw err
-	} finally {
-		loader.dispose()
-		loader = null
-	}
+		throw err	
+	} 
+
+	// const args = {
+	// 	method: 'POST',
+	// 	headers: {
+	// 		'Content-Type': 'application/json'
+	// 	},
+	// 	body: JSON.stringify({
+	// 		source: Source,
+	// 		id: id
+	// 	})
+	// }
+
+	// let loader = new $fgta5.Dataloader() 
+	// try {
+
+	// 	const resp = await loader.load('/user/header-delete', args)
+	// 	if (resp.code!=0) {
+	// 		throw new Error(resp.message)
+	// 	}
+
+	// 	return resp.result
+	// } catch (err) {
+	// 	throw err
+	// } finally {
+	// 	loader.dispose()
+	// 	loader = null
+	// }
 }
 
 
@@ -283,7 +292,7 @@ async function  frm_unlocked(self, evt) {
 
 
 async function setPrimaryKeyState(self, opt) {
-	const obj_pk = CurrentState.obj_pk 
+	const obj_pk = frm.getPrimaryInput()
 	obj_pk.disabled = opt.disabled===true
 	if (opt.placeholder!==undefined) {
 		obj_pk.placeholder = opt.placeholder
@@ -410,8 +419,8 @@ async function btn_save_click(self, evt) {
 		}
 
 		console.log('result', result)
-		const obj_pk = CurrentState.obj_pk 
-		const pk = CurrentState.key
+		const obj_pk = frm.getPrimaryInput()
+		const pk = obj_pk.getBindingData()
 		const idValue = result[pk]
 
 		console.log(`get data id ${idValue}`)
@@ -466,7 +475,7 @@ async function btn_del_click(self, evt) {
 		return
 	}
 
-	const obj_pk = CurrentState.obj_pk 
+	const obj_pk = frm.getPrimaryInput()
 	const idValue = obj_pk.value
 
 	// konfirmasi untuk delete data

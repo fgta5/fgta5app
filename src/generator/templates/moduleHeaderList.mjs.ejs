@@ -136,6 +136,22 @@ async function openRow(self, tr) {
 	}
 }
 
+async function listRows(self, criteria, offset,limit, sort) {
+	const url = `/${Context.moduleName}/header-list`
+	try {
+		const columns = []
+		const result = await self.apiCall(url, {  
+			columns,
+			criteria,
+			offset,
+			limit,
+			sort
+		}) 
+		return result 
+	} catch (err) {
+		throw err	
+	} 
+}
 
 async function tbl_nextdata(self, evt) {
 	const criteria = evt.detail.criteria
@@ -198,47 +214,21 @@ async function tbl_loadData(self, params={}) {
 		sort = tbl.getSort()
 	}
 
-	const args = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			columns: [],
-			criteria: criteria,
-			offset: offset,
-			limit: limit,
-			sort: sort
-		})
-	}
-
+	
 	let mask = $fgta5.Modal.createMask()
-	let loader = new $fgta5.Dataloader() 
 	try {
-		const resp = await loader.load('/<%= moduleName %>/header-list', args)
-		const code = resp.code
-		const message = resp.message
-		const result = resp.result
+		const result = await listRows(self, criteria, offset,limit, sort)
 
-		if (code!=0) {
-			const err = new Error('Server Error: ' + message)
-			err.code = code
-			throw err
-		}
-
-		if (offset===undefined) {
+		if (offset===0) {
 			tbl.clear()
 		}
 		tbl.addRows(result.data)
 		tbl.setNext(result.nextoffset, result.limit)
-
 	} catch (err) {
 		console.error(err)
 		$fgta5.MessageBox.error(err.message)
 	} finally {
 		mask.close()
-		loader.dispose()
-		loader = null
 		mask = null
 	}
 	

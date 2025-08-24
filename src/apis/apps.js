@@ -4,11 +4,11 @@ import db from '../app-db.js'
 import Api from '../api.js'
 import sqlUtil from '@agung_dhewe/pgsqlc'
 
-import * as Extender from './extenders/<%= moduleName %>-apiext.js'
+import * as Extender from './extenders/apps-apiext.js'
 
-const moduleName = '<%= moduleName %>'
+const moduleName = 'apps'
 const headerSectionName = 'header'
-const headerTableName = '<%= headerTableName %>'
+const headerTableName = 'core.apps'
 
 // api: account
 export default class extends Api {
@@ -32,19 +32,19 @@ export default class extends Api {
 	// dipanggil dengan model snake syntax
 	// contoh: header-list
 	//         header-open-data
-	async init(body) { return await <%= moduleName %>_init(this, body) }
+	async init(body) { return await apps_init(this, body) }
 
 	// header
-	async headerList(body) { return await <%= moduleName %>_headerList(this, body) }
-	async headerOpen(body) { return await <%= moduleName %>_headerOpen(this, body) }
-	async headerUpdate(body) { return await <%= moduleName %>_headerUpdate(this, body)}
-	async headerCreate(body) { return await <%= moduleName %>_headerCreate(this, body)}
-	async headerDelete(body) { return await <%= moduleName %>_headerDelete(this, body) }
+	async headerList(body) { return await apps_headerList(this, body) }
+	async headerOpen(body) { return await apps_headerOpen(this, body) }
+	async headerUpdate(body) { return await apps_headerUpdate(this, body)}
+	async headerCreate(body) { return await apps_headerCreate(this, body)}
+	async headerDelete(body) { return await apps_headerDelete(this, body) }
 
 }
 
 
-async function <%= moduleName %>_init(self, body) {
+async function apps_init(self, body) {
 	console.log('init generator')
 	self.req.session.sid = self.req.sessionID
 
@@ -59,10 +59,9 @@ async function <%= moduleName %>_init(self, body) {
 
 
 
-async function <%= moduleName %>_headerList(self, body) {
+async function apps_headerList(self, body) {
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
-	const searchMap = {<% headerSearchMap.forEach(searchmap => { %>
-		<%= searchmap.name %>: `<%- searchmap.data %>`,<% }) %>
+	const searchMap = {
 	};
 
 	try {
@@ -115,11 +114,11 @@ async function <%= moduleName %>_headerList(self, body) {
 	}
 }
 
-async function <%= moduleName %>_headerOpen(self, body) {
+async function apps_headerOpen(self, body) {
 	try {
 		const { id } = body 
-		const criteria = { <%= headerPrimaryKey %>: id }
-		const searchMap = { <%= headerPrimaryKey %>: `<%= headerPrimaryKey %> = \${<%= headerPrimaryKey %>}`}
+		const criteria = { apps_id: id }
+		const searchMap = { apps_id: `apps_id = \${apps_id}`}
 		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
 		const sql = sqlUtil.createSqlSelect({
 			tablename: headerTableName, 
@@ -152,7 +151,7 @@ async function <%= moduleName %>_headerOpen(self, body) {
 }
 
 
-async function <%= moduleName %>_headerCreate(self, body) {
+async function apps_headerCreate(self, body) {
 	const { source, data } = body
 
 	try {
@@ -162,11 +161,11 @@ async function <%= moduleName %>_headerCreate(self, body) {
 		data._createdate = (new Date()).toISOString()
 
 
-		const cmd = sqlUtil.createInsertCommand(headerTableName, data, ['<%= headerPrimaryKey %>'])
+		const cmd = sqlUtil.createInsertCommand(headerTableName, data, ['apps_id'])
 		const result = await cmd.execute(data)
 		
 		// record log
-		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'CREATE', id: result.<%= headerPrimaryKey %>}
+		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'CREATE', id: result.apps_id}
 		await self.log(logdata)
 		
 		return result
@@ -175,7 +174,7 @@ async function <%= moduleName %>_headerCreate(self, body) {
 	}
 }
 
-async function <%= moduleName %>_headerUpdate(self, body) {
+async function apps_headerUpdate(self, body) {
 	const { source, data } = body
 
 	try {
@@ -184,11 +183,11 @@ async function <%= moduleName %>_headerUpdate(self, body) {
 		data._modifyby = 1
 		data._modifydate = (new Date()).toISOString()
 		
-		const cmd =  sqlUtil.createUpdateCommand(headerTableName, data, ['<%= headerPrimaryKey %>'])
+		const cmd =  sqlUtil.createUpdateCommand(headerTableName, data, ['apps_id'])
 		const result = await cmd.execute(data)
 		
 		// record log
-		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'UPDATE', id: data.<%= headerPrimaryKey %>} 
+		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'UPDATE', id: data.apps_id} 
 		await self.log(logdata)
 
 		return result
@@ -198,13 +197,13 @@ async function <%= moduleName %>_headerUpdate(self, body) {
 }
 
 
-async function <%= moduleName %>_headerDelete(self, body) {
+async function apps_headerDelete(self, body) {
 
 	try {
 		const { source, id } = body 
-		const dataToRemove = {<%= headerPrimaryKey %>: id}
+		const dataToRemove = {apps_id: id}
 
-		const cmd = sqlUtil.createDeleteCommand(headerTableName, ['<%= headerPrimaryKey %>'])
+		const cmd = sqlUtil.createDeleteCommand(headerTableName, ['apps_id'])
 		const result = await cmd.execute(dataToRemove)
 	
 		// record log

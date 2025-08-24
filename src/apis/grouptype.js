@@ -4,11 +4,11 @@ import db from '../app-db.js'
 import Api from '../api.js'
 import sqlUtil from '@agung_dhewe/pgsqlc'
 
-import * as Extender from './extenders/user-apiext.js'
+import * as Extender from './extenders/grouptype-apiext.js'
 
-const moduleName = 'user'
+const moduleName = 'grouptype'
 const headerSectionName = 'header'
-const tablename = 'core.user'
+const headerTableName = 'core.grouptype'
 
 // api: account
 export default class extends Api {
@@ -32,17 +32,19 @@ export default class extends Api {
 	// dipanggil dengan model snake syntax
 	// contoh: header-list
 	//         header-open-data
-	async init(body) { return await module_init(this, body) }
-	async headerList(body) { return await headerList(this, body) }
-	async headerOpen(body) { return await headerOpen(this, body) }
-	async headerUpdate(body) { return await headerUpdate(this, body)}
-	async headerCreate(body) { return await headerCreate(this, body)}
-	async headerDelete(body) { return await headerDelete(this, body) }
+	async init(body) { return await grouptype_init(this, body) }
+
+	// header
+	async headerList(body) { return await grouptype_headerList(this, body) }
+	async headerOpen(body) { return await grouptype_headerOpen(this, body) }
+	async headerUpdate(body) { return await grouptype_headerUpdate(this, body)}
+	async headerCreate(body) { return await grouptype_headerCreate(this, body)}
+	async headerDelete(body) { return await grouptype_headerDelete(this, body) }
 
 }
 
 
-async function module_init(self, body) {
+async function grouptype_init(self, body) {
 	console.log('init generator')
 	self.req.session.sid = self.req.sessionID
 
@@ -57,12 +59,10 @@ async function module_init(self, body) {
 
 
 
-async function headerList(self, body) {
+async function grouptype_headerList(self, body) {
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
 	const searchMap = {
-		searchtext: `user_fullname ILIKE '%' || \${searchtext} || '%' OR user_id=try_cast_bigint(\${searchtext}, 0)`,
-		searchgroup: `group_id = \${searchgroup}`,
-		user_isdisabled: `user_isdisabled = \${user_isdisabled}`
+		search: `grouptype_id=try_cast_int(\${search}, 0) OR grouptype_name ILIKE '%' || \${search} || '%' OR grouptype_descr ILIKE '%' || \${search} || '%'`,
 	};
 
 	try {
@@ -77,7 +77,7 @@ async function headerList(self, body) {
 
 		var max_rows = limit==0 ? 10 : limit
 		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
-		const sql = sqlUtil.createSqlSelect({tablename, columns, whereClause, sort, limit:max_rows+1, offset, queryParams})
+		const sql = sqlUtil.createSqlSelect({tablename:headerTableName, columns, whereClause, sort, limit:max_rows+1, offset, queryParams})
 		const rows = await db.any(sql, queryParams);
 
 		
@@ -87,7 +87,9 @@ async function headerList(self, body) {
 			i++
 			if (i>max_rows) { break }
 
-			
+			// TODO: buat program untuk lookup data disini
+
+
 			// pasang extender di sini
 			if (typeof Extender.headerListRow === 'function') {
 				await Extender.headerListRow(row)
@@ -113,14 +115,14 @@ async function headerList(self, body) {
 	}
 }
 
-async function headerOpen(self, body) {
+async function grouptype_headerOpen(self, body) {
 	try {
 		const { id } = body 
-		const criteria = { user_id: id }
-		const searchMap = { user_id: `user_id = \${user_id}`}
+		const criteria = { grouptype_id: id }
+		const searchMap = { grouptype_id: `grouptype_id = \${grouptype_id}`}
 		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
 		const sql = sqlUtil.createSqlSelect({
-			tablename, 
+			tablename: headerTableName, 
 			columns:[], 
 			whereClause, 
 			sort:{}, 
@@ -133,17 +135,10 @@ async function headerOpen(self, body) {
 			throw new Error("data tidak ditemukan") 
 		}	
 
-		// lokkup group_name
-		{
-			const { group_name } = await sqlUtil.lookupdb(db, 'core."group"', 'group_id', data.group_id)
-			data.group_name = group_name
-		}
 
-		// lokkup group_name
-		{
-			const { group_name } = await sqlUtil.lookupdb(db, 'core."group"', 'group_id', data.group_id)
-			data.group_name = group_name
-		}	
+		// lookup data
+		// TODO: buat program untuk lookup data disini
+
 
 		// pasang extender untuk olah data
 		if (typeof Extender.headerOpen === 'function') {
@@ -157,7 +152,7 @@ async function headerOpen(self, body) {
 }
 
 
-async function headerCreate(self, body) {
+async function grouptype_headerCreate(self, body) {
 	const { source, data } = body
 
 	try {
@@ -167,11 +162,12 @@ async function headerCreate(self, body) {
 		data._createdate = (new Date()).toISOString()
 
 
-		const cmd = sqlUtil.createInsertCommand(tablename, data, ['user_id'])
+		const cmd = sqlUtil.createInsertCommand(headerTableName, data, ['grouptype_id'])
 		const result = await cmd.execute(data)
 		
 		// record log
-		await self.log({source, tablename, section:headerSectionName, action:'CREATE', id: result.user_id})
+		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'CREATE', id: result.grouptype_id}
+		await self.log(logdata)
 		
 		return result
 	} catch (err) {
@@ -179,7 +175,7 @@ async function headerCreate(self, body) {
 	}
 }
 
-async function headerUpdate(self, body) {
+async function grouptype_headerUpdate(self, body) {
 	const { source, data } = body
 
 	try {
@@ -188,14 +184,11 @@ async function headerUpdate(self, body) {
 		data._modifyby = 1
 		data._modifydate = (new Date()).toISOString()
 		
-		const cmd =  sqlUtil.createUpdateCommand(tablename, data, ['user_id'])
+		const cmd =  sqlUtil.createUpdateCommand(headerTableName, data, ['grouptype_id'])
 		const result = await cmd.execute(data)
 		
 		// record log
-		let logdata = {source, tablename, section:headerSectionName, action:'UPDATE', id: data.user_id} 
-		if (typeof Extender.logHeaderUpdate === 'function') {
-			await Extender.logHeaderUpdate(logdata, data, result)
-		}
+		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'UPDATE', id: data.grouptype_id} 
 		await self.log(logdata)
 
 		return result
@@ -205,17 +198,18 @@ async function headerUpdate(self, body) {
 }
 
 
-async function headerDelete(self, body) {
+async function grouptype_headerDelete(self, body) {
 
 	try {
 		const { source, id } = body 
-		const dataToRemove = {user_id: id}
+		const dataToRemove = {grouptype_id: id}
 
-		const cmd = sqlUtil.createDeleteCommand(tablename, ['user_id'])
+		const cmd = sqlUtil.createDeleteCommand(headerTableName, ['grouptype_id'])
 		const result = await cmd.execute(dataToRemove)
 	
 		// record log
-		await self.log({source, tablename, section:headerSectionName, action:'DELETE', id})
+		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'DELETE', id}
+		await self.log(logdata)
 
 		return result
 	} catch (err) {

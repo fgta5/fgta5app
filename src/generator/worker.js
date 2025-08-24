@@ -81,12 +81,14 @@ async function generate(data) {
 		await prepareDirectory(context, {overwrite:true})
 		await sleep(jedaWaktu)
 
+		
 		await createApiModule(context, {overwrite:true})
 		await sleep(jedaWaktu)
 
 		await createApiExtenderModule(context, {overwrite:true})
 		await sleep(jedaWaktu)
 
+		
 		await createTable(context, {overwrite:true})
 		await sleep(jedaWaktu)
 

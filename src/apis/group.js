@@ -108,7 +108,12 @@ async function group_headerList(self, body) {
 			i++
 			if (i>max_rows) { break }
 
-			// TODO: buat program untuk lookup data disini
+			// lookup: grouptype_name dari field grouptype_name pada table core.grouptype dimana (core.grouptype.grouptype_id = core.group.grouptype_id)
+			{
+				const { grouptype_name } = await sqlUtil.lookupdb(db, 'core.grouptype', 'grouptype_id', row.grouptype_id)
+				row.grouptype_name = grouptype_name
+			}
+			
 
 
 			// pasang extender di sini

@@ -103,23 +103,55 @@ router.use((req, res, next) => {
 
 
 router.get('/', (req, res) => {
-
-	// kedepannya set ini untuk keperluan login
-	req.session.user = {
-		userId: '234',
-		userName: 'agung',
-		userFullname: 'Agung Nugroho'
-	}
-
-	console.log(req.session)
-	
 	const sessionId = req.sessionID;
 	console.log('Created Session ID:', sessionId);
 
-	res.render('index', {
-		title: 'Fgta5js Development',
-	});
+	const modulename = 'container';
+	try {
+
+		res.render('container', {
+			modulename,
+			title: 'Container',
+			fgta5jsDebugMode,
+			fgta5jsVersion: fgta5jsVersion==='' ? '' : `-${fgta5jsVersion}`,
+			appDebugMode		
+		});
+	} catch (err) {
+		err.Context = { modulename, ejsPath}
+		handlePageError(err, res, next)
+		logger.access(req.session.user, modulename, fullUrlWithHostHeader, err)
+
+	}
 })
+
+
+router.get('/login', (req, res) => {
+	// kedepannya set ini untuk keperluan login
+	// req.session.user = {
+	// 	userId: '234',
+	// 	userName: 'agung',
+	// 	userFullname: 'Agung Nugroho'
+	// }
+
+	const modulename = 'login';
+	try {
+		res.render('login', {
+			modulename,
+			title: 'Login',
+			fgta5jsDebugMode,
+			fgta5jsVersion: fgta5jsVersion==='' ? '' : `-${fgta5jsVersion}`,
+			appDebugMode	
+		});
+	} catch (err) {
+		err.Context = { modulename, ejsPath}
+		handlePageError(err, res, next)
+		logger.access(req.session.user, modulename, fullUrlWithHostHeader, err)
+
+	}
+
+	// res.status(200).send('Dummy Login')
+})
+
 
 router.get('/:modulename', async(req, res, next)=>{
 	const modulename = req.params.modulename;

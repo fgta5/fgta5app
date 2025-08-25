@@ -65,10 +65,11 @@ export default class Module {
 				await $fgta5.MessageBox.error(err.message)
 				if (this.isInFrame()) {
 					window.parent.postMessage({
-						action:'REDIRECT_TO_LOGIN'
+						action:'REDIRECT_TO_LOGIN',
+						href: '/login'
 					}, '*')
 				} else {
-					location.href = '/'
+					location.href = '/login'
 				}
 				await this.sleep(10000)
 				throw err				

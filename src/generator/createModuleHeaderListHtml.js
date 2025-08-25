@@ -43,6 +43,7 @@ export async function createModuleHeaderListHtml(context, sectionName='header', 
 			const dataName = item.name
 			const binding = item.data_fieldname
 			const label = item.input_label
+			const {bindingValue, bindingText, bindingDisplay, table} = item.Reference
 			
 			// additional attributes
 			const attrs = []
@@ -68,8 +69,8 @@ export async function createModuleHeaderListHtml(context, sectionName='header', 
 			// masukkan ke fields
 			fields.push({  
 				component,
-				dataName,
-				binding,
+				dataName: bindingDisplay!=null ? bindingDisplay : dataName, 
+				binding: bindingDisplay!=null ? bindingDisplay : binding,
 				label,
 				additionalAttributes
 			})

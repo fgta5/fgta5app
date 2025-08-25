@@ -48,24 +48,46 @@ async function apps_init(self, body) {
 	console.log('init generator')
 	self.req.session.sid = self.req.sessionID
 
-	return {
-		userId: self.context.userId,
-		userFullname: self.context.userFullname,
-		sid: self.context.sid ,
-		notifierId: self.context.notifierId,
-		notifierSocket: self.context.notifierSocket
+	try {
+		// ambil data app dari database
+		const sql = 'select apps_id, apps_url from core."apps"'
+		const result = await db.any(sql)
+
+		const appsUrls = {}
+		for (let row of result) {
+			appsUrls[row.apps_id] = {
+				url: row.apps_url
+			}
+		}
+
+		return {
+			userId: self.context.userId,
+			userFullname: self.context.userFullname,
+			sid: self.context.sid ,
+			notifierId: self.context.notifierId,
+			notifierSocket: self.context.notifierSocket,
+			appsUrls: appsUrls
+		}
+	} catch (err) {
+		throw err
 	}
 }
-
 
 
 async function apps_headerList(self, body) {
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
 	const searchMap = {
+		searchtext: `apps_id = \${searchtext} OR apps_name ILIKE '%' || \${searchtext} || '%'`,
 	};
 
 	try {
 	
+		// jika tidak ada default searchtext
+		if (searchMap.searchtext===undefined) {
+			throw new Error(`'searchtext' belum didefinisikan di searchMap`)	
+		}
+		
+
 		// hilangkan criteria '' atau null
 		for (var cname in criteria) {
 			if (criteria[cname]==='' || criteria[cname]===null) {
@@ -86,7 +108,7 @@ async function apps_headerList(self, body) {
 			i++
 			if (i>max_rows) { break }
 
-			// TODO: buat program untuk lookup data disini
+			
 
 
 			// pasang extender di sini
@@ -131,12 +153,11 @@ async function apps_headerOpen(self, body) {
 		})
 		const data = await db.one(sql, queryParams);
 		if (data==null) { 
-			throw new Error("data tidak ditemukan") 
+			throw new Error(`[${headerTableName}] data dengan id '${id}' tidak ditemukan`) 
 		}	
 
+		
 
-		// lookup data
-		// TODO: buat program untuk lookup data disini
 
 
 		// pasang extender untuk olah data

@@ -108,7 +108,7 @@ async function grouptype_headerList(self, body) {
 			i++
 			if (i>max_rows) { break }
 
-			// TODO: buat program untuk lookup data disini
+			
 
 
 			// pasang extender di sini
@@ -153,12 +153,11 @@ async function grouptype_headerOpen(self, body) {
 		})
 		const data = await db.one(sql, queryParams);
 		if (data==null) { 
-			throw new Error("data tidak ditemukan") 
+			throw new Error(`[${headerTableName}] data dengan id '${id}' tidak ditemukan`) 
 		}	
 
+		
 
-		// lookup data
-		// TODO: buat program untuk lookup data disini
 
 
 		// pasang extender untuk olah data

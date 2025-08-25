@@ -21,11 +21,22 @@ export default class Api {
 
 	cekLogin(req) {
 		// jika req.session.user tidak ada datanya, berarti belum login 
-		if (req.session.user==null) {
-			const err = new Error('belum login')
+		try {
+			if (req.session.user==null) {
+				throw new Error('belum login')
+			}
+
+			if (req.session.user.isLogin==null) {
+				throw new Error('belum login')
+			}
+
+			if (req.session.user.isLogin==false) {
+				throw new Error('belum login')
+			}
+		} catch (err) {
 			err.code = 401
 			throw err
-		}	
+		}
 	}
 
 

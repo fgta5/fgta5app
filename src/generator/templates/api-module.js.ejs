@@ -108,7 +108,12 @@ async function <%= moduleName %>_headerList(self, body) {
 			i++
 			if (i>max_rows) { break }
 
-			// TODO: buat program untuk lookup data disini
+			<% headerFieldsLookup.forEach(lookup => { %>// lookup: <%= lookup.bindingDisplay %> dari field <%= lookup.bindingText %> pada table <%= lookup.table %> dimana (<%= lookup.table %>.<%= lookup.bindingValue %> = <%= headerTableName %>.<%=lookup.fieldname%>)
+			{
+				const { <%= lookup.bindingText %> } = await sqlUtil.lookupdb(db, '<%= lookup.table %>', '<%=lookup.bindingValue%>', row.<%=lookup.fieldname%>)
+				row.<%= lookup.bindingDisplay %> = <%= lookup.bindingText %>
+			}
+			<% }) %>
 
 
 			// pasang extender di sini

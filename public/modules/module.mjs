@@ -60,16 +60,19 @@ export default class Module {
 			const result = await api.execute(args)
 			return result 
 		} catch (err) {
+			const currentUrl = window.location.href;
 			if (err.code==401) {
 				console.error(err)
 				await $fgta5.MessageBox.error(err.message)
 				if (this.isInFrame()) {
 					window.parent.postMessage({
 						action:'REDIRECT_TO_LOGIN',
-						href: '/login'
+						href: '/login',
+						nexturl: currentUrl
+
 					}, '*')
 				} else {
-					location.href = '/login'
+					location.href = `/login?nexturl=${currentUrl}`
 				}
 				await this.sleep(10000)
 				throw err				

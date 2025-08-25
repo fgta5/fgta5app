@@ -41,7 +41,9 @@ async function main(self, args) {
 		appmgr.setMenu(Context.programs)
 		appmgr.setFavourite(Context.favourites)
 
-		// console.log(Context.programs)
+		appmgr.addEventListener('logout', (evt)=>{
+			appmgr_logout(self, evt)
+		})
 
 
 	} catch (err) {
@@ -49,3 +51,22 @@ async function main(self, args) {
 	}
 }
 
+async function appmgr_logout(self, evt) {
+	let mask = $fgta5.Modal.createMask()
+	try {
+		const apiLogout = new $fgta5.ApiEndpoint('login/do-logout')
+		const result = await apiLogout.execute({})
+		if (result) {
+			sessionStorage.removeItem('nextmodule');
+			sessionStorage.removeItem('login_nexturl');
+			sessionStorage.removeItem('login');
+			location.href = '/login'
+		}
+	} catch (err) {
+		console.log(err)
+		$fgta5.MessageBox.error(err.message)
+	} finally {
+		mask.close()
+		mask = null
+	}
+}

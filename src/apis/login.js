@@ -19,6 +19,7 @@ export default class extends Api {
 	//         header-open-data
 	async init(body) { return await login_init(this, body) }	
 	async doLogin(body) { return await login_doLogin(this, body) }	
+	async doLogout(body) { return await login_doLogout(this, body) }
 }
 
 
@@ -44,6 +45,15 @@ async function login_doLogin(self, body) {
 		} else {
 			return null
 		}
+	} catch (err) {
+		throw err
+	}
+}
+
+async function login_doLogout(self, body) {
+	try {
+		self.req.session.user = null
+		return true
 	} catch (err) {
 		throw err
 	}

@@ -1,4 +1,4 @@
-import { loadTemplate } from './../module.mjs'
+// import Module from './../module.mjs'
 import Context from './user-context.mjs'
 
 
@@ -13,7 +13,7 @@ export async function init(self, args) {
 	// self.Extender.cbo_group_id_selecting = ({evt}) => { cbo_group_id_selecting(self, evt) }
 
 	// tambahkan new user dialog
-	loadTemplate(self, 'dlg-newdata')
+	Module.loadTemplate('dlg-newdata')
 	Context.dlgNewData = new $fgta5.Dialog('dlg-newdata', {title:'New User'})
 	Context.dlgNewData.addAsyncEventListener('showing', async (evt) => { dlgNewData_showing(self, evt) })
 	Context.dlgNewData.addAsyncEventListener('ok', async (evt)=>{ await dlgNewData_ok(self, evt) })

@@ -1,4 +1,4 @@
-import Module from '../module.mjs'
+// import Module from '../module.mjs'
 import Context from './user-context.mjs'
 import * as Extender from './user-ext.mjs'
 
@@ -141,7 +141,7 @@ async function listRows(self, criteria, offset,limit, sort) {
 	const url = `/${Context.moduleName}/header-list`
 	try {
 		const columns = []
-		const result = await self.apiCall(url, {  
+		const result = await Module.apiCall(url, {  
 			columns,
 			criteria,
 			offset,

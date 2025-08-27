@@ -1,5 +1,3 @@
-import Module from './../module.mjs'
-
 const Context = {}
 const btn_login = document.getElementById('btn_login')
 const obj_username = document.getElementById('obj_username')

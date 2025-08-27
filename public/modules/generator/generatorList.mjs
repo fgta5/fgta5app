@@ -1,4 +1,3 @@
-import Module from '../module.mjs'
 import Context from './generator-context.mjs'
 import * as Extender from './generator-ext.mjs'
 

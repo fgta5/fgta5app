@@ -1,4 +1,3 @@
-import Module from './../module.mjs'
 import Context from './<%= moduleName %>-context.mjs'
 import * as Extender from './<%= moduleName %>-ext.mjs'
 
@@ -66,7 +65,7 @@ export async function init(self, args) {
 
 			cbo.wait()
 			try {
-				const result = await self.apiCall(url, {
+				const result = await Module.apiCall(url, {
 					searchtext: searchtext,
 					offset: evt.detail.offset,
 					limit: evt.detail.limit,
@@ -136,7 +135,7 @@ async function openData(self, id) {
 
 	const url = `/${Context.moduleName}/header-open`
 	try {
-		const result = await self.apiCall(url, { id }) 
+		const result = await Module.apiCall(url, { id }) 
 		return result 
 	} catch (err) {
 		CurrentState.currentOpenedId = null
@@ -147,7 +146,7 @@ async function openData(self, id) {
 async function createData(self, data) {
 	const url = `/${Context.moduleName}/header-create`
 	try {
-		const result = await self.apiCall(url, { data, source: Source }) 
+		const result = await Module.apiCall(url, { data, source: Source }) 
 		return result 
 	} catch (err) {
 		throw err	
@@ -158,7 +157,7 @@ async function createData(self, data) {
 async function updateData(self, data) {
 	const url = `/${Context.moduleName}/header-update`
 	try {
-		const result = await self.apiCall(url, { data, source: Source }) 
+		const result = await Module.apiCall(url, { data, source: Source }) 
 		return result 
 	} catch (err) {
 		throw err	
@@ -169,7 +168,7 @@ async function updateData(self, data) {
 async function deleteData(self, id) {
 	const url = `/${Context.moduleName}/header-delete`
 	try {
-		const result = await self.apiCall(url, { id, source: Source }) 
+		const result = await Module.apiCall(url, { id, source: Source }) 
 		return result 
 	} catch (err) {
 		throw err	

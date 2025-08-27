@@ -1,4 +1,4 @@
-import Module from './../module.mjs'
+// import Module from './../module.mjs'
 import Context from './user-context.mjs'
 import * as userHeaderList from './userHeaderList.mjs'
 import * as userHeaderEdit from './userHeaderEdit.mjs'
@@ -35,7 +35,7 @@ export default class extends Module {
 			
 			// inisiasi sisi server
 			try {
-				const result = await self.apiCall(`/${Context.moduleName}/init`, { })
+				const result = await Module.apiCall(`/${Context.moduleName}/init`, { })
 				Context.notifierId = result.notifierId
 				Context.notifierSocket = result.notifierSocket
 				Context.userId = result.userId
@@ -64,7 +64,7 @@ export default class extends Module {
 async function render(self) {
 	try {
 		const footerButtonsContainer =  document.getElementsByClassName('footer-buttons-container')
-		self.renderFooterButtons(footerButtonsContainer)
+		Module.renderFooterButtons(footerButtonsContainer)
 	
 		Crsl.addEventListener($fgta5.SectionCarousell.EVT_SECTIONSHOWING, (evt)=>{
 			var sectionId = evt.detail.commingSection.Id

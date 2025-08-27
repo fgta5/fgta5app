@@ -1,5 +1,3 @@
-import Module from './../module.mjs'
-
 const appElementId = 'mainapp'
 const appmgr = new $fgta5.AppManager(appElementId)
 const Context = {}
@@ -22,7 +20,7 @@ async function main(self, args) {
 	try {
 		// inisiasi sisi server
 		try {
-			const result = await self.apiCall(`/container/init`, { })
+			const result = await Module.apiCall(`/container/init`, { })
 			Context.notifierId = result.notifierId
 			Context.notifierSocket = result.notifierSocket
 			Context.userId = result.userId

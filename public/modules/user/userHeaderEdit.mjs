@@ -1,4 +1,4 @@
-import Module from './../module.mjs'
+// import Module from './../module.mjs'
 import Context from './user-context.mjs'
 import * as Extender from './user-ext.mjs'
 
@@ -116,7 +116,7 @@ async function openData(self, id) {
 
 	const url = `/${Context.moduleName}/header-open`
 	try {
-		const result = await self.apiCall(url, { id }) 
+		const result = await Module.apiCall(url, { id }) 
 		return result 
 	} catch (err) {
 		CurrentState.currentOpenedId = null
@@ -128,7 +128,7 @@ async function createData(self, data) {
 
 	const url = `/${Context.moduleName}/header-create`
 	try {
-		const result = await self.apiCall(url, { data, source: Source }) 
+		const result = await Module.apiCall(url, { data, source: Source }) 
 		return result 
 	} catch (err) {
 		throw err	
@@ -165,7 +165,7 @@ async function updateData(self, data) {
 
 	const url = `/${Context.moduleName}/header-update`
 	try {
-		const result = await self.apiCall(url, { data, source: Source }) 
+		const result = await Module.apiCall(url, { data, source: Source }) 
 		return result 
 	} catch (err) {
 		throw err	

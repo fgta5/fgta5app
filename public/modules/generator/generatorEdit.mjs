@@ -1,4 +1,3 @@
-import Module from './../module.mjs'
 import Context from './generator-context.mjs'
 import AppGenUI from './appgen-ui.mjs'
 import * as Extender from './generator-ext.mjs'
@@ -156,7 +155,7 @@ async function btn_generate_click(self, evt)  {
 async function Save(self, data) {
 	const url = `/${Context.moduleName}/save`
 	try {
-		const result = await self.apiCall(url, { data }) 
+		const result = await Module.apiCall(url, { data }) 
 		return result 
 	} catch (err) {
 		throw err	

@@ -17,7 +17,7 @@
 			"public/libs/fgta5js/fonts": true,
 			"public/libs/fgta5js/images": true,
 			"public/libs/fgta5js/views": true,
-			"public/libs/fgta5js/src/*.*": true,
+			// "public/libs/fgta5js/src/*.*": true,
 			"public/libs/fgta5js/*.*": true,
 			"public/libs/fgta5js/LICENSE": true,
 			"public/libs/-*": true,
